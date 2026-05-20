@@ -88,7 +88,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main style={{ background: s.cream, overflowX: "hidden" }}>
+    <main style={{ background: s.cream, overflowX: "hidden", position: "relative" }}>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
@@ -158,18 +158,17 @@ export default function HomePage() {
 
           <div className="fi1" style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
             <div className="divider" />
-            <span style={{ ...s.eyebrow, color: s.amber, fontSize: 11 }}>West Africa · Agriculture · Education · Community</span>
+            <span style={{ ...s.eyebrow, color: s.amber, fontSize: 11 }}>West Africa · Agriculture · Education</span>
           </div>
 
           <h1 className="hero-title su1" style={{ ...s.display, fontSize: "clamp(56px,7vw,104px)", fontWeight: 400, color: s.white, lineHeight: 1.03, marginBottom: 32, maxWidth: 760 }}>
-            Where a child<br />
-            gets <em style={{ color: s.amber, fontStyle: "italic" }}>everything</em><br />
-            <span style={{ fontWeight: 700 }}>they need</span><br />
-            <span style={{ fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>to become who they are.</span>
+            To be seen.<br />
+            To be heard.<br />
+            <em style={{ color: s.amber, fontStyle: "italic" }}>To stay in school.</em>
           </h1>
 
           <p className="su2" style={{ ...s.body, color: "rgba(255,255,255,0.6)", fontSize: 16, maxWidth: 480, marginBottom: 48 }}>
-            School fees. Hostel. Exam registration. Food on the table. Skills for a lifetime. Greenforce Foundation walks every step with students and communities in Ghana and The Gambia.
+            We don't watch from afar. Greenforce Foundation protects the vulnerable, ensuring poverty never cuts a child's story short.
           </p>
 
           <div className="su3" style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
@@ -203,7 +202,7 @@ export default function HomePage() {
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "40px 48px" }}>
               <span style={{ ...s.eyebrow, fontSize: 10, color: s.amber, display: "block", marginBottom: 12 }}>The Reality</span>
               <p style={{ ...s.display, fontSize: "clamp(22px,2.5vw,32px)", fontStyle: "italic", color: s.white, lineHeight: 1.3, fontWeight: 400 }}>
-                "Every child who doesn't<br />make it in had a reason."
+                "No child simply chooses to drift away."
               </p>
             </div>
           </div>
@@ -212,11 +211,11 @@ export default function HomePage() {
             <Reveal>
               <div className="divider" style={{ marginBottom: 32 }} />
               <p style={{ ...s.display, fontSize: "clamp(28px,3vw,44px)", color: s.white, lineHeight: 1.25, fontWeight: 400, marginBottom: 28 }}>
-                Most children don't drop out.<br />
-                <em style={{ color: s.amber }}>They get pushed out</em> —<br />by what they couldn't afford.
+                Potential is everywhere.<br />
+                <em style={{ color: s.amber }}>Belief is rare.</em><br />We protect the spaces in between.
               </p>
               <p style={{ ...s.body, color: "rgba(255,255,255,0.5)", fontSize: 15, marginBottom: 40, maxWidth: 400 }}>
-                School fees unpaid. Exam forms unsubmitted. No hostel, so no school. No food, so no focus. The system doesn't fail them loudly — it fails them quietly, one unmet need at a time. We show up precisely where those needs are.
+                A missed fee, an unsubmitted paper, or an empty stomach shouldn't dictate a destiny. The system forgets them quietly—one overlooked need at a time. We protect their placement, keeping paths clear so they can simply learn.
               </p>
               <Link href="/about" style={{ ...s.eyebrow, color: s.amber, display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, transition: "gap .3s" }}
                 onMouseEnter={e => (e.currentTarget.style.gap = "16px")}
@@ -264,44 +263,37 @@ export default function HomePage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "rgba(255,255,255,0.04)" }} className="three-col">
             {[
               {
-                icon: "📋",
                 title: "School Registration & Enrollment",
                 body: "We walk students through the paperwork, fees, and bureaucracy that quietly disqualify thousands every year. A form shouldn't determine a child's future.",
                 verse: "Isaiah 1:17"
               },
               {
-                icon: "📝",
                 title: "WAEC & BECE Exam Support",
                 body: "Exam registration fees, revision materials, coaching — we make sure that when the exam comes, the only thing missing is a pen. Not preparation, not funding, not confidence.",
                 verse: "Prov. 2:6"
               },
               {
-                icon: "🏠",
                 title: "Hostel & Residential Support",
                 body: "No hostel, no school — it's that simple for rural students. We provide and maintain residential quarters so geography doesn't end an education.",
                 verse: "Ps. 68:5–6"
               },
               {
-                icon: "🍽️",
                 title: "Feeding & Nutrition",
                 body: "We run feeding programs directly in schools and hostels. A child who eats can think. Everything else builds on that foundation.",
                 verse: "Matt. 25:35"
               },
               {
-                icon: "🌱",
                 title: "Agriculture & Vocational Skills",
                 body: "Greenhouses, farm cycles, soil science, market sense. Students who grow food build discipline, earn income, and graduate with more than a certificate.",
                 verse: "Prov. 12:11"
               },
               {
-                icon: "🤝",
                 title: "Community & Family Interventions",
                 body: "Care for the aged, support for widows, health outreach. We don't stop at the school gate — we follow the need wherever it lives.",
                 verse: "James 1:27"
               },
             ].map((item, i) => (
               <Reveal key={item.title} delay={i * 80} style={{ background: "rgba(255,255,255,0.03)", padding: "48px 40px" }}>
-                <div style={{ fontSize: 32, marginBottom: 24 }}>{item.icon}</div>
                 <h3 style={{ ...s.display, fontSize: 20, color: s.white, marginBottom: 16, fontWeight: 500, lineHeight: 1.25 }}>{item.title}</h3>
                 <p style={{ ...s.body, color: "rgba(255,255,255,0.45)", fontSize: 14, lineHeight: 1.85, marginBottom: 28 }}>{item.body}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.07)" }}>
@@ -534,16 +526,19 @@ export default function HomePage() {
             <p style={{ ...s.body, color: "rgba(255,255,255,0.45)", fontSize: 16, maxWidth: 540, margin: "0 auto 56px", lineHeight: 1.85 }}>
               Every cedi, pound, or dollar you give pays a school fee, registers a child for their exams, puts food in front of a student who would otherwise sit hungry in class. Change a family's story forever.
             </p>
-            <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 16, marginBottom: 64 }}>
+            <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 16, marginBottom: 40 }}>
               <Link href="/donate" className="btn-gold">Donate Now <Heart size={14} /></Link>
               <Link href="/contact" className="btn-ghost">Partner With Us</Link>
-            </div>
-            <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 40, paddingTop: 40, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-              <WhatsAppButton />
             </div>
           </Reveal>
         </div>
       </section>
+
+      {/* ── GLOBAL FLOATING ACTION BUTTON ── */}
+      <div style={{ position: "fixed", bottom: "32px", right: "32px", zIndex: 100 }}>
+        <WhatsAppButton />
+      </div>
+
     </main>
   );
 }
