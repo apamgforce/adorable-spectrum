@@ -87,7 +87,6 @@ export default function DonatePage() {
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(13,13,11,0.3), rgba(26,61,31,0.95))" }} />
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          {/* FIXED DUPLICATE ATTRIBUTE ERROR HERE */}
           <span className="mb-4 block" style={{ ...s.eyebrow, color: s.amber }}>
             Apam • Banjul • Africa
           </span>
@@ -115,7 +114,6 @@ export default function DonatePage() {
               </div>
               <div>
                 <p style={s.eyebrow} className="text-neutral-400">{stat.label}</p>
-                {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                 <p className="text-base font-medium mt-0.5" style={{ ...s.body, color: s.forest }}>{stat.value}</p>
               </div>
             </div>
@@ -129,9 +127,7 @@ export default function DonatePage() {
           
           {/* LEFT PHILOSOPHY HUB */}
           <div className="lg:col-span-5 reveal">
-            {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
             <span style={{ ...s.eyebrow, color: s.sage }}>Why Give</span>
-            {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
             <h2 className="text-4xl lg:text-5xl font-light mt-2 mb-6" style={{ ...s.display, color: s.forest }}>
               Your impact is <br /><em style={{ color: s.gold, fontStyle: "italic", fontWeight: "400" }}>local, visible, and lasting.</em>
             </h2>
@@ -144,7 +140,6 @@ export default function DonatePage() {
               <div className="flex gap-4">
                 <div className="w-2 h-2 rounded-full mt-2 shrink-0" style={{ background: s.gold }} />
                 <div>
-                  {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                   <h4 className="font-semibold text-sm" style={{ ...s.body, color: s.forest }}>100% Direct Channel</h4>
                   <p style={s.body} className="text-xs text-slate-500 mt-0.5">Every donation matches field operations directly. No middle layers. (Luke 16:10)</p>
                 </div>
@@ -152,14 +147,12 @@ export default function DonatePage() {
               <div className="flex gap-4">
                 <div className="w-2 h-2 rounded-full mt-2 shrink-0" style={{ background: s.gold }} />
                 <div>
-                  {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                   <h4 className="font-semibold text-sm" style={{ ...s.body, color: s.forest }}>Double Harvest Paradigm</h4>
                   <p style={s.body} className="text-xs text-slate-500 mt-0.5">We combine structural local food production output with disciplined, identity-focused mentoring.</p>
                 </div>
               </div>
             </div>
 
-            {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
             <div className="mt-12 p-6 rounded-2xl" style={{ background: s.mist }}>
               <p className="text-lg italic" style={{ ...s.display, color: s.forest }}>
                 &ldquo;Whoever is generous to the poor lends to the Lord, and he will repay him for his deed.&rdquo;
@@ -170,7 +163,6 @@ export default function DonatePage() {
 
           {/* RIGHT CTA CREDENTIALS BOX */}
           <div className="lg:col-span-7 reveal">
-            {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
             <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-sm border border-neutral-100">
               <h3 className="text-3xl font-light mb-2" style={{ ...s.display, color: s.forest }}>Transfer Credentials</h3>
               <p style={s.body} className="text-slate-400 text-sm mb-8">Please use the verified official channels below to safely forward your contributions.</p>
@@ -207,7 +199,6 @@ export default function DonatePage() {
                   <div className="p-5 rounded-2xl flex items-center justify-between border border-neutral-100" style={{ background: s.cream }}>
                     <div>
                       <span style={s.eyebrow} className="text-xs text-neutral-400 font-semibold block">Telecel</span>
-                      {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                       <p className="text-2xl font-light mt-1 tracking-tight" style={{ ...s.display, color: s.forest }}>050 094 0262</p>
                       <p style={s.body} className="text-xs text-slate-400 mt-1">Greenforce Foundation Africa</p>
                     </div>
@@ -217,7 +208,6 @@ export default function DonatePage() {
                   <div className="p-5 rounded-2xl flex items-center justify-between border border-neutral-100" style={{ background: s.cream }}>
                     <div>
                       <span style={s.eyebrow} className="text-xs text-neutral-400 font-semibold block">MTN Mobile Money</span>
-                      {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                       <p className="text-2xl font-light mt-1 tracking-tight" style={{ ...s.display, color: s.forest }}>024 571 8457</p>
                       <p style={s.body} className="text-xs text-slate-400 mt-1">Greenforce Foundation Africa</p>
                     </div>
@@ -230,27 +220,37 @@ export default function DonatePage() {
                   <div className="p-6 rounded-2xl border border-neutral-100 space-y-4" style={{ background: s.cream }}>
                     <div>
                       <span style={s.eyebrow} className="text-xs text-neutral-400 block">Beneficiary Name</span>
-                      {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                       <p className="text-base font-medium mt-0.5" style={{ ...s.body, color: s.forest }}>Greenforce Foundation Africa</p>
                     </div>
                     
                     <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-neutral-200/50">
                       <div>
-                        <span style={s.eyebrow} className="text-xs text-neutral-400 block">Bank Group</span>
-                        {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
-                        <p className="text-sm font-medium mt-0.5" style={{ ...s.body, color: s.forest }}>Gomoa Community Rural Bank</p>
+                        <span style={s.eyebrow} className="text-xs text-neutral-400 block">Bank Name</span>
+                        <p className="text-sm font-medium mt-0.5" style={{ ...s.body, color: s.forest }}>Gomoa Community Bank PLC</p>
                       </div>
                       <div>
-                        <span style={s.eyebrow} className="text-xs text-neutral-400 block">Branch Code / Hub</span>
-                        {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
-                        <p className="text-sm font-medium mt-0.5" style={{ ...s.body, color: s.forest }}>Apam (RCB)</p>
+                        <span style={s.eyebrow} className="text-xs text-neutral-400 block">Branch / Hub</span>
+                        <p className="text-sm font-medium mt-0.5" style={{ ...s.body, color: s.forest }}>Apam</p>
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-neutral-200/50">
+                      <div>
+                        <span style={s.eyebrow} className="text-xs text-neutral-400 block">Correspondent Bank</span>
+                        <p className="text-sm font-medium mt-0.5" style={{ ...s.body, color: s.forest }}>Ghana International Bank</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span style={s.eyebrow} className="text-xs text-neutral-400 block">SWIFT Code</span>
+                          <p className="text-sm font-semibold tracking-wide mt-0.5" style={{ ...s.body, color: s.forest }}>GHIBGB2L</p>
+                        </div>
+                        <ClipboardButton text="GHIBGB2L" />
                       </div>
                     </div>
 
                     <div className="pt-3 border-t border-neutral-200/50 flex items-center justify-between">
                       <div>
                         <span style={s.eyebrow} className="text-xs text-neutral-400 block">Primary Account Number</span>
-                        {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                         <p className="text-xl tracking-wide mt-0.5" style={{ ...s.display, color: s.forest }}>2081520000491151</p>
                       </div>
                       <ClipboardButton text="2081520000491151" />
@@ -269,7 +269,6 @@ export default function DonatePage() {
                         <div key={acc.label} className="p-4 rounded-xl border border-neutral-100 bg-white flex items-center justify-between shadow-sm">
                           <div>
                             <span style={s.eyebrow} className="text-[10px] text-neutral-400 block">{acc.label}</span>
-                            {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
                             <span className="text-sm font-semibold tracking-wide block mt-0.5" style={{ ...s.body, color: s.forest }}>{acc.val}</span>
                           </div>
                           <ClipboardButton text={acc.val} />
@@ -294,7 +293,6 @@ export default function DonatePage() {
       {/* FIELD INVESTMENT SCALE */}
       <section className="py-24 px-6" style={{ background: s.forest }}>
         <div className="max-w-5xl mx-auto text-center reveal">
-          {/* FIXED DOUBLE STYLE ATTRIBUTE HERE */}
           <span style={{ ...s.eyebrow, color: s.amber }}>Resource Deployment Matrix</span>
           <h2 style={s.display} className="text-4xl lg:text-5xl text-white font-light mt-2 mb-12">
             What your seed becomes in Apam
