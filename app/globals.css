@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --forest: #1a3d1f;
+  --leaf: #2d6a35;
+  --sage: #4a8c52;
+  --lime: #7bc47f;
+  --mint: #b8deba;
+  --cream: #faf8f3;
+  --ivory: #f5f0e8;
+  --earth: #8b6914;
+  --gold: #c9a227;
+  --amber: #e8b84b;
+  --charcoal: #1c1c1c;
+  --slate: #3d3d3d;
+  --mist: #f0f4f1;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--cream);
+  color: var(--charcoal);
+  overflow-x: hidden;
+}
+
+.font-display { font-family: 'Cormorant Garamond', serif; }
+.font-headline { font-family: 'Playfair Display', serif; }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--sage); border-radius: 2px; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes kenBurns {
+  0% { transform: scale(1) translateX(0) translateY(0); }
+  100% { transform: scale(1.08) translateX(-1%) translateY(-1%); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes pulseGreen {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 140, 82, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(74, 140, 82, 0); }
+}
+
+.animate-slide-up { animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fade-in { animation: fadeIn 1.2s ease forwards; }
+.animate-scale-in { animation: scaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-marquee { animation: marquee 35s linear infinite; }
+.animate-ken-burns { animation: kenBurns 14s ease-in-out infinite alternate; }
+.animate-pulse-green { animation: pulseGreen 2.5s ease-in-out infinite; }
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-800 { animation-delay: 0.8s; }
+.opacity-0 { opacity: 0; }
+
+.btn-shimmer {
+  background: linear-gradient(90deg, var(--leaf) 0%, var(--sage) 40%, var(--lime) 60%, var(--leaf) 100%);
+  background-size: 200% auto;
+  transition: background-position 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+.btn-shimmer:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(45, 106, 53, 0.4);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--earth) 0%, var(--gold) 50%, var(--amber) 100%);
+  background-size: 200% auto;
+  transition: all 0.4s ease;
+}
+.btn-gold:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(201, 162, 39, 0.5);
+}
+
+/* ==========================================================================
+   OPTIMIZED REVEAL MECHANISM
+   ========================================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px); /* Slightly reduced offset to prevent heavy layout shifts */
+  will-change: transform, opacity; /* Informs browser to optimize performance layer */
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fallback: Ensure visibility if JavaScript execution stalls or if 
+   the user has "reduce motion" active on their device */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+.stat-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--leaf), var(--lime));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-glass {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(250, 248, 243, 0.9);
+  border-bottom: 1px solid rgba(45, 106, 53, 0.08);
+}
+
+.card-lift {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+.card-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 60px rgba(26, 61, 31, 0.12);
+}
+
+.text-gradient-green {
+  background: linear-gradient(135deg, var(--forest), var(--sage));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--earth), var(--amber));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.scripture {
+  border-left: 3px solid var(--gold);
+  background: linear-gradient(to right, rgba(201, 162, 39, 0.06), transparent);
+}
+
+.animate-underline {
+  position: relative;
+}
+.animate-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-underline:hover::after { width: 100%; }
+
+.divider-leaf {
+  background: linear-gradient(to right, transparent, var(--sage), transparent);
+  height: 1px;
+}
+
+.writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
