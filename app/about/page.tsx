@@ -85,30 +85,49 @@ export default function AboutPage() {
       </section>
 
       {/* ══════════════════════════════
-          SECTION 2: BACKGROUND PERSPECTIVE
+          SECTION 2: BACKGROUND PERSPECTIVE & STANDOUT MISSION / VISION
           ══════════════════════════════ */}
       <section className="section-padding" style={{ padding: "140px 60px", maxWidth: 1280, margin: "0 auto" }}>
         <div className="flex-row-split">
           <div className="third-width">
-            <span style={{ ...s.eyebrow, color: s.forest, display: "block", marginBottom: 16 }}>01 // The Burden</span>
+            <span style={{ ...s.eyebrow, color: s.forest, display: "block", marginBottom: 16 }}>01 // Core Directives</span>
             <h2 style={{ ...s.display, fontSize: 32, fontWeight: 400, color: s.forest, lineHeight: 1.35 }}>
               What started as helping a single school hostel farm has grown into a West African mission.
             </h2>
+            <p style={{ ...s.body, fontSize: 15, color: "rgba(13,13,11,0.6)", marginTop: 24 }}>
+              Greenforce Foundation Africa was founded in 2010 out of a burden seen in Apam, Gomoa West. For over 15 years, we have stood by development, open administration, culture, and love. From classrooms to regional farms, true internal structural reformation precedes external elevation.
+            </p>
           </div>
           
-          <div className="two-thirds-width side-padding-override" style={{ paddingLeft: "60px" }}>
-            <p style={{ ...s.body, fontSize: 20, color: s.ink, fontWeight: 400, marginBottom: 28 }}>
-              Greenforce Foundation Africa was founded in 2010 out of a burden seen in Apam, Gomoa West. For over 15 years, we have stood by development, open administration, culture, and love.
-            </p>
-            <p style={{ ...s.body, fontSize: 16, color: "rgba(13,13,11,0.65)", marginBottom: 48 }}>
-              From classrooms to farms, from the aged to the youth, our work framework is designed to prove a singular scriptural and human reality: that true internal structural reformation precedes external elevation.
-            </p>
+          <div className="two-thirds-width side-padding-override" style={{ paddingLeft: "60px", display: "flex", flexDirection: "column", gap: "40px" }}>
             
-            <div style={{ paddingTop: 40, borderTop: `1px solid ${s.sand}` }}>
-              <blockquote style={{ ...s.display, fontSize: 24, fontStyle: "italic", color: s.forest, lineHeight: 1.5 }}>
+            {/* High-Impact Mission Box */}
+            <div style={{ background: s.white, borderLeft: `4px solid ${s.forest}`, padding: "40px", boxShadow: "0 10px 30px rgba(0,0,0,0.02)", borderTop: `1px solid ${s.sand}`, borderRight: `1px solid ${s.sand}`, borderBottom: `1px solid ${s.sand}` }}>
+              <span style={{ ...s.eyebrow, color: s.gold, display: "block", marginBottom: 12 }}>Our Mission</span>
+              <p style={{ ...s.display, fontSize: "26px", color: s.ink, fontWeight: 400, lineHeight: 1.4, marginBottom: 16 }}>
+                “Greenforce Foundation Africa exists to equip students, youth, and communities in Ghana and The Gambia with green skills, education, and character that create food security, income, and dignity.”
+              </p>
+              <p style={{ ...s.body, fontSize: 14, color: "rgba(13,13,11,0.5)", fontStyle: "italic" }}>
+                Training hands, transforming hearts, growing dignity through green action.
+              </p>
+            </div>
+
+            {/* High-Impact Vision Box */}
+            <div style={{ background: s.forest, color: s.white, padding: "40px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+              <span style={{ ...s.eyebrow, color: s.amber, display: "block", marginBottom: 12 }}>Our Vision</span>
+              <p style={{ ...s.display, fontSize: "26px", fontWeight: 300, lineHeight: 1.4, marginBottom: 16 }}>
+                “Our vision is an Africa where every school is a centre of food production, and every young person, widow, and aged person lives with skill, dignity, and hope.”
+              </p>
+              <p style={{ ...s.body, fontSize: 14, color: "rgba(255,255,255,0.6)", fontStyle: "italic" }}>
+                Discipline Grows to Dignity – From Apam to Africa.
+              </p>
+            </div>
+            
+            <div style={{ paddingTop: 20 }}>
+              <blockquote style={{ ...s.display, fontSize: 22, fontStyle: "italic", color: s.forest, lineHeight: 1.5 }}>
                 “No discipline seems pleasant at the time, but painful. Later on, however, it produces a harvest of righteousness and peace for those who have been trained by it.”
               </blockquote>
-              <span style={{ ...s.eyebrow, color: s.gold, fontSize: 10, display: "block", marginTop: 16 }}>— Hebrews 12:11</span>
+              <span style={{ ...s.eyebrow, color: s.gold, fontSize: 10, display: "block", marginTop: 12 }}>— Hebrews 12:11</span>
             </div>
           </div>
         </div>
@@ -184,17 +203,21 @@ export default function AboutPage() {
         <div className="flex-row-split">
           <div className="half-width" style={{ background: s.white, padding: "40px", border: `1px solid ${s.sand}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: `1px solid ${s.sand}`, paddingBottom: 16, marginBottom: 24 }}>
-              <h3 style={{ ...s.display, fontSize: 24, color: s.ink }}>Ghana</h3>
+              <h3 style={{ ...s.display, fontSize: 24, color: s.ink }}>Ghana Head Office</h3>
               <span style={{ ...s.eyebrow, color: "rgba(13,13,11,0.4)" }}>Est. Sept 2010</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div>
-                <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Headquarters</span>
-                <p style={{ ...s.body, fontWeight: 500, fontSize: 15, marginTop: 2 }}>Apam, Gomoa West, Central Region</p>
+                <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Headquarters Location</span>
+                <p style={{ ...s.body, fontWeight: 500, fontSize: 15, marginTop: 2 }}>Apam, Gomoa West District, Central Region</p>
               </div>
               <div>
-                <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Core Directive</span>
-                <p style={{ ...s.body, fontSize: 14, color: "rgba(13,13,11,0.6)", marginTop: 2 }}>Hostel farming execution and SHS greenhouse infrastructure scaling.</p>
+                <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Flagship Infrastructure</span>
+                <p style={{ ...s.body, fontSize: 14, color: "rgba(13,13,11,0.6)", marginTop: 2 }}>Apam Hostel Greenhouse – training 60 students yearly in modern farming tracks.</p>
+              </div>
+              <div>
+                <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Monthly Outreach Directive</span>
+                <p style={{ ...s.body, fontSize: 14, color: "rgba(13,13,11,0.6)", marginTop: 2 }}>Dignity Packs allocated to 35 aged individuals and widows in Gomoa West.</p>
               </div>
               <div>
                 <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Primary State Partner</span>
@@ -205,17 +228,17 @@ export default function AboutPage() {
 
           <div className="half-width" style={{ background: s.white, padding: "40px", border: `1px solid ${s.sand}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: `1px solid ${s.sand}`, paddingBottom: 16, marginBottom: 24 }}>
-              <h3 style={{ ...s.display, fontSize: 24, color: s.ink }}>The Gambia</h3>
+              <h3 style={{ ...s.display, fontSize: 24, color: s.ink }}>The Gambia Operations</h3>
               <span style={{ ...s.eyebrow, color: "rgba(13,13,11,0.4)" }}>Est. Dec 2010</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div>
                 <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Regional Scope</span>
-                <p style={{ ...s.body, fontWeight: 500, fontSize: 15, marginTop: 2 }}>Banjul Region</p>
+                <p style={{ ...s.body, fontWeight: 500, fontSize: 15, marginTop: 2 }}>Banjul Region (Operational since December 2010)</p>
               </div>
               <div>
                 <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Core Directive</span>
-                <p style={{ ...s.body, fontSize: 14, color: "rgba(13,13,11,0.6)", marginTop: 2 }}>Vocational training tracks and dignity deployment platforms for the aged.</p>
+                <p style={{ ...s.body, fontSize: 14, color: "rgba(13,13,11,0.6)", marginTop: 2 }}>Vocational training tracks, youth infrastructure development, and localized dignity deployment platforms.</p>
               </div>
               <div>
                 <span style={{ ...s.eyebrow, fontSize: 9, color: s.gold }}>Primary State Partner</span>
@@ -232,10 +255,10 @@ export default function AboutPage() {
       <section className="section-padding" style={{ background: s.white, padding: "100px 60px", borderTop: `1px solid ${s.sand}`, borderBottom: `1px solid ${s.sand}` }}>
         <div className="flex-row-split pillar-stack" style={{ maxWidth: 1280, margin: "0 auto", gap: "24px" }}>
           {[
-            { title: "Development", text: "We build capable, structural self-sufficiency within people, refusing to invest in fleeting, transactional programmatic metrics." },
-            { title: "Open Administration", text: "Every single unit of localized currency remains completely verifiable via strict stewardship governance standards.", verse: "Luke 16:10" },
-            { title: "Culture", text: "We honor and preserve specific indigenous structures while simultaneously establishing contemporary tactical skillsets." },
-            { title: "Love", text: "The foundational and ultimate baseline mechanism supporting our entire localized operational network.", verse: "1 Cor. 13:13" }
+            { title: "Development", text: "We turn land, talent, and time into lasting progress. We build capable, structural self-sufficiency within communities.", verse: "Deuteronomy 28:12" },
+            { title: "Open Administration", text: "Every single unit of localized currency (cedi or dalasi) remains completely accounted for. Transparency builds long-term trust.", verse: "Luke 16:10" },
+            { title: "Culture", text: "We honor and preserve our beautiful Apam and Gambian heritage while simultaneously teaching modern agricultural innovation." },
+            { title: "Love", text: "Discipline without love breaks; we correct to build up. The foundational mechanism supporting our entire network.", verse: "1 Corinthians 13:13" }
           ].map((val, i) => (
             <div key={i} className="quarter-width" style={{ display: "flex", flexDirection: "column" }}>
               <span style={{ ...s.display, fontSize: 36, color: "rgba(30,61,26,0.12)", fontWeight: 700, lineHeight: 1 }}>0{i+1}</span>
@@ -251,7 +274,7 @@ export default function AboutPage() {
           SECTION 7: LEADERSHIP ECOSYSTEM
           ══════════════════════════════ */}
       <section className="section-padding" style={{ padding: "140px 60px", maxWidth: 1280, margin: "0 auto" }}>
-        <div className="flex-row-split" style={{ alignItems: "center" }}>
+        <div className="flex-row-split" style={{ alignItems: "flex-start" }}>
           <div className="half-width">
             <div style={{ 
               position: "relative", 
@@ -272,23 +295,58 @@ export default function AboutPage() {
                 }}
               />
             </div>
+
+            {/* Practical Operational Contact Specs */}
+            <div style={{ marginTop: "32px", padding: "24px", border: `1px solid ${s.sand}`, background: "rgba(255,255,255,0.3)" }}>
+              <span style={{ ...s.eyebrow, color: s.gold, fontSize: 10, display: "block", marginBottom: 12 }}>Executive Contacts</span>
+              <p style={{ ...s.body, fontSize: 14, color: s.ink, marginBottom: 6 }}>
+                <strong>Office:</strong> Near Botsio Building, Apam, Central Region, Ghana
+              </p>
+              <p style={{ ...s.body, fontSize: 14, color: s.ink, marginBottom: 6 }}>
+                <strong>Email:</strong> info@greenforceafrica.org
+              </p>
+              <p style={{ ...s.body, fontSize: 14, color: s.ink }}>
+                <strong>Availability:</strong> Saturdays 8am - 11am GMT for structured project visits
+              </p>
+            </div>
           </div>
 
           <div className="half-width side-padding-override" style={{ display: "flex", flexDirection: "column", gap: "20px", paddingLeft: "40px" }}>
             <span style={{ ...s.eyebrow, color: s.forest }}>04 // Leadership Profile</span>
-            <h2 style={{ ...s.display, fontSize: 40, fontWeight: 400, color: s.forest }}>Victor Tokunbo Ogundipe</h2>
-            <p style={{ ...s.eyebrow, color: s.gold, fontSize: 11, letterSpacing: "0.15em" }}>Educationist | Administrator | Humanitarian Worker</p>
+            <h2 style={{ ...s.display, fontSize: 40, fontWeight: 400, color: s.forest, marginBottom: 0 }}>Victor Tokunbo Ogundipe</h2>
+            <p style={{ ...s.eyebrow, color: s.gold, fontSize: 11, letterSpacing: "0.15em", marginTop: -5 }}>
+              Founder & Executive Director // Educationist | Administrator | Humanitarian Worker
+            </p>
             
             <div style={{ width: 48, height: 1, background: s.sand, margin: "4px 0" }} />
             
             <div style={{ ...s.body, fontSize: 15, color: "rgba(13,13,11,0.65)", display: "flex", flexDirection: "column", gap: 14 }}>
-              <p>Serving seamlessly as the foundational engine of Greenforce Foundation Africa across Ghana and The Gambia since 2010, his dual administrative methods harmonize strict literacy development, structural agronomy, and disciplined youth mentorship.</p>
-              <p>He serves simultaneously as the Assistant Head of Department for Languages within the statutory framework of the Ghana Education Service (GES) — Gomoa West District.</p>
+              <p>
+                Victor Tokunbo Ogundipe is the Founder and Executive Director of Greenforce Foundation Africa. For over 15 years, he has served communities across Ghana and The Gambia through synchronized actions in education, agriculture, humanitarian care, and strategic youth development tracks.
+              </p>
+              <p>
+                <strong>Current Statutory Role:</strong> He acts as the Assistant Head of Department for Languages within the framework of the Ghana Education Service (GES), Gomoa West District, Central Region. He elegantly combines classroom teaching with cross-border humanitarian leadership to raise students with both deep academic excellence and practical lifestyle skills.
+              </p>
+              
+              <h4 style={{ ...s.display, fontSize: 18, color: s.forest, marginTop: 10, fontWeight: 500 }}>Professional Background & Governance Roles</h4>
+              <ul style={{ paddingLeft: 20, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                <li><strong>Language Instruction:</strong> Veteran Language Teacher across Junior and Senior High Schools.</li>
+                <li><strong>GES Leadership Mandates:</strong> Assistant HOD of the Language Department, Head of the Discipline Committee, Head of Internal & External Examinations, and Head of Records & Recovery.</li>
+                <li><strong>School & Hostel Management:</strong> Former Head of Charity International Senior High School & Hostel Manager.</li>
+                <li><strong>Development Work Frameworks:</strong> Former Labour Officer for an international Construction Company, specializing in cross-functional project management and manual workforce training.</li>
+              </ul>
             </div>
 
             <div style={{ background: s.forest, color: s.white, padding: "28px 32px", marginTop: 8 }}>
-              <p style={{ ...s.display, fontSize: 18, fontStyle: "italic", lineHeight: 1.5 }}>
+              <p style={{ ...s.display, fontSize: 18, fontStyle: "italic", lineHeight: 1.5, marginBottom: 8 }}>
                 “We are not just running an NGO. We are raising a generation that works the land and walks in love.”
+              </p>
+              <span style={{ ...s.eyebrow, color: s.amber, fontSize: 10 }}>— Victor T. Ogundipe</span>
+            </div>
+
+            <div style={{ marginTop: 8 }}>
+              <p style={{ ...s.body, fontSize: 14, color: "rgba(13,13,11,0.6)" }}>
+                <strong>Philosophical Approach:</strong> Victor firmly believes Africa’s strategic transformation begins when schools become vibrant, productive centres of food production and rigorous character formation. To truly “train up a child” (Proverbs 22:6) means giving them a functional certificate in one hand and a practical skill in the other.
               </p>
             </div>
 
@@ -306,10 +364,9 @@ export default function AboutPage() {
         <div className="flex-row-split" style={{ maxWidth: 1280, margin: "0 auto", alignItems: "center" }}>
           <div className="two-thirds-width">
             <p style={{ ...s.body, fontSize: 12, color: "rgba(13,13,11,0.45)", lineHeight: 1.6 }}>
-              <strong>STATUTORY COMPLIANCE NOTICE:</strong> Greenforce Foundation Africa holds valid independent non-governmental organization (NGO) corporate charters within the sovereign registries of the Republic of Ghana (Inception: Sept 2010) and the Republic of The Gambia (Inception: Dec 2010). All regional operations are verified in strict accordance with cross-border NGO validation standards.
+              <strong>STATUTORY COMPLIANCE NOTICE:</strong> Greenforce Foundation Africa holds valid independent non-governmental organization (NGO) corporate charters within the sovereign registries of the Republic of Ghana (Inception: Sept 2010) and the Republic of The Gambia (Inception: Dec 2010). All regional operations are verified in strict accordance with cross-border NGO validation frameworks and Open Administration accountability standards.
             </p>
           </div>
-          
         </div>
       </section>
 
