@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  Leaf,
   Mail,
   Phone,
   MapPin,
@@ -69,9 +68,13 @@ export default function Footer() {
         
         {/* Brand Column */}
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
-            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Leaf size={15} style={{ color: s.amber }} strokeWidth={1.5} />
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "6px", overflow: "hidden", display: "flex", alignItems: "center", justifyCnotent: "center", flexShrink: 0 }}>
+              <img 
+                src="/logo.jpg" 
+                alt="Greenforce Foundation Africa Logo" 
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
             </div>
 
             <div>
@@ -83,6 +86,11 @@ export default function Footer() {
               </span>
             </div>
           </div>
+
+          {/* VISIBLE & LOUD MOTTO BRANDING EDGE */}
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.75rem", fontWeight: 600, color: s.gold, letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 16px 0", lineHeight: 1.4 }}>
+            Connecting opportunities to outstanding possibilities
+          </p>
 
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.875rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.8, margin: 0 }}>
             Rooting youth in purpose — through agriculture, education, and the timeless values that grow lasting communities across West Africa.
@@ -177,7 +185,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* ── DEDICATED SOCIAL ICON ZONE (HIGH VISIBILITY / NOTICEABLE) ── */}
+      {/* ── DEDICATED SOCIAL ICON ZONE ── */}
       <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 24px 32px 24px" }}>
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "32px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "0.65rem", fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.35)", letterSpacing: "0.2em", textTransform: "uppercase" }}>
@@ -185,6 +193,19 @@ export default function Footer() {
           </span>
           
           <div style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
+            {/* X (formerly Twitter) */}
+            <a
+              href="https://x.com/greenforceafric"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X (formerly Twitter)"
+              className="footer-social-icon-btn"
+            >
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+
             {/* Facebook */}
             <a
               href="https://www.facebook.com/vtogreenforcefoundation"
@@ -215,7 +236,7 @@ export default function Footer() {
               aria-label="LinkedIn"
               className="footer-social-icon-btn"
             >
-              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37;
             </a>
           </div>
         </div>
