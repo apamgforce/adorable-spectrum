@@ -2,88 +2,73 @@ import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { put, del } from "@vercel/blob";
 
-// FORCES Vercel to treat this as a live, dynamic server route
 export const dynamic = "force-dynamic";
-
 const sql = neon(process.env.POSTGRES_URL!);
 
-// 1. GET ALL IMAGES
+// Helper: Directly matches incoming temporary request credentials against Vercel env variable
+function isAuthorized(request: Request): boolean {
+  const authHeader = request.headers.get("Authorization");
+  const secureToken = process.env.ADMIN_SECURE_TOKEN; // e.g., "greenforce_admin:Apam_Greenhouse_2026"
+  
+  if (!authHeader || !secureToken) return false;
+  return authHeader === `Bearer ${secureToken}`;
+}
+
+// 1. GET ALL IMAGES (Public)
 export async function GET() {
   try {
     const data = await sql`SELECT * FROM gallery_images ORDER BY id DESC`;
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Fetch failed" }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Fetch failed" }, { status: 500 });
   }
 }
 
-// 2. UPLOAD NEW IMAGE (With deep diagnostic logging)
+// 2. UPLOAD IMAGE ROUTE (Authenticated on-demand)
 export async function POST(request: Request) {
+  if (!isAuthorized(request)) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
+  
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const caption = formData.get("caption") as string;
     const category = formData.get("category") as string;
 
-    if (!file || !caption || !category) {
-      return NextResponse.json({ error: "Missing fields in form data" }, { status: 400 });
-    }
+    if (!file || !caption || !category) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
-    // Safety check to ensure we actually got a raw file binary
-    if (file.size === 0) {
-      return NextResponse.json({ error: "File buffer is completely empty" }, { status: 400 });
-    }
-
-    // Generate clean unique identifier
     const uniqueFilename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
+    const blob = await put(uniqueFilename, file, { access: "public" });
 
-    // Upload to Vercel Blob Store
-    let blob;
-    try {
-      blob = await put(uniqueFilename, file, { access: "public" });
-    } catch (blobErr: any) {
-      return NextResponse.json({ 
-        error: "Vercel Blob rejected file. Check if BLOB_READ_WRITE_TOKEN is linked.",
-        details: blobErr.message 
-      }, { status: 500 });
-    }
-
-    // Save mapping index to Neon Postgres
-    try {
-      await sql`
-        INSERT INTO gallery_images (src, caption, category) 
-        VALUES (${blob.url}, ${caption}, ${category})
-      `;
-    } catch (dbErr: any) {
-      // If DB fails, try to cleanup the stranded blob we just uploaded
-      if (blob?.url) await del(blob.url);
-      return NextResponse.json({ 
-        error: "Blob saved, but writing to Postgres failed.",
-        details: dbErr.message 
-      }, { status: 500 });
-    }
-
+    await sql`INSERT INTO gallery_images (src, caption, category) VALUES (${blob.url}, ${caption}, ${category})`;
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ 
-      error: "Global API Crash caught inside runtime handler", 
-      details: error.message 
-    }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
 
-// 3. DELETE IMAGE
+// 3. EDIT/UPDATE ROUTE (Authenticated on-demand)
+export async function PUT(request: Request) {
+  if (!isAuthorized(request)) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
+  
+  try {
+    const { id, caption, category } = await request.json();
+    await sql`UPDATE gallery_images SET caption = ${caption}, category = ${category} WHERE id = ${id}`;
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
+  }
+}
+
+// 4. DELETE ROUTE (Authenticated on-demand)
 export async function DELETE(request: Request) {
+  if (!isAuthorized(request)) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
+  
   try {
     const { id, src } = await request.json();
     await sql`DELETE FROM gallery_images WHERE id = ${id}`;
-
-    if (src.includes("public.blob.vercel-storage.com")) {
-      await del(src);
-    }
-
+    if (src.includes("public.blob.vercel-storage.com")) await del(src);
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Delete failed" }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 }
