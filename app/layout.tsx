@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script"; // <-- Imported for optimized script loading
+import Script from "next/script";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -8,26 +8,36 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://greenforceafrica.com"),
 
   title: {
-    default: "Greenforce Foundation Africa | School Greenhouses & Youth Agriculture in Ghana",
+    default: "Greenforce Foundation Africa | School Greenhouses, Education & Community Support",
     template: "%s | Greenforce Foundation Africa",
   },
 
   description:
-    "Greenforce Foundation Africa is a West Africa NGO based in Ghana and The Gambia. We build school greenhouses, train youth in agriculture, support education sponsorships, healthcare outreach, widow and aged care, sports discipline, and evangelism programs across Apam and Gomoa West.",
+    "Greenforce Foundation Africa is a West African NGO empowering communities in Ghana and The Gambia. We transform lives through school greenhouses, youth agricultural training, education sponsorships, healthcare outreach, widow support, and dedicated care for the aged and less privileged.",
 
   keywords: [
+    // --- Agriculture & Greenhouses ---
     "Greenforce Foundation Africa",
     "NGO in Ghana",
+    "Gambia NGO agriculture",
     "school greenhouse Ghana",
     "youth agriculture training Apam",
     "Gomoa West development NGO",
-    "hostel farming Ghana",
-    "education sponsorship Ghana NGO",
-    "West Africa agriculture NGO",
     "community farming Ghana",
-    "Gambia NGO agriculture",
-    "Christian NGO Ghana",
     "school farming program Ghana",
+    "hostel farming Ghana",
+    // --- Education & Sponsorships ---
+    "education sponsorship Ghana NGO",
+    "child education support West Africa",
+    "school charity Ghana",
+    "sponsor a student Ghana",
+    // --- Social Welfare, Aged Care, Widows ---
+    "support for widows Ghana",
+    "aged care charity West Africa",
+    "helping less privileged in Ghana",
+    "healthcare outreach NGO Africa",
+    "social welfare community support charity",
+    "Christian NGO Ghana",
   ],
 
   authors: [{ name: "Greenforce Foundation Africa" }],
@@ -42,10 +52,9 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://greenforceafrica.com",
     siteName: "Greenforce Foundation Africa",
-    title:
-      "Greenforce Foundation Africa | Transforming Education Through Agriculture in Ghana",
+    title: "Greenforce Foundation Africa | Transforming Communities & Education in West Africa",
     description:
-      "We use school greenhouses, youth agricultural training, and community farming to build dignity, food security, and opportunity across West Africa.",
+      "Empowering youth through school greenhouses, providing education sponsorships, and bringing critical healthcare, widow care, and aged support to the less privileged across Ghana and The Gambia.",
     images: [
       {
         url: "/logo.jfif",
@@ -60,7 +69,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Greenforce Foundation Africa",
     description:
-      "School greenhouses, youth farming, education sponsorship & community transformation in Ghana & The Gambia.",
+      "School greenhouses, youth farming, education sponsorships, widow support, and aged care transforming lives in Ghana & The Gambia.",
     images: ["/logo.jfif"],
   },
 
@@ -91,16 +100,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Fonts (keep but optimize loading) */}
+        {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
         <link
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap"
           rel="stylesheet"
         />
 
-        {/* Structured Data (VERY IMPORTANT FOR NGO SEO) */}
+        {/* Enhanced Structured Data for Google NGO Analytics */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -111,7 +119,7 @@ export default function RootLayout({
               url: "https://greenforceafrica.com",
               logo: "https://greenforceafrica.com/logo.jfif",
               description:
-                "West Africa NGO focused on school greenhouses, youth agriculture training, education sponsorships, healthcare outreach, and community development.",
+                "West African NGO dedicated to school greenhouses, sustainable youth agriculture training, student education sponsorships, healthcare outreach, and vital welfare support for widows, the aged, and less privileged communities.",
               address: {
                 "@type": "PostalAddress",
                 addressLocality: "Apam",
@@ -119,19 +127,41 @@ export default function RootLayout({
                 addressCountry: "Ghana",
               },
               areaServed: ["Ghana", "The Gambia", "West Africa"],
+              knowsAbout: [
+                "Sustainable Agriculture",
+                "Youth Education Sponsorships",
+                "Elderly and Aged Community Support",
+                "Widow Welfare Programs",
+                "Community Healthcare Outreach",
+              ],
               foundingDate: "2010",
               sameAs: [],
             }),
           }}
         />
 
-        {/* GTranslate Configuration Configuration */}
+        {/* GTranslate Configuration Setup (14 Strategic Global & Regional Languages) */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               window.gtranslateSettings = {
                 "default_language": "en",
-                "languages": ["en", "fr"], // Add more codes here if needed (e.g., "de", "es")
+                "languages": [
+                  "en",     // English (Default)
+                  "fr",     // French (Crucial for West African neighbors: Senegal, Togo, Ivory Coast)
+                  "zh-CN",  // Chinese Simplified (Major international development partner)
+                  "es",     // Spanish (Global reach)
+                  "pt",     // Portuguese (Strategic for regional links to Guinea-Bissau & Cape Verde)
+                  "ha",     // Hausa (Major West African / Ghanaian trade & community language)
+                  "yo",     // Yoruba (Crucial regional West African language)
+                  "ig",     // Igbo (Crucial regional West African language)
+                  "ar",     // Arabic (Highly relevant for regional ties & North/West African charities)
+                  "de",     // German (Strong European donor landscape)
+                  "it",     // Italian (Key European humanitarian base)
+                  "nl",     // Dutch (High per-capita NGO donations)
+                  "ja",     // Japanese (Major international aid partnerships)
+                  "ko"      // Korean (Rapidly growing global development stakeholder)
+                ], 
                 "wrapper_selector": ".gtranslate_container",
                 "select_language_style": "minimal", 
                 "flag_size": 20,
@@ -159,7 +189,7 @@ export default function RootLayout({
         {children}
         <Footer />
 
-        {/* Load GTranslate core assets after the page becomes interactive */}
+        {/* Core dynamic auto-translating asset layer */}
         <Script 
           src="https://cdn.gtranslate.net/widgets/latest/float.js" 
           strategy="afterInteractive" 
