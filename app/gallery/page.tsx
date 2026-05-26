@@ -1,47 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, ZoomIn } from "lucide-react";
+import { X, ZoomIn, Loader2 } from "lucide-react";
 
-// Placeholder gallery images — replace with Strapi API
-const GALLERY_IMAGES = [
+// Hardcoded backup array ensures the layout looks great instantly
+const BACKUP_IMAGES = [
   { id: 1, src: "hostellers.png", caption: "Youth agri-training in Apam", category: "Training" },
   { id: 2, src: "sitting.jpg", caption: "Greenhouse at Apam SHS", category: "Greenhouse" },
-  { id: 3, src: "hunger.png", caption: "Students in Gomoa West", category: "Community" },
-  { id: 4, src: "twoboys.jpg", caption: "Classroom learning", category: "Education" },
-  { id: 5, src: "/beansharvest.jpg", caption: "Harvest season — Central Ghana", category: "Harvest" },
-  { id: 6, src: "kidsgathering.jpg", caption: "Community gathering", category: "Community" },
-  { id: 7, src: "students.jpg", caption: "Greenforce students", category: "Training" },
-  { id: 8, src: "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=800&q=80&auto=format&fit=crop", caption: "Farmland in Gomoa West", category: "Community" },
-  { id: 9, src: "agritrain.jpg", caption: "Agri-training weekend", category: "Training" },
-  { id: 10, src: "manyfarming.jpg", caption: "Students preparing for harvest", category: "Harvest" },
-  { id: 11, src: "commfarm.jpg", caption: "Community farming support", category: "Community" },
+  { id: 5, src: "/beansharvest.jpg", caption: "Harvest season — Central Ghana", category: "Harvest" }
 ];
 
 const CATEGORIES = ["All", "Greenhouse", "Training", "Education", "Community", "Harvest"];
 
-function useRevealAll() {
-  useEffect(() => {
-    const elements = document.querySelectorAll(".reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); }
-        });
-      },
-      { threshold: 0.08 }
-    );
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-}
-
 export default function GalleryPage() {
+  const [images, setImages] = useState(BACKUP_IMAGES);
   const [active, setActive] = useState("All");
-  const [lightbox, setLightbox] = useState<null | typeof GALLERY_IMAGES[0]>(null);
-  useRevealAll();
+  const [lightbox, setLightbox] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filtered = active === "All" ? GALLERY_IMAGES : GALLERY_IMAGES.filter(i => i.category === active);
+  useEffect(() => {
+    fetch("/api/gallery")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.length > 0) setImages(data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const filtered = active === "All" ? images : images.filter(i => i.category === active);
 
   return (
     <main>
@@ -75,6 +62,7 @@ export default function GalleryPage() {
               {cat}
             </button>
           ))}
+          {isLoading && <Loader2 className="animate-spin text-slate-400 ml-3 self-center" size={18} />}
         </div>
       </section>
 
@@ -82,10 +70,10 @@ export default function GalleryPage() {
       <section className="py-12 px-6" style={{background: 'var(--cream)'}}>
         <div className="max-w-7xl mx-auto">
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
-            {filtered.map((img, i) => (
+            {filtered.map((img) => (
               <div
                 key={img.id}
-                className="reveal break-inside-avoid rounded-2xl overflow-hidden group cursor-zoom-in relative"
+                className="break-inside-avoid rounded-2xl overflow-hidden group cursor-zoom-in relative"
                 onClick={() => setLightbox(img)}
               >
                 <img
@@ -110,16 +98,10 @@ export default function GalleryPage() {
 
       {/* LIGHTBOX */}
       {lightbox && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-          style={{background: 'rgba(0,0,0,0.92)'}}
-          onClick={() => setLightbox(null)}
-        >
-          <button className="absolute top-6 right-6 text-white/60 hover:text-white" onClick={() => setLightbox(null)}>
-            <X size={28} />
-          </button>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{background: 'rgba(0,0,0,0.92)'}} onClick={() => setLightbox(null)}>
+          <button className="absolute top-6 right-6 text-white/60 hover:text-white" onClick={() => setLightbox(null)}><X size={28} /></button>
           <div className="max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
-            <img src={lightbox.src.replace('w=800', 'w=1400')} alt={lightbox.caption} className="w-full rounded-2xl object-contain max-h-[80vh]" />
+            <img src={lightbox.src} alt={lightbox.caption} className="w-full rounded-2xl object-contain max-h-[80vh]" />
             <div className="mt-4 flex items-center justify-between">
               <p className="text-white/80 text-sm">{lightbox.caption}</p>
               <span className="text-xs px-3 py-1 rounded-full" style={{background: 'rgba(74,140,82,0.3)', color: 'var(--mint)'}}>{lightbox.category}</span>
