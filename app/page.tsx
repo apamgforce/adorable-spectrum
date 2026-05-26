@@ -507,49 +507,65 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS SECTION ── */}
-<section style={{ background: s.cream, padding: "120px 60px", overflow: "hidden" }} className="section-pad">
+{/* ── TESTIMONIALS SECTION ── */}
+<section style={{ background: s.cream, padding: "120px 60px" }} className="section-pad">
   <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-    <Reveal style={{ marginBottom: 64 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
-        <div className="divider" />
-        <span style={{ ...s.eyebrow, color: s.sage, fontSize: 11 }}>Voices of Impact</span>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64 }}>
+      <Reveal>
+        <span style={{ ...s.eyebrow, color: s.sage, display: "block", marginBottom: 16 }}>Voices of Impact</span>
+        <h2 style={{ ...s.display, fontSize: "clamp(40px,5vw,72px)", color: s.forest, fontWeight: 400, lineHeight: 1.1 }}>
+          The community speaks.
+        </h2>
+      </Reveal>
+      <div style={{ display: "flex", gap: 16 }}>
+        <button 
+          onClick={() => { const el = document.getElementById('testi-scroll'); if(el) el.scrollLeft -= 600; }}
+          style={{ width: 50, height: 50, borderRadius: "50%", border: `1px solid ${s.forest}`, background: "transparent", color: s.forest, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          &lt;
+        </button>
+        <button 
+          onClick={() => { const el = document.getElementById('testi-scroll'); if(el) el.scrollLeft += 600; }}
+          style={{ width: 50, height: 50, borderRadius: "50%", border: `1px solid ${s.forest}`, background: s.forest, color: s.cream, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          &gt;
+        </button>
       </div>
-      <h2 style={{ ...s.display, fontSize: "clamp(32px,4vw,56px)", color: s.forest, fontWeight: 400 }}>The community speaks.</h2>
-    </Reveal>
+    </div>
 
-    <div style={{ position: "relative", width: "100%", overflow: "hidden" }}>
-      <div 
-        style={{ 
+    <div 
+      id="testi-scroll"
+      style={{ 
+        display: "flex", 
+        gap: "32px", 
+        overflowX: "auto", 
+        scrollBehavior: "smooth", 
+        paddingBottom: "40px",
+        scrollbarWidth: "none" 
+      }}
+    >
+      {[
+        { q: "Our school was on the verge of losing twelve final-year candidates. Greenforce didn't just pay the balance; they assigned supervisors to track their welfare. All twelve successfully sat their papers.", a: "Dr. Emmanuel K. Baidoo", r: "Headmaster, Gomoa District" },
+        { q: "When my husband passed, the farm was left unattended. The team rehabilitated the land, provided high-yield vegetable crops, and put my daughter back into a residential hostel within weeks.", a: "Comfort Nana Osei", r: "Parent, Apam" },
+        { q: "The greenhouse projects attached to our quarters aren't minor decorative patches. They teach precision farming. Our school dining hall saves significantly on fresh grocery supply because the children supply their own kitchens.", a: "Elder Silas Boateng", r: "Board Chairman" },
+        { q: "I thought dropping out was my final step. Missing two full assessment marks means you are effectively out of the system. Greenforce settled the administration desk and gave me a technical plot.", a: "Abigail Naa Darkoa", r: "Student, Apam" }
+      ].map((t, i) => (
+        <div key={i} style={{ 
+          minWidth: "600px", 
+          padding: "64px", 
+          background: s.white, 
+          border: `1px solid ${s.sand}`, 
           display: "flex", 
-          gap: "24px",
-          transition: "transform 0.8s ease-in-out",
-          animation: "slideLeft 20s linear infinite"
-        }}
-      >
-        <style>{`
-          @keyframes slideLeft {
-            0%, 25% { transform: translateX(0); }
-            33%, 58% { transform: translateX(-33.33%); }
-            66%, 91% { transform: translateX(-66.66%); }
-            100% { transform: translateX(-66.66%); }
-          }
-        `}</style>
-        {[
-          { q: "Our school was on the verge of losing twelve final-year candidates. Greenforce didn't just pay the balance; they assigned supervisors to track their welfare. All twelve successfully sat their papers.", a: "Dr. Emmanuel K. Baidoo", r: "Headmaster, Gomoa District" },
-          { q: "When my husband passed, the farm was left unattended. The team rehabilitated the land, provided high-yield vegetable crops, and put my daughter back into a residential hostel within weeks.", a: "Comfort Nana Osei", r: "Parent, Apam" },
-          { q: "The greenhouse projects attached to our quarters aren't minor decorative patches. They teach precision farming. Our school dining hall saves significantly on fresh grocery supply because the children supply their own kitchens.", a: "Elder Silas Boateng", r: "Board Chairman" },
-          { q: "I thought dropping out was my final step. Missing two full assessment marks means you are effectively out of the system. Greenforce settled the administration desk and gave me a technical plot. Now I'm preparing for my upcoming WASSCE.", a: "Abigail Naa Darkoa", r: "Student, Apam" }
-        ].map((t, i) => (
-          <div key={i} style={{ minWidth: "350px", flexShrink: 0, background: s.white, padding: "40px", border: `1px solid ${s.dust}`, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <p style={{ ...s.body, color: "rgba(30,61,26,0.7)", fontSize: 15, lineHeight: 1.8, marginBottom: 32, fontStyle: "italic" }}>"{t.q}"</p>
-            <div>
-              <p style={{ ...s.display, fontSize: 16, color: s.forest, fontWeight: 500 }}>{t.a}</p>
-              <p style={{ ...s.eyebrow, fontSize: 9, color: s.gold, marginTop: 4 }}>{t.r}</p>
-            </div>
+          flexDirection: "column", 
+          justifyContent: "space-between" 
+        }}>
+          <p style={{ ...s.body, color: s.ink, fontSize: "20px", lineHeight: 1.7, fontStyle: "italic", marginBottom: 48 }}>"{t.q}"</p>
+          <div style={{ borderTop: `1px solid ${s.dust}`, paddingTop: 24 }}>
+            <p style={{ ...s.display, fontSize: 18, color: s.forest, fontWeight: 500 }}>{t.a}</p>
+            <p style={{ ...s.eyebrow, fontSize: 10, color: s.gold, marginTop: 8 }}>{t.r}</p>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   </div>
 </section>
