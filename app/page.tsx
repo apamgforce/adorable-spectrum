@@ -510,7 +510,7 @@ export default function HomePage() {
 {/* ── TESTIMONIALS SECTION ── */}
 <section style={{ background: s.cream, padding: "120px 60px" }} className="section-pad">
   <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 64, flexWrap: "wrap", gap: 24 }}>
       <Reveal>
         <span style={{ ...s.eyebrow, color: s.sage, display: "block", marginBottom: 16 }}>Voices of Impact</span>
         <h2 style={{ ...s.display, fontSize: "clamp(40px,5vw,72px)", color: s.forest, fontWeight: 400, lineHeight: 1.1 }}>
@@ -519,17 +519,29 @@ export default function HomePage() {
       </Reveal>
       <div style={{ display: "flex", gap: 16 }}>
         <button 
-          onClick={() => { const el = document.getElementById('testi-scroll'); if(el) el.scrollLeft -= 600; }}
+          onClick={() => {
+            const el = document.getElementById('testi-scroll');
+            if (el) {
+              const items = el.children;
+              const currentIdx = Math.round(el.scrollLeft / items[0].getBoundingClientRect().width);
+              const nextIdx = currentIdx === 0 ? items.length - 1 : currentIdx - 1;
+              (items[nextIdx] as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+            }
+          }}
           style={{ width: 50, height: 50, borderRadius: "50%", border: `1px solid ${s.forest}`, background: "transparent", color: s.forest, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-        >
-          &lt;
-        </button>
+        >&lt;</button>
         <button 
-          onClick={() => { const el = document.getElementById('testi-scroll'); if(el) el.scrollLeft += 600; }}
+          onClick={() => {
+            const el = document.getElementById('testi-scroll');
+            if (el) {
+              const items = el.children;
+              const currentIdx = Math.round(el.scrollLeft / items[0].getBoundingClientRect().width);
+              const nextIdx = currentIdx >= items.length - 1 ? 0 : currentIdx + 1;
+              (items[nextIdx] as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+            }
+          }}
           style={{ width: 50, height: 50, borderRadius: "50%", border: `1px solid ${s.forest}`, background: s.forest, color: s.cream, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-        >
-          &gt;
-        </button>
+        >&gt;</button>
       </div>
     </div>
 
@@ -541,7 +553,8 @@ export default function HomePage() {
         overflowX: "auto", 
         scrollBehavior: "smooth", 
         paddingBottom: "40px",
-        scrollbarWidth: "none" 
+        scrollbarWidth: "none",
+        scrollSnapType: "x mandatory"
       }}
     >
       {[
@@ -549,17 +562,21 @@ export default function HomePage() {
         { q: "When my husband passed, the farm was left unattended. The team rehabilitated the land, provided high-yield vegetable crops, and put my daughter back into a residential hostel within weeks.", a: "Comfort Nana Osei", r: "Parent, Apam" },
         { q: "The greenhouse projects attached to our quarters aren't minor decorative patches. They teach precision farming. Our school dining hall saves significantly on fresh grocery supply because the children supply their own kitchens.", a: "Elder Silas Boateng", r: "Board Chairman" },
         { q: "I thought dropping out was my final step. Missing two full assessment marks means you are effectively out of the system. Greenforce settled the administration desk and gave me a technical plot.", a: "Abigail Naa Darkoa", r: "Student, Apam" }
-      ].map((t, i) => (
+      ]
+      .sort(() => Math.random() - 0.5) // Randomizes order on every render
+      .map((t, i) => (
         <div key={i} style={{ 
-          minWidth: "600px", 
-          padding: "64px", 
+          minWidth: "calc(100% - 32px)", 
+          maxWidth: "600px", 
+          padding: "48px", 
           background: s.white, 
           border: `1px solid ${s.sand}`, 
           display: "flex", 
           flexDirection: "column", 
-          justifyContent: "space-between" 
+          justifyContent: "space-between",
+          scrollSnapAlign: "start"
         }}>
-          <p style={{ ...s.body, color: s.ink, fontSize: "20px", lineHeight: 1.7, fontStyle: "italic", marginBottom: 48 }}>"{t.q}"</p>
+          <p style={{ ...s.body, color: s.ink, fontSize: "clamp(18px, 2vw, 22px)", lineHeight: 1.7, fontStyle: "italic", marginBottom: 48 }}>"{t.q}"</p>
           <div style={{ borderTop: `1px solid ${s.dust}`, paddingTop: 24 }}>
             <p style={{ ...s.display, fontSize: 18, color: s.forest, fontWeight: 500 }}>{t.a}</p>
             <p style={{ ...s.eyebrow, fontSize: 10, color: s.gold, marginTop: 8 }}>{t.r}</p>
