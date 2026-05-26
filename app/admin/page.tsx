@@ -46,7 +46,7 @@ export default function AdminPage() {
       return;
     }
     
-    // FRONTEND GUARDRAIL: Matches the credentials you set in Vercel
+    // FRONTEND GUARDRAIL: Change these if you update them in Vercel!
     const EXPECTED_USER = "greenforce_admin";
     const EXPECTED_PASS = "Apam_Greenhouse_2026";
 
@@ -66,6 +66,63 @@ export default function AdminPage() {
     setIsAuthenticated(false);
     setUsernameInput("");
     setPasswordInput("");
+  };
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file || !caption) return alert("Please select a file and type a caption.");
+
+    setIsSubmitting(true);
+    const activeToken = sessionStorage.getItem("admin_session_auth") || "";
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("caption", caption);
+      formData.append("category", category);
+
+      const res = await fetch("/api/gallery", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${activeToken}` }, 
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setCaption("");
+        setFile(null);
+        const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+        refreshImages();
+        setApiError(null);
+      } else {
+        setApiError(data.error || "Upload rejected by database validation.");
+      }
+    } catch (err) {
+      setApiError("Network transmission exception.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: number, src: string) => {
+    if (!confirm("Are you sure you want to delete this photo from the website?")) return;
+    const activeToken = sessionStorage.getItem("admin_session_auth") || "";
+
+    try {
+      const res = await fetch("/api/gallery", {
+        method: "DELETE",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${activeToken}`
+        },
+        body: JSON.stringify({ id, src }),
+      });
+      if (res.ok) refreshImages();
+    } catch (err) {
+      alert("Action denied.");
+    }
   };
 
   // SCREEN 1: BRANDED LOGIN PORTAL
@@ -146,7 +203,6 @@ export default function AdminPage() {
           </h1>
         </div>
         
-        {/* CLEAR, BIG, VISIBLE RED LOGOUT BUTTON */}
         <button 
           onClick={handleLogout} 
           className="text-sm font-bold text-red-600 hover:text-white bg-red-50 hover:bg-red-600 px-5 py-2.5 rounded-xl transition border border-red-200 flex items-center gap-2 shadow-sm"
@@ -178,7 +234,7 @@ export default function AdminPage() {
         </div>
         <div>
           <label className="block text-xs font-semibold text-slate-500 mb-1">PHOTO CAPTION / DESCRIPTION</label>
-          <input type="text" value={caption} onChange={(e) => setText(e.target.value)} placeholder="Write a short description of what is happening in this photo..." className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-emerald-600 text-slate-800" />
+          <input type="text" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Write a short description of what is happening in this photo..." className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-emerald-600 text-slate-800" />
         </div>
         <button type="submit" disabled={isSubmitting} className="flex items-center gap-2 text-sm bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-sm disabled:opacity-50">
           {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
