@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script"; // <-- Imported for optimized script loading
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -90,7 +91,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-
         {/* Fonts (keep but optimize loading) */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -124,12 +124,47 @@ export default function RootLayout({
             }),
           }}
         />
+
+        {/* GTranslate Configuration Configuration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.gtranslateSettings = {
+                "default_language": "en",
+                "languages": ["en", "fr"], // Add more codes here if needed (e.g., "de", "es")
+                "wrapper_selector": ".gtranslate_container",
+                "select_language_style": "minimal", 
+                "flag_size": 20,
+                "flag_style": "2d",
+                "alt_flags": { "en": "usa" }
+              }
+            `,
+          }}
+        />
       </head>
 
       <body className="antialiased">
+        {/* Floating Beautiful Translation Picker Container */}
+        <div 
+          className="gtranslate_container" 
+          style={{ 
+            position: 'fixed', 
+            bottom: '24px', 
+            right: '24px', 
+            zIndex: 9999,
+          }} 
+        />
+
         <Navbar />
         {children}
         <Footer />
+
+        {/* Load GTranslate core assets after the page becomes interactive */}
+        <Script 
+          src="https://cdn.gtranslate.net/widgets/latest/float.js" 
+          strategy="afterInteractive" 
+          defer 
+        />
       </body>
     </html>
   );
