@@ -513,10 +513,10 @@ export default function HomePage() {
   <div style={{ maxWidth: 1280, margin: "0 auto" }}>
     <div className="founder-grid">
       
-      {/* Left Column: Visual Portrait & Top Affiliations */}
+      {/* Left Column: Visual Portrait & Core Quote */}
       <Reveal>
         <div style={{ position: "relative", overflow: "hidden", height: 500, marginBottom: 32 }}>
-          <img src="/founder.png" alt="Victor Tokunbo Ogundipe" className="img-hover" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }} />
+          <img src="/founder.jpg" alt="Victor Tokunbo Ogundipe" className="img-hover" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top, rgba(30,61,26,0.95), transparent)", padding: "32px" }}>
             <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 28, color: "#ffffff", fontWeight: 500, marginBottom: 4 }}>Victor Tokunbo Ogundipe</p>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#e8b84b" }}>Educationist · Administrator · Humanitarian</p>
@@ -525,64 +525,41 @@ export default function HomePage() {
         
         <div style={{ background: "#ffffff", padding: "32px", borderLeft: "3px solid #c9992a" }}>
           <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 18, fontStyle: "italic", color: "#1e3d1a", lineHeight: 1.5, marginBottom: 16 }}>
-            "Show love. Give hope. Offer encouragement — and it shall be well with us all."
+            “Show love. Give hope. Offer encouragement — and it shall be well with us all.”
           </p>
           <div className="divider-sm" />
         </div>
       </Reveal>
 
-      {/* Right Column: Narrative & Formal Footprint */}
+      {/* Right Column: Third-Person Narrative */}
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <Reveal>
           <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#5a7a4a", display: "block", marginBottom: 16 }}>Leadership & Mission</span>
           <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: "clamp(32px,4vw,48px)", color: "#1e3d1a", lineHeight: 1.2, fontWeight: 400, marginBottom: 28 }}>
             Meeting Our Founder
           </h2>
+          
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "#0d0d0b", fontSize: 15, marginBottom: 20 }}>
-            I am Victor Tokunbo Ogundipe, a Ghanaian Educationist and Administrator with a Bachelor’s Degree in Education and a Master’s Degree in Public Administration. Born into a humble background and raised by teachers, I was instilled with values of discipline, dignity, love, and service from an early age. Having experienced life without much, I developed a deep empathy for the less privileged and a burning passion to serve humanity.
+            Victor Tokunbo Ogundipe is a Ghanaian Educationist and Administrator with a Bachelor’s Degree in Education and a Master’s Degree in Public Administration. Born into a humble background and raised by parents who were teachers, he was instilled with values of discipline, dignity, love, and service from an early age. Having experienced life without much, he developed a deep empathy for the less privileged and a burning passion to serve humanity.
           </p>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "rgba(13,13,11,0.7)", fontSize: 14, marginBottom: 28 }}>
-            With over two decades of experience in the education sector, I have served as a teacher in basic and senior high schools, holding leadership milestones including Head of the Language Department, Internal Examinations, Disciplinary, and Counseling Committees. These foundational spaces proved that while resources are vital, genuine encouragement and mentorship are what truly unlock human potential.
-          </p>
-
-          <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20, color: "#1e3d1a", marginTop: 40, marginBottom: 8, fontWeight: 500 }}>Current Regional Directorships</h3>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "rgba(13,13,11,0.6)", fontSize: 13, marginBottom: 16 }}>
-            Driving structural educational systems, community reach-out, and youth support networks across West African boundaries:
+          
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "rgba(13,13,11,0.8)", fontSize: 14, marginBottom: 20 }}>
+            With over two decades of experience in the education sector, Mr. Ogundipe has served as a teacher in both basic schools and senior high schools. He has held several leadership positions including Head of the Language Department, Head of Internal Examinations, Head of the Disciplinary Committee, and Head of the Counseling Committee. These roles deepened his passion for nurturing young minds and reinforced his strong belief in the transformative power of discipline, guidance, and encouragement.
           </p>
 
-          <table className="org-table">
-            <tbody>
-              <tr>
-                <td style={{ width: "40%", paddingRight: 16 }}>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#1e3d1a", display: "block" }}>Greenforce Foundation Africa</span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 12, color: "rgba(0,0,0,0.4)" }}>CEO & Executive Director</span>
-                </td>
-                <td style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 13, color: "rgba(13,13,11,0.7)" }}>
-                  Registered in Ghana and The Gambia since September 2010. Protecting vulnerable households and providing structural care frameworks.
-                </td>
-              </tr>
-              <tr>
-                <td style={{ width: "40%", paddingRight: 16 }}>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#1e3d1a", display: "block" }}>Billion Child Foundation (BCF)</span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 12, color: "rgba(0,0,0,0.4)" }}>Regional Director West Africa</span>
-                </td>
-                <td style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 13, color: "rgba(13,13,11,0.7)" }}>
-                  Overseeing large-scale regional operations focused on developmental equality, children's empowerment, and fundamental instructional liberties.
-                </td>
-              </tr>
-              <tr>
-                <td style={{ width: "40%", paddingRight: 16 }}>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#1e3d1a", display: "block" }}>Charity International SHS</span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 12, color: "rgba(0,0,0,0.4)" }}>Headmaster & Hostel Lead</span>
-                </td>
-                <td style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 13, color: "rgba(13,13,11,0.7)" }}>
-                  Directing holistic academic progress, structural operations, and protective student boarding spaces in Apam, Central Region of Ghana.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "rgba(13,13,11,0.8)", fontSize: 14, marginBottom: 20 }}>
+            Through his work, he discovered his true calling as a humanitarian dedicated to supporting underprivileged families, vulnerable children, and anyone in need of hope and opportunity. As a trained educationist, he has traveled across many African countries, sharing knowledge, identifying talents, and empowering individuals to build brighter futures. He firmly believes that while money is important, genuine encouragement, support, and mentorship are what truly unlock human potential. He is committed to using his knowledge, wisdom, and life experiences to create a more disciplined, hopeful, and supportive environment for all.
+          </p>
 
-          <div style={{ marginTop: 40, display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "rgba(13,13,11,0.8)", fontSize: 14, marginBottom: 28 }}>
+            Currently, he serves as the <strong>CEO and Executive Director</strong> of Greenforce Foundation Africa, a non-governmental organization registered in Ghana and The Gambia in September 2010. He also expands his humanitarian footprint across regional borders as the <strong>West Africa Regional Director</strong> for the Billion Child Foundation (BCF), and acts as the <strong>Headmaster</strong> of Charity International Senior High School and its associated hostel in Apam, Central Region of Ghana.
+          </p>
+
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "#1e3d1a", fontSize: 14, marginBottom: 40, fontStyle: "italic" }}>
+            His greatest desire is to connect with like-minded individuals, partners, and organizations who share this vision of service, so that together we can spread love, restore hope, promote peace, and uplift humanity across Africa and beyond.
+          </p>
+
+          <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
             <Link href="/about" className="btn-main">Full Bio & History</Link>
             <Link href="/contact" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#3a5c2e", display: "inline-flex", alignItems: "center", gap: 8 }}>
               Partner With Our Vision <ArrowRight size={13} />
@@ -595,6 +572,8 @@ export default function HomePage() {
   </div>
 </section>
 
+
+  
 {/* ── TESTIMONIALS SECTION ── */}
 <section style={{ background: s.cream, padding: "120px 60px" }} className="section-pad">
   <div style={{ maxWidth: 1280, margin: "0 auto" }}>
