@@ -507,6 +507,93 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── FOUNDER'S SECTION ── */}
+<section style={{ background: "#f2ede3", padding: "120px 60px", borderTop: "1px solid #e4dccf" }} className="section-pad">
+  <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+    <div className="founder-grid">
+      
+      {/* Left Column: Visual Portrait & Top Affiliations */}
+      <Reveal>
+        <div style={{ position: "relative", overflow: "hidden", height: 500, marginBottom: 32 }}>
+          <img src="/sitting.jpg" alt="Victor Tokunbo Ogundipe" className="img-hover" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top, rgba(30,61,26,0.95), transparent)", padding: "32px" }}>
+            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 28, color: "#ffffff", fontWeight: 500, marginBottom: 4 }}>Victor Tokunbo Ogundipe</p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#e8b84b" }}>Educationist · Administrator · Humanitarian</p>
+          </div>
+        </div>
+        
+        <div style={{ background: "#ffffff", padding: "32px", borderLeft: "3px solid #c9992a" }}>
+          <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 18, fontStyle: "italic", color: "#1e3d1a", lineHeight: 1.5, marginBottom: 16 }}>
+            "Show love. Give hope. Offer encouragement — and it shall be well with us all."
+          </p>
+          <div className="divider-sm" />
+        </div>
+      </Reveal>
+
+      {/* Right Column: Narrative & Formal Footprint */}
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <Reveal>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#5a7a4a", display: "block", marginBottom: 16 }}>Leadership & Mission</span>
+          <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: "clamp(32px,4vw,48px)", color: "#1e3d1a", lineHeight: 1.2, fontWeight: 400, marginBottom: 28 }}>
+            Meeting Our Founder
+          </h2>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "#0d0d0b", fontSize: 15, marginBottom: 20 }}>
+            I am Victor Tokunbo Ogundipe, a Ghanaian Educationist and Administrator with a Bachelor’s Degree in Education and a Master’s Degree in Public Administration. Born into a humble background and raised by teachers, I was instilled with values of discipline, dignity, love, and service from an early age. Having experienced life without much, I developed a deep empathy for the less privileged and a burning passion to serve humanity.
+          </p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "rgba(13,13,11,0.7)", fontSize: 14, marginBottom: 28 }}>
+            With over two decades of experience in the education sector, I have served as a teacher in basic and senior high schools, holding leadership milestones including Head of the Language Department, Internal Examinations, Disciplinary, and Counseling Committees. These foundational spaces proved that while resources are vital, genuine encouragement and mentorship are what truly unlock human potential.
+          </p>
+
+          <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20, color: "#1e3d1a", marginTop: 40, marginBottom: 8, fontWeight: 500 }}>Current Regional Directorships</h3>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, color: "rgba(13,13,11,0.6)", fontSize: 13, marginBottom: 16 }}>
+            Driving structural educational systems, community reach-out, and youth support networks across West African boundaries:
+          </p>
+
+          <table className="org-table">
+            <tbody>
+              <tr>
+                <td style={{ width: "40%", paddingRight: 16 }}>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#1e3d1a", display: "block" }}>Greenforce Foundation Africa</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 12, color: "rgba(0,0,0,0.4)" }}>CEO & Executive Director</span>
+                </td>
+                <td style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 13, color: "rgba(13,13,11,0.7)" }}>
+                  Registered in Ghana and The Gambia since September 2010. Protecting vulnerable households and providing structural care frameworks.
+                </td>
+              </tr>
+              <tr>
+                <td style={{ width: "40%", paddingRight: 16 }}>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#1e3d1a", display: "block" }}>Billion Child Foundation (BCF)</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 12, color: "rgba(0,0,0,0.4)" }}>Regional Director West Africa</span>
+                </td>
+                <td style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 13, color: "rgba(13,13,11,0.7)" }}>
+                  Overseeing large-scale regional operations focused on developmental equality, children's empowerment, and fundamental instructional liberties.
+                </td>
+              </tr>
+              <tr>
+                <td style={{ width: "40%", paddingRight: 16 }}>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#1e3d1a", display: "block" }}>Charity International SHS</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 12, color: "rgba(0,0,0,0.4)" }}>Headmaster & Hostel Lead</span>
+                </td>
+                <td style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, lineHeight: 1.75, fontSize: 13, color: "rgba(13,13,11,0.7)" }}>
+                  Directing holistic academic progress, structural operations, and protective student boarding spaces in Apam, Central Region of Ghana.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style={{ marginTop: 40, display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+            <Link href="/about" className="btn-main">Full Bio & History</Link>
+            <Link href="/contact" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#3a5c2e", display: "inline-flex", alignItems: "center", gap: 8 }}>
+              Partner With Our Vision <ArrowRight size={13} />
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 {/* ── TESTIMONIALS SECTION ── */}
 <section style={{ background: s.cream, padding: "120px 60px" }} className="section-pad">
   <div style={{ maxWidth: 1280, margin: "0 auto" }}>
