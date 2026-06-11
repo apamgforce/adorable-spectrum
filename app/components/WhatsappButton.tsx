@@ -6,7 +6,7 @@ export default function WhatsAppButton() {
   const [message, setMessage] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const WHATSAPP_NUMBER = "+23320000000"; 
+  const WHATSAPP_NUMBER = "+233509170770"; 
   const DEFAULT_GREETING = "Hello! Welcome to Greenforce Foundation. How can we help you plant a seed of change today?";
 
   // Format link for wa.me based on custom message or quick direct link
