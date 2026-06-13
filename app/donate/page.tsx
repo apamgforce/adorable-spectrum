@@ -208,10 +208,10 @@ export default function DonatePage() {
                   <div className="p-5 rounded-2xl flex items-center justify-between border border-neutral-100" style={{ background: s.cream }}>
                     <div>
                       <span style={s.eyebrow} className="text-xs text-neutral-400 font-semibold block">MTN Mobile Money</span>
-                      <p className="text-2xl font-light mt-1 tracking-tight" style={{ ...s.display, color: s.forest }}>024 571 8457</p>
-                      <p style={s.body} className="text-xs text-slate-400 mt-1">Greenforce Foundation Africa</p>
+                      <p className="text-2xl font-light mt-1 tracking-tight" style={{ ...s.display, color: s.forest }}>025 659 4150</p>
+                      <p style={s.body} className="text-xs text-slate-400 mt-1">VTO Greenforce Foundation Africa</p>
                     </div>
-                    <ClipboardButton text="0245718457" />
+                    <ClipboardButton text="0256594150" />
                   </div>
                 </div>
               ) : (
