@@ -82,11 +82,11 @@ export default function ContactPage() {
           {/* LEFT — Info */}
           <div className="reveal">
             <div className="relative rounded-3xl overflow-hidden mb-10" style={{ height: '300px' }}>
-              <img src={CONTACT_IMG} alt="Greenforce community" className="w-full h-full object-cover" />
+              <img src={CONTACT_IMG} alt="Charity International Senior High School Campus" className="w-full h-full object-cover" />
               <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(26,61,31,0.85), transparent 50%)' }} />
               <div className="absolute bottom-6 left-6">
                 <p className="font-display text-2xl italic text-white">Come, see the work.</p>
-                <p className="text-white/60 text-sm mt-1">Apam, Central Region, Ghana</p>
+                <p className="text-white/60 text-sm mt-1">Nsawam, APAM, Ghana</p>
               </div>
             </div>
 
@@ -97,10 +97,17 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="font-medium text-sm" style={{ color: 'var(--forest)' }}>Location</p>
-                  <p className="text-slate-500 text-sm mt-1">Apam & Gomoa West, Central Region, Ghana</p>
+                  <p className="text-slate-600 text-sm mt-1 font-semibold">
+                    Charity International Senior High School
+                  </p>
+                  <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">
+                    Behind Nyamekye Preparatory School,<br />
+                    Bostia Road, Nsawam, APAM<br />
+                    S16 Chaya Street &bull; CI - 0034-2522<br />
+                    Post Office Box SO 106
+                  </p>
                 </div>
               </div>
-
 
               <div className="flex gap-4 items-start p-5 rounded-2xl" style={{ background: 'var(--mist)' }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(74,140,82,0.12)' }}>
