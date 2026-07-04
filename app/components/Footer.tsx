@@ -51,6 +51,14 @@ export default function Footer() {
         .footer-btn-cta:hover {
           background: ${s.amber} !important; color: ${s.ink} !important; border-color: ${s.amber} !important;
         }
+        .footer-attribution-link {
+          color: rgba(255,255,255,0.4);
+          text-decoration: none;
+          transition: color 0.3s ease;
+        }
+        .footer-attribution-link:hover {
+          color: ${s.amber} !important;
+        }
       `}</style>
 
       {/* ── SCRIPTURE BANNER ── */}
@@ -248,9 +256,20 @@ export default function Footer() {
           © {new Date().getFullYear()} Greenforce Foundation Africa. All rights reserved.
         </p>
 
-        <p style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", margin: 0, textAlign: "right" }}>
-          Registered NGO • Transforming Communities Through Agriculture & Care
-        </p>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", margin: 0, textAlign: "right" }}>
+          <p style={{ margin: "0 0 4px 0" }}>Registered NGO • Transforming Communities Through Agriculture & Care</p>
+          <p style={{ margin: 0 }}>
+            Developed by{" "}
+            <a 
+              href="https://wa.me/233535899952" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="footer-attribution-link"
+            >
+              Allace Consult
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
