@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Heart, BookOpen, TreePine, Users, Globe, Smartphone, Copy, Check } from "lucide-react";
+import { Heart, BookOpen, TreePine, Users, Globe, Smartphone, Copy, Check, CreditCard } from "lucide-react";
 
 const DONATE_HERO = "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1800&q=85&auto=format&fit=crop";
+const GIVESENDGO_LINK = "https://www.givesendgo.com/greenforcefoundation?utm_source=sharelink&utm_medium=copy_link&utm_campaign=greenforcefoundation";
 
 const s = {
   eyebrow: { fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.25em", textTransform: "uppercase" as const, fontWeight: 500 },
@@ -69,20 +70,20 @@ function useRevealAll() {
 }
 
 export default function DonatePage() {
-  const [activeTab, setActiveTab] = useState<"momo" | "bank">("momo");
+  const [activeTab, setActiveTab] = useState<"momo" | "bank" | "givesendgo">("momo");
   useRevealAll();
 
   return (
     <main style={{ background: s.cream, color: s.ink, minHeight: "100vh" }}>
       {/* Structural Styles Injection */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,300;0,400;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
         .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.visible { opacity: 1; transform: translateY(0); }
       `}</style>
 
       {/* HERO */}
-      <section className="relative flex items-center justify-center overflow-hidden" style={{ height: "75vh", minHeight: "550px" }}>
+      <section className="relative flex items-center justify-center overflow-hidden py-20" style={{ minHeight: "80vh" }}>
         <img src={DONATE_HERO} alt="Apam student waiting for opportunity" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(13,13,11,0.3), rgba(26,61,31,0.95))" }} />
 
@@ -97,15 +98,34 @@ export default function DonatePage() {
             <em style={{ color: s.amber, fontStyle: "italic", fontWeight: "400" }}>and builds Greenforce.</em>
           </h1>
 
-          <p style={s.body} className="text-white/80 text-lg font-light leading-relaxed max-w-2xl mx-auto">
+          <p style={s.body} className="text-white/80 text-lg font-light leading-relaxed max-w-2xl mx-auto mb-8">
             “He who supplies seed to the sower… will increase your store of seed.” — 2 Corinthians 9:10.  
             Every donation directly powers food security, vocational dignity, and agricultural literacy for young people across the Central Region.
           </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a 
+              href={GIVESENDGO_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-4 rounded-xl text-sm font-medium tracking-wide transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center gap-2"
+              style={{ background: s.amber, color: s.ink, fontFamily: "'DM Sans', sans-serif" }}
+            >
+              <Heart size={16} fill={s.ink} /> Support via GiveSendGo
+            </a>
+            <a 
+              href="#credentials"
+              className="px-8 py-4 rounded-xl text-sm font-medium tracking-wide transition-all duration-300 border border-white/30 text-white hover:bg-white/10"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              View Local Credentials
+            </a>
+          </div>
         </div>
       </section>
 
       {/* THREE PILLAR IMPACT GRAPHIC */}
-      <section className="relative z-20 -mt-16 px-6 max-w-7xl mx-auto">
+      <section className="relative z-20 -mt-12 px-6 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-6">
           {STATS.map((stat, i) => (
             <div key={i} className="bg-white rounded-2xl p-6 shadow-md flex items-center gap-4 border border-neutral-100 reveal">
@@ -122,7 +142,7 @@ export default function DonatePage() {
       </section>
 
       {/* CENTRAL TRANSACTION DESK */}
-      <section className="py-24 px-6">
+      <section id="credentials" className="py-24 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-16 items-start">
           
           {/* LEFT PHILOSOPHY HUB */}
@@ -168,33 +188,44 @@ export default function DonatePage() {
               <p style={s.body} className="text-slate-400 text-sm mb-8">Please use the verified official channels below to safely forward your contributions.</p>
 
               {/* TABS SWITCHER */}
-              <div className="flex p-1.5 rounded-xl mb-8" style={{ background: s.mist }}>
+              <div className="flex p-1.5 rounded-xl mb-8 gap-1" style={{ background: s.mist }}>
                 <button
                   onClick={() => setActiveTab("momo")}
-                  className="flex-1 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200"
+                  className="flex-1 py-3 rounded-lg text-xs md:text-sm font-medium flex items-center justify-center gap-1.5 transition-all duration-200"
                   style={{
                     background: activeTab === "momo" ? s.white : "transparent",
                     color: activeTab === "momo" ? s.forest : "#64748b",
                     boxShadow: activeTab === "momo" ? "0 4px 12px rgba(0,0,0,0.03)" : "none"
                   }}
                 >
-                  <Smartphone size={16} /> Mobile Money (Local)
+                  <Smartphone size={16} /> Mobile Money
                 </button>
                 <button
                   onClick={() => setActiveTab("bank")}
-                  className="flex-1 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200"
+                  className="flex-1 py-3 rounded-lg text-xs md:text-sm font-medium flex items-center justify-center gap-1.5 transition-all duration-200"
                   style={{
                     background: activeTab === "bank" ? s.white : "transparent",
                     color: activeTab === "bank" ? s.forest : "#64748b",
                     boxShadow: activeTab === "bank" ? "0 4px 12px rgba(0,0,0,0.03)" : "none"
                   }}
                 >
-                  <Globe size={16} /> Bank Wire (Global / Local)
+                  <Globe size={16} /> Bank Wire
+                </button>
+                <button
+                  onClick={() => setActiveTab("givesendgo")}
+                  className="flex-1 py-3 rounded-lg text-xs md:text-sm font-medium flex items-center justify-center gap-1.5 transition-all duration-200"
+                  style={{
+                    background: activeTab === "givesendgo" ? s.white : "transparent",
+                    color: activeTab === "givesendgo" ? s.forest : "#64748b",
+                    boxShadow: activeTab === "givesendgo" ? "0 4px 12px rgba(0,0,0,0.03)" : "none"
+                  }}
+                >
+                  <CreditCard size={16} /> GiveSendGo
                 </button>
               </div>
 
               {/* INFORMATION CHANNELS */}
-              {activeTab === "momo" ? (
+              {activeTab === "momo" && (
                 <div className="space-y-4">
                   <div className="p-5 rounded-2xl flex items-center justify-between border border-neutral-100" style={{ background: s.cream }}>
                     <div>
@@ -214,7 +245,9 @@ export default function DonatePage() {
                     <ClipboardButton text="0256594150" />
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {activeTab === "bank" && (
                 <div className="space-y-6">
                   {/* MAIN ACCOUNT IDENTIFIER */}
                   <div className="p-6 rounded-2xl border border-neutral-100 space-y-4" style={{ background: s.cream }}>
@@ -275,6 +308,27 @@ export default function DonatePage() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "givesendgo" && (
+                <div className="space-y-4">
+                  <div className="p-6 rounded-2xl text-center border border-neutral-100" style={{ background: s.cream }}>
+                    <span style={s.eyebrow} className="text-xs text-neutral-400 block mb-2">Global Crowdfunding Campaign</span>
+                    <h4 className="text-xl font-light mb-4" style={{ ...s.display, color: s.forest }}>Free School for Orphans & Vulnerable Children</h4>
+                    <p style={s.body} className="text-slate-500 text-sm max-w-md mx-auto mb-6 leading-relaxed">
+                      Perfect for international credit card gifts, processing card payments safely from anywhere across the globe.
+                    </p>
+                    <a 
+                      href={GIVESENDGO_LINK}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-4 rounded-xl text-sm font-medium tracking-wide transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                      style={{ background: s.forest, color: s.white, fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      Go to GiveSendGo Campaign <Globe size={14} />
+                    </a>
                   </div>
                 </div>
               )}
