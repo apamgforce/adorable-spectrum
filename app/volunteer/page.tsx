@@ -5,9 +5,10 @@ import { Users, MapPin, Send, CheckCircle, AlertCircle, Clock } from "lucide-rea
 
 const VOLUNTEER_IMG = "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=900&q=85&auto=format&fit=crop";
 
-// Replace these with your actual HubSpot values
-const HUBSPOT_PORTAL_ID = "YOUR_HUBSPOT_PORTAL_ID";
-const HUBSPOT_FORM_ID = "YOUR_HUBSPOT_FORM_ID";
+// HubSpot Credentials
+const HUBSPOT_PORTAL_ID = "149113634";
+const HUBSPOT_FORM_ID = "478982e9-0966-4030-a24d-8402a1c04c9f";
+const HUBSPOT_REGION = "eu1";
 const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0";
 
 function useRevealAll() {
@@ -50,7 +51,7 @@ export default function VolunteerPage() {
     const firstName = nameParts[0] || "";
     const lastName = nameParts.slice(1).join(" ") || "N/A";
 
-    // Prepare HubSpot Forms API v3 Payload
+    // Prepare HubSpot Forms API Payload
     const portalData = {
       fields: [
         { name: "firstname", value: firstName },
@@ -69,7 +70,7 @@ export default function VolunteerPage() {
 
     try {
       const response = await fetch(
-        `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_ID}`,
+        `https://api-${HUBSPOT_REGION}.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_ID}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -190,8 +191,7 @@ export default function VolunteerPage() {
                 </div>
               ) : (
                 <>
-                  <h2 className="font-display text-3xl font-light mb-2" style={{ color: 'var(--forest)' }}>Apply in 1 minute</h2>
-                  <p className="text-slate-400 text-sm mb-8">We&apos;ll train you. Just bring your passion for climate action.</p>
+                  <h2 className="font-display text-3xl font-light mb-8" style={{ color: 'var(--forest)' }}>Apply in 1 minute</h2>
 
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
