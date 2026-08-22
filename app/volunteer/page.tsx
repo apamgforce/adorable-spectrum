@@ -5,6 +5,11 @@ import { Users, MapPin, Send, CheckCircle, AlertCircle, Clock } from "lucide-rea
 
 const VOLUNTEER_IMG = "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=900&q=85&auto=format&fit=crop";
 
+// Replace these with your actual HubSpot values
+const HUBSPOT_PORTAL_ID = "YOUR_HUBSPOT_PORTAL_ID";
+const HUBSPOT_FORM_ID = "YOUR_HUBSPOT_FORM_ID";
+const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0";
+
 function useRevealAll() {
   useEffect(() => {
     const elements = document.querySelectorAll(".reveal");
@@ -26,12 +31,12 @@ function useRevealAll() {
 
 export default function VolunteerPage() {
   const [form, setForm] = useState({ 
-    name: "", 
+    fullName: "", 
     whatsapp: "", 
     email: "", 
-    role: "", 
+    track: "", 
     hours: "", 
-    area: "" 
+    mode: "" 
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   useRevealAll();
@@ -40,32 +45,45 @@ export default function VolunteerPage() {
     e.preventDefault();
     setStatus("submitting");
 
+    // Split Full Name into First and Last Name for HubSpot
+    const nameParts = form.fullName.trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "N/A";
+
+    // Prepare HubSpot Forms API v3 Payload
+    const portalData = {
+      fields: [
+        { name: "firstname", value: firstName },
+        { name: "lastname", value: lastName },
+        { name: "email", value: form.email },
+        { name: "mobilephone", value: form.whatsapp },
+        { name: "volunteer_track", value: form.track },
+        { name: "hours_per_month", value: form.hours },
+        { name: "engagement_mode", value: form.mode }
+      ],
+      context: {
+        pageUri: window.location.href,
+        pageName: "Volunteer Application Page"
+      }
+    };
+
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_key: "84b28010-14e6-4d41-8b6c-7da6f3580552",
-          name: form.name,
-          whatsapp: form.whatsapp,
-          email: form.email,
-          role: form.role,
-          hours: form.hours,
-          area: form.area,
-          subject: `GFA Volunteer Application: ${form.role}`,
-          message: `New Volunteer Application\n\nName: ${form.name}\nWhatsApp: ${form.whatsapp}\nEmail: ${form.email}\nRole: ${form.role}\nHours/Month: ${form.hours}\nArea: ${form.area}\n\nJoin WhatsApp Group: https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0`,
-          from_name: "Greenforce Foundation Africa Web"
-        }),
-      });
+      const response = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_ID}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(portalData),
+        }
+      );
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (response.ok) {
         setStatus("success");
-        setForm({ name: "", whatsapp: "", email: "", role: "", hours: "", area: "" });
-        // Auto redirect to WhatsApp group after 2 seconds
+        setForm({ fullName: "", whatsapp: "", email: "", track: "", hours: "", mode: "" });
+        
+        // Auto-redirect to WhatsApp group after 2 seconds
         setTimeout(() => {
-          window.open("https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0", "_blank");
+          window.open(WHATSAPP_GROUP_LINK, "_blank");
         }, 2000);
       } else {
         setStatus("error");
@@ -114,10 +132,9 @@ export default function VolunteerPage() {
                   <Users size={18} style={{ color: 'var(--sage)' }} />
                 </div>
                 <div>
-                  <p className="font-medium text-sm" style={{ color: 'var(--forest)' }}>Volunteer Roles</p>
+                  <p className="font-medium text-sm" style={{ color: 'var(--forest)' }}>Volunteer Tracks</p>
                   <p className="text-slate-600 text-xs mt-1 leading-relaxed">
-                    Content Creator, Community Mobilizer, Research, Fundraising, Graphic Design, 
-                    Video Editor, Translation, Event Hype
+                    Media & Content, Field Operations, Community Outreach, Grant Writing, Graphic Design, Video Editing, Local Translations
                   </p>
                 </div>
               </div>
@@ -138,7 +155,7 @@ export default function VolunteerPage() {
                 </div>
                 <div>
                   <p className="font-medium text-sm" style={{ color: 'var(--forest)' }}>Location</p>
-                  <p className="text-slate-500 text-sm mt-1">Virtual from anywhere + Physical in Ghana</p>
+                  <p className="text-slate-500 text-sm mt-1">Virtual from anywhere + Physical in Ghana & The Gambia</p>
                 </div>
               </div>
             </div>
@@ -159,15 +176,16 @@ export default function VolunteerPage() {
                   <CheckCircle size={48} className="mx-auto mb-4" style={{ color: 'var(--sage)' }} />
                   <h3 className="font-display text-3xl font-light mb-3" style={{ color: 'var(--forest)' }}>Application sent!</h3>
                   <p className="text-slate-500 text-sm leading-relaxed mb-4">
-                    Thank you for joining Greenforce. We&apos;ll email you within 3 days. 
-                    Redirecting you to our WhatsApp group now...
+                    Thank you for joining Greenforce. We&apos;ve logged your details. 
+                    Redirecting you to our active WhatsApp group now...
                   </p>
                   <a 
-                    href="https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0"
+                    href={WHATSAPP_GROUP_LINK}
                     target="_blank"
+                    rel="noreferrer"
                     className="text-sm font-medium" style={{ color: 'var(--leaf)' }}
                   >
-                    Join WhatsApp Group →
+                    Click here if not redirected automatically →
                   </a>
                 </div>
               ) : (
@@ -180,8 +198,8 @@ export default function VolunteerPage() {
                       <label className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: 'var(--forest)' }}>Full Name</label>
                       <input
                         required
-                        value={form.name}
-                        onChange={e => setForm({ ...form, name: e.target.value })}
+                        value={form.fullName}
+                        onChange={e => setForm({ ...form, fullName: e.target.value })}
                         placeholder="Your full name"
                         disabled={status === "submitting"}
                         className="w-full px-4 py-3 rounded-xl border text-sm outline-none focus:ring-2 transition-all disabled:opacity-50"
@@ -218,30 +236,27 @@ export default function VolunteerPage() {
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: 'var(--forest)' }}>Volunteer Role</label>
+                      <label className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: 'var(--forest)' }}>Primary Volunteer Track</label>
                       <select
                         required
-                        value={form.role}
-                        onChange={e => setForm({ ...form, role: e.target.value })}
+                        value={form.track}
+                        onChange={e => setForm({ ...form, track: e.target.value })}
                         disabled={status === "submitting"}
                         className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all disabled:opacity-50"
-                        style={{ borderColor: 'rgba(74,140,82,0.2)', background: 'var(--mist)', color: form.role ? 'var(--charcoal)' : '#94a3b8' }}
+                        style={{ borderColor: 'rgba(74,140,82,0.2)', background: 'var(--mist)', color: form.track ? 'var(--charcoal)' : '#94a3b8' }}
                       >
-                        <option value="">Select a role...</option>
-                        <option>Content Creator Advocate</option>
-                        <option>Community Mobilizer Advocate</option>
-                        <option>Research Advocate</option>
-                        <option>Fundraising Advocate</option>
-                        <option>Graphic Design Advocate</option>
-                        <option>Video/Status Editor Advocate</option>
-                        <option>Translation Advocate - Twi/Hausa/Ga</option>
-                        <option>Event Hype Advocate</option>
+                        <option value="">Select your primary skill / focus...</option>
+                        <option value="Media & Creative">Media, Graphic Design & Video Editing</option>
+                        <option value="Community Mobilization">Community Mobilization & Field Operations</option>
+                        <option value="Research & Writing">Research, Grant Writing & Fundraising</option>
+                        <option value="Translation">Translation (Twi, Hausa, Ga, Fante)</option>
+                        <option value="Event Support">Event Planning & On-Ground Hype</option>
                       </select>
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
-                        <label className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: 'var(--forest)' }}>Hours per Month</label>
+                        <label className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: 'var(--forest)' }}>Hours / Month</label>
                         <select
                           required
                           value={form.hours}
@@ -251,26 +266,26 @@ export default function VolunteerPage() {
                           style={{ borderColor: 'rgba(74,140,82,0.2)', background: 'var(--mist)', color: form.hours ? 'var(--charcoal)' : '#94a3b8' }}
                         >
                           <option value="">Select...</option>
-                          <option>2-4 hours</option>
-                          <option>5-6 hours</option>
-                          <option>7-8 hours</option>
+                          <option value="2-4 hours">2-4 hours</option>
+                          <option value="5-6 hours">5-6 hours</option>
+                          <option value="7-8 hours">7-8 hours</option>
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: 'var(--forest)' }}>Advocate Area</label>
+                        <label className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: 'var(--forest)' }}>Engagement Mode</label>
                         <select
                           required
-                          value={form.area}
-                          onChange={e => setForm({ ...form, area: e.target.value })}
+                          value={form.mode}
+                          onChange={e => setForm({ ...form, mode: e.target.value })}
                           disabled={status === "submitting"}
                           className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all disabled:opacity-50"
-                          style={{ borderColor: 'rgba(74,140,82,0.2)', background: 'var(--mist)', color: form.area ? 'var(--charcoal)' : '#94a3b8' }}
+                          style={{ borderColor: 'rgba(74,140,82,0.2)', background: 'var(--mist)', color: form.mode ? 'var(--charcoal)' : '#94a3b8' }}
                         >
                           <option value="">Select...</option>
-                          <option>Physical</option>
-                          <option>Graphic</option>
-                          <option>Content</option>
-                          <option>Video</option>
+                          <option value="Virtual (Remote)">Virtual / Remote</option>
+                          <option value="On-Site (Ghana)">On-Site (Ghana)</option>
+                          <option value="On-Site (Gambia)">On-Site (The Gambia)</option>
+                          <option value="Hybrid">Hybrid</option>
                         </select>
                       </div>
                     </div>
