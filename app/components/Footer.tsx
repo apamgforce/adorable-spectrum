@@ -1,4 +1,3 @@
-```tsx
 import Link from "next/link";
 import {
   Mail,
@@ -275,4 +274,3 @@ export default function Footer() {
     </footer>
   );
 }
-```
