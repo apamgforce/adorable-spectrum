@@ -1,3 +1,4 @@
+```tsx
 import Link from "next/link";
 import {
   Mail,
@@ -80,14 +81,14 @@ export default function Footer() {
             <div style={{ width: "36px", height: "36px", borderRadius: "6px", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <img 
                 src="/logo.jpg" 
-                alt="Greenforce Foundation Africa Logo" 
+                alt="VTO Greenforce Foundation Africa Logo" 
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
 
             <div>
               <span style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: "1.125rem", fontWeight: 600, color: s.white, display: "block", lineHeight: 1.2 }}>
-                Greenforce
+                VTO Greenforce
               </span>
               <span style={{ fontSize: "0.75rem", display: "block", color: "rgba(255,255,255,0.6)", letterSpacing: "0.15em", textTransform: "uppercase" }}>
                 Foundation Africa
@@ -168,11 +169,11 @@ export default function Footer() {
             <li style={{ display: "flex", gap: "12px", alignItems: "center" }}>
               <Mail size={16} style={{ color: s.amber, flexShrink: 0 }} />
               <a
-                href="mailto:greenforceafricaconsult@gmail.com"
+                href="mailto:info@greenforceafrica.com"
                 style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.6)", fontSize: "0.875rem", textDecoration: "none", transition: "color 0.3s ease" }}
                 className="footer-nav-link"
               >
-                greenforceafricaconsult@gmail.com
+                info@greenforceafrica.com
               </a>
             </li>
 
@@ -233,7 +234,7 @@ export default function Footer() {
               aria-label="YouTube"
               className="footer-social-icon-btn"
             >
-              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.002 3.002 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.002 3.002 0 0 0 2.11 2.11C4.483 20.455 12 20.455 12 20.455s7.517 0 9.388-.508a3.002 3.002 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             </a>
 
             {/* LinkedIn */}
@@ -244,7 +245,7 @@ export default function Footer() {
               aria-label="LinkedIn"
               className="footer-social-icon-btn"
             >
-              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 23.227 22.225 0h.003z"/></svg>
             </a>
           </div>
         </div>
@@ -253,7 +254,7 @@ export default function Footer() {
       {/* ── LOWER META STRIP ── */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", margin: 0 }}>
-          © {new Date().getFullYear()} Greenforce Foundation Africa. All rights reserved.
+          © {new Date().getFullYear()} VTO Greenforce Foundation Africa. All rights reserved.
         </p>
 
         <div style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", margin: 0, textAlign: "right" }}>
@@ -274,3 +275,4 @@ export default function Footer() {
     </footer>
   );
 }
+```
