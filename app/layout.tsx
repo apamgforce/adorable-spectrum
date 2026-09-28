@@ -12,6 +12,9 @@ export const metadata: Metadata = {
       "VTO Greenforce Foundation Africa | School Greenhouses, Education & Community Support",
     template: "%s | VTO Greenforce Foundation Africa",
   },
+  verification: {
+    google: "Y-tS5j6qKKRgRiJBP1SaWm8d0VadYgr-ne3HJOlZxWA",
+  },
 
   description:
     "VTO Greenforce Foundation Africa is a West African NGO empowering communities in Ghana and The Gambia. We transform lives through school greenhouses, youth agricultural training, education sponsorships, healthcare outreach, widow support, and dedicated care for the aged and less privileged.",
