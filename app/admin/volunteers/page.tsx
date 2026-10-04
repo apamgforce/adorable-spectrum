@@ -70,6 +70,7 @@ export default function VolunteerAdmin() {
   };
 
   const qualifies = (id: number) => !!data?.eligible.some((e) => e.id === id);
+  const pending = (data?.volunteers || []).filter((v) => v.status === "pending");
   const active = useMemo(() => (data?.volunteers || []).filter((v) => v.status === "active"), [data]);
 
   if (!auth) {
@@ -142,7 +143,7 @@ export default function VolunteerAdmin() {
         )}
 
         <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-100 w-fit mb-5">
-          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", "Volunteers"], ["certs", `Certificates${data?.eligible.filter((e) => !e.issued).length ? ` (${data.eligible.filter((e) => !e.issued).length})` : ""}`], ["settings", "Settings"]] as const).map(([id, l]) => (
+          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", `Volunteers${pending.length ? ` (${pending.length} new)` : ""}`], ["certs", `Certificates${data?.eligible.filter((e) => !e.issued).length ? ` (${data.eligible.filter((e) => !e.issued).length})` : ""}`], ["settings", "Settings"]] as const).map(([id, l]) => (
             <button key={id} onClick={() => setTab(id)} className={`px-4 py-2 rounded-lg text-base ${tab === id ? "bg-forest text-white" : "text-slate-600"}`}>{l}</button>
           ))}
         </div>
@@ -177,7 +178,7 @@ export default function VolunteerAdmin() {
                 </div>
               </div>
               <div className="max-h-96 overflow-auto divide-y divide-slate-100">
-                {active.length === 0 && <p className="text-base text-slate-400 py-6 text-center">No volunteers yet. Add one or sync from HubSpot.</p>}
+                {active.length === 0 && <p className="text-base text-slate-400 py-6 text-center">No approved volunteers yet. Approve new signups in the Volunteers tab.</p>}
                 {active.map((v) => (
                   <label key={v.id} className="flex items-center gap-3 py-2.5 cursor-pointer">
                     <input type="checkbox" className="accent-[#2d6a35] w-4 h-4" checked={sel.includes(v.id)} onChange={() => setSel(sel.includes(v.id) ? sel.filter((i) => i !== v.id) : [...sel, v.id])} />
@@ -214,15 +215,21 @@ export default function VolunteerAdmin() {
               <table className="w-full text-base">
                 <thead><tr className="text-left text-sm uppercase tracking-wider text-slate-400 border-b border-slate-100"><th className="p-4">Volunteer</th><th>ID</th><th>Done</th><th>Group</th><th></th></tr></thead>
                 <tbody>
-                  {data?.volunteers.map((v) => (
-                    <tr key={v.id} className={`border-b border-slate-50 ${v.status !== "active" ? "opacity-40" : ""}`}>
+                  {[...(data?.volunteers || [])].sort((a, b) => Number(b.status === "pending") - Number(a.status === "pending")).map((v) => (
+                    <tr key={v.id} className={`border-b border-slate-50 ${v.status === "inactive" ? "opacity-40" : v.status === "pending" ? "bg-amber/10" : ""}`}>
                       <td className="p-4"><p className="font-medium text-forest">{v.name}</p><p className="text-sm text-slate-400">{v.track || "No track"}{v.last_login ? "" : " · never logged in"}</p></td>
-                      <td className="font-mono text-sm">{v.code}</td>
+                      <td className="font-mono text-sm">{v.status === "pending" ? <span className="text-earth text-sm font-sans">Awaiting approval</span> : v.code}</td>
                       <td>{v.done}/{v.assigned}</td>
                       <td>{v.confirmed}</td>
                       <td className="text-right pr-4 whitespace-nowrap">
-                        <button onClick={() => copy(v)} className="p-2 text-slate-400 hover:text-forest" title="Copy invite message">{copied === v.code ? <Check size={15} /> : <Copy size={15} />}</button>
-                        <button onClick={() => post({ action: "set_status", volunteerId: v.id, status: v.status === "active" ? "inactive" : "active" })} className="text-sm text-slate-400 hover:text-forest px-2">{v.status === "active" ? "Pause" : "Activate"}</button>
+                        {v.status === "pending" ? (
+                          <button onClick={async () => { const r = await post({ action: "set_status", volunteerId: v.id, status: "active" }); if (r) { copy(v); setMsg(`${v.name} approved. Their invite message with the ID is copied: paste it to them.`); } }} className="btn-shimmer px-4 py-2 rounded-lg text-white text-base mr-1">Approve</button>
+                        ) : (
+                          <>
+                            <button onClick={() => copy(v)} className="p-2 text-slate-400 hover:text-forest" title="Copy invite message">{copied === v.code ? <Check size={15} /> : <Copy size={15} />}</button>
+                            <button onClick={() => post({ action: "set_status", volunteerId: v.id, status: v.status === "active" ? "inactive" : "active" })} className="text-sm text-slate-400 hover:text-forest px-2">{v.status === "active" ? "Pause" : "Activate"}</button>
+                          </>
+                        )}
                         <button onClick={() => { if (confirm(`Delete ${v.name} permanently? Their tasks and certificate are deleted too.`)) post({ action: "delete_volunteer", volunteerId: v.id }, "Volunteer deleted"); }} className="text-sm text-red-500 hover:text-red-700 px-2" title="Delete volunteer"><Trash2 size={15} /></button>
                       </td>
                     </tr>

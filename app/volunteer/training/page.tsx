@@ -6,8 +6,8 @@ import { ChevronDown, CheckCircle2, Circle, MessageCircle, ArrowRight, Clipboard
 
 
 const FLOW = [
-  { icon: Users, title: "Sign up & get your ID", text: "Fill in the volunteer form. Your personal ID, like GF-7K2QX, appears right after you submit. Save it: it's your key, no password needed." },
-  { icon: Smartphone, title: "Get approved", text: "Join the main community group. Once the coordinator approves you, you're invited to the Active Volunteers group, where all work is reported." },
+  { icon: Users, title: "Sign up", text: "Fill in the volunteer form and join the main community group." },
+  { icon: Smartphone, title: "Get approved & receive your ID", text: "Once the coordinator approves you, you're added to the Active Volunteers group, where all work is reported. Your personal ID, like GF-7K2QX, is sent to you there. It's your key, no password needed." },
   { icon: ClipboardList, title: "Receive tasks", text: "Tasks are assigned once or twice a week. Open the portal and enter your ID to see yours." },
   { icon: CheckCheck, title: "Mark done", text: "When you finish, tap Mark as done in the portal." },
   { icon: MessageCircle, title: "Type DONE in the group", text: "Then type DONE in the Active Volunteers group so the whole team sees it." },

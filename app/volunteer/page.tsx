@@ -40,8 +40,6 @@ export default function VolunteerPage() {
     hours: "", 
     mode: "" 
   });
-  const [myCode, setMyCode] = useState<string | null>(null);
-  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   useRevealAll();
 
@@ -82,17 +80,13 @@ export default function VolunteerPage() {
       );
 
       if (response.ok) {
-        // Register in the volunteer system and get the personal ID (never blocks the signup)
+        // Register in the volunteer system as pending approval (never blocks the signup)
         try {
-          const r = await fetch("/api/volunteer/signup", {
+          await fetch("/api/volunteer/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: form.fullName, email: form.email, whatsapp: form.whatsapp, track: form.track }),
           });
-          const j = await r.json();
-          setMyCode(j.code || null);
-          setAlreadyRegistered(!!j.existing);
-          if (j.code) { try { localStorage.setItem("gf_vol_code", j.code); } catch {} }
         } catch {}
         setStatus("success");
         setForm({ fullName: "", whatsapp: "", email: "", track: "", hours: "", mode: "" });
@@ -194,18 +188,10 @@ export default function VolunteerPage() {
                   <p className="text-slate-500 text-sm leading-relaxed mb-4">
                     Thank you for joining Greenforce. We&apos;ve logged your details.
                   </p>
-                  {myCode ? (
-                    <div className="rounded-2xl p-5 mb-5" style={{ background: 'var(--mist)' }}>
-                      <p className="text-xs tracking-[0.2em] uppercase mb-1" style={{ color: 'var(--sage)' }}>Your personal volunteer ID</p>
-                      <p className="text-3xl font-semibold tracking-widest" style={{ color: 'var(--forest)' }}>{myCode}</p>
-                      <p className="text-sm text-slate-500 mt-2">Save this. You&apos;ll use it to see and complete your tasks.</p>
-                      <a href="/volunteer/portal" className="inline-block mt-3 text-sm font-medium" style={{ color: 'var(--leaf)' }}>Open my portal →</a>
-                    </div>
-                  ) : alreadyRegistered ? (
-                    <p className="text-sm rounded-2xl p-4 mb-5" style={{ background: 'var(--mist)', color: 'var(--forest)' }}>
-                      This email is already registered. To see your ID, register again with the same WhatsApp number you used before, or ask the coordinator.
-                    </p>
-                  ) : null}
+                  <div className="rounded-2xl p-5 mb-5 text-left" style={{ background: 'var(--mist)' }}>
+                    <p className="font-medium mb-1" style={{ color: 'var(--forest)' }}>What happens next</p>
+                    <p className="text-sm text-slate-600">We review your application. Once you&apos;re approved, you&apos;ll be added to the Active Volunteers group and receive your personal volunteer ID there.</p>
+                  </div>
                   <p className="text-slate-500 text-sm mb-3">Opening our WhatsApp community group...</p>
                   <a 
                     href={WHATSAPP_GROUP_LINK}
