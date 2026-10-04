@@ -17,7 +17,6 @@ type Dash = {
   eligible: { id: number; name: string; email: string | null; whatsapp: string | null; assigned: number; done: number; issued: boolean; token: string | null; kind: string | null }[];
   galleryOps: { id: number; username: string }[];
   activeGroup: string;
-  emailEnabled: boolean;
 };
 
 export default function VolunteerAdmin() {
@@ -240,7 +239,7 @@ export default function VolunteerAdmin() {
                       <td>{v.confirmed}</td>
                       <td className="text-right pr-4 whitespace-nowrap">
                         {v.status === "pending" ? (
-                          <button onClick={async () => { const r = await post({ action: "set_status", volunteerId: v.id, status: "active" }); if (r) { copy(v); setMsg(r.emailed ? `${v.name} approved. Their ID was emailed. The WhatsApp invite is also copied if you want to paste it.` : `${v.name} approved. Their invite message with the ID is copied: paste it to them.`); } }} className="btn-shimmer px-4 py-2 rounded-lg text-white text-base mr-1">Approve</button>
+                          <button onClick={async () => { const r = await post({ action: "set_status", volunteerId: v.id, status: "active" }); if (r) { copy(v); setMsg(`${v.name} approved. Their invite message with the ID is copied: paste it to them.`); } }} className="btn-shimmer px-4 py-2 rounded-lg text-white text-base mr-1">Approve</button>
                         ) : (
                           <>
                             <button onClick={() => copy(v)} className="p-2 text-slate-400 hover:text-forest" title="Copy invite message">{copied === v.code ? <Check size={15} /> : <Copy size={15} />}</button>
@@ -288,9 +287,7 @@ export default function VolunteerAdmin() {
                     <>
                       <a href={link} target="_blank" className="px-5 py-3 rounded-xl border border-slate-200 text-lg">View</a>
                       <a href={`${link}/pdf`} className="px-5 py-3 rounded-xl border border-slate-200 text-lg">PDF</a>
-                      {v.email && (data?.emailEnabled
-                        ? <button onClick={() => post({ action: "email_certificate", volunteerId: v.id }, `Certificate emailed to ${v.email}`)} className="px-5 py-3 rounded-xl bg-forest text-white text-lg">Email it</button>
-                        : <a href={`mailto:${v.email}?subject=${encodeURIComponent("Your Greenforce Certificate")}&body=${encodeURIComponent(body)}`} className="px-5 py-3 rounded-xl bg-forest text-white text-lg">Email it</a>)}
+                      {v.email && <a href={`mailto:${v.email}?subject=${encodeURIComponent("Your Greenforce Certificate")}&body=${encodeURIComponent(body)}`} className="px-5 py-3 rounded-xl bg-forest text-white text-lg">Email it</a>}
                       {v.whatsapp && <a href={`https://wa.me/${v.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(body)}`} target="_blank" className="px-5 py-3 rounded-xl bg-[#25D366] text-white text-lg">WhatsApp</a>}
                     </>
                   )}
@@ -308,12 +305,6 @@ export default function VolunteerAdmin() {
               <p className="text-base text-slate-500">Paste the invite link of the group where volunteers type DONE. It powers the buttons in the portal and training.</p>
               <input className={input} placeholder="https://chat.whatsapp.com/..." value={group} onChange={(e) => setGroup(e.target.value)} />
               <button disabled={busy} onClick={() => post({ action: "set_active_group", link: group }, "Group link saved")} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium">Save link</button>
-            </div>
-            <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-2 lg:col-span-2">
-              <h2 className="font-display text-2xl text-forest">Automatic emails</h2>
-              <p className={`text-lg font-medium ${data?.emailEnabled ? "text-leaf" : "text-earth"}`}>{data?.emailEnabled ? "Connected ✓" : "Not connected yet"}</p>
-              <p className="text-base text-slate-500">When connected, volunteers get an email when they apply, when you approve them (with their ID), and when you send a certificate. Until then, the site works the same and you use the copy and WhatsApp buttons.</p>
-              {!data?.emailEnabled && <p className="text-base text-slate-500">To connect: create a free account at resend.com, verify your domain there, then add <code>RESEND_API_KEY</code> (and optionally <code>EMAIL_FROM</code>) in your Vercel environment variables and redeploy.</p>}
             </div>
             <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3">
               <h2 className="font-display text-2xl text-forest">Gallery-only logins</h2>

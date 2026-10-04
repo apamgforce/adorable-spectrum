@@ -40,7 +40,6 @@ export default function VolunteerPage() {
     hours: "", 
     mode: "" 
   });
-  const [emailed, setEmailed] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   useRevealAll();
 
@@ -83,13 +82,11 @@ export default function VolunteerPage() {
       if (response.ok) {
         // Register in the volunteer system as pending approval (never blocks the signup)
         try {
-          const r = await fetch("/api/volunteer/signup", {
+          await fetch("/api/volunteer/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: form.fullName, email: form.email, whatsapp: form.whatsapp, track: form.track }),
           });
-          const j = await r.json();
-          setEmailed(!!j.emailed);
         } catch {}
         setStatus("success");
         setForm({ fullName: "", whatsapp: "", email: "", track: "", hours: "", mode: "" });
@@ -193,7 +190,7 @@ export default function VolunteerPage() {
                   </p>
                   <div className="rounded-2xl p-5 mb-5 text-left" style={{ background: 'var(--mist)' }}>
                     <p className="font-medium mb-1" style={{ color: 'var(--forest)' }}>What happens next</p>
-                    <p className="text-sm text-slate-600">We review your application. Once you&apos;re approved, you&apos;ll be added to the Active Volunteers group and receive your personal volunteer ID there.{emailed ? " We have also sent a confirmation to your email." : ""}</p>
+                    <p className="text-sm text-slate-600">We review your application. Once you&apos;re approved, you&apos;ll be added to the Active Volunteers group and receive your personal volunteer ID there.</p>
                   </div>
                   <p className="text-slate-500 text-sm mb-3">Opening our WhatsApp community group...</p>
                   <a 
