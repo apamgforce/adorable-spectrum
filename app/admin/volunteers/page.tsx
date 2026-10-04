@@ -143,7 +143,7 @@ export default function VolunteerAdmin() {
         )}
 
         <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-100 w-fit mb-5">
-          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", "Volunteers"]] as const).map(([id, l]) => (
+          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", "Volunteers"], ["certs", `Certificates${data?.eligible.filter((e) => !e.issued).length ? ` (${data.eligible.filter((e) => !e.issued).length})` : ""}`], ["settings", "Settings"]] as const).map(([id, l]) => (
             <button key={id} onClick={() => setTab(id)} className={`px-4 py-2 rounded-lg text-base ${tab === id ? "bg-forest text-white" : "text-slate-600"}`}>{l}</button>
           ))}
         </div>
