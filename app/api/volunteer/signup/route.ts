@@ -14,7 +14,10 @@ export async function POST(request: Request) {
     if (!name || !email.includes("@")) return NextResponse.json({ ok: false }, { status: 400 });
     await sql`INSERT INTO vol_volunteers (code, name, email, whatsapp, track)
       VALUES (${makeCode()}, ${name}, ${email}, ${String(b.whatsapp || "").slice(0, 40) || null}, ${String(b.track || "").slice(0, 60) || null})
-      ON CONFLICT (email) DO NOTHING`;
+      ON CONFLICT (email) DO UPDATE SET
+        name = EXCLUDED.name,
+        track = COALESCE(EXCLUDED.track, vol_volunteers.track),
+        whatsapp = COALESCE(EXCLUDED.whatsapp, vol_volunteers.whatsapp)`;
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false }, { status: 500 });
