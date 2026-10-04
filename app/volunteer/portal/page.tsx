@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Paperclip, X, CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles } from "lucide-react";
+import { Share2, Download, Link2, Check, Paperclip, X, CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles } from "lucide-react";
 
 
 type Assignment = {
@@ -10,7 +10,7 @@ type Assignment = {
   attachments?: number; done_at: string | null; group_confirmed_at: string | null; verified_at: string | null;
   title: string; details: string | null; track: string | null; due_date: string | null;
 };
-type Data = { volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[]; certificate: { token: string; kind: string } | null; activeGroup: string };
+type Data = { volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[]; certificate: { token: string; kind: string; issued_at: string } | null; activeGroup: string };
 
 
 // Shrink phone photos before upload so they stay well under the 4MB request limit.
@@ -39,6 +39,7 @@ export default function PortalPage() {
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState("");
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const call = useCallback(async (c: string, extra: Record<string, unknown> = {}) => {
     const res = await fetch("/api/volunteer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: c, ...extra }) });
@@ -169,6 +170,32 @@ export default function PortalPage() {
             <p className="text-base mt-1 opacity-90 flex items-center gap-1">View &amp; download <ArrowRight size={14} /></p>
           </a>
         )}
+
+        {data.certificate && (() => {
+          const t = data.certificate.token;
+          const verifyUrl = `${location.origin}/verified/${t}`;
+          const d = new Date(data.certificate.issued_at);
+          const linkedinAdd = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent("Greenforce Verified Volunteer")}&organizationName=${encodeURIComponent("VTO Greenforce Foundation Africa")}&issueYear=${d.getFullYear()}&issueMonth=${d.getMonth() + 1}&certUrl=${encodeURIComponent(verifyUrl)}&certId=${encodeURIComponent("GF-" + t.slice(0, 8).toUpperCase())}`;
+          const linkedinShare = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(verifyUrl)}`;
+          return (
+            <div className="rounded-3xl bg-white border border-slate-100 shadow-sm p-6 mb-6">
+              <div className="flex items-center gap-5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`/certificate/${t}/badge`} alt="Greenforce Verified Volunteer badge" className="w-28 h-28 rounded-full shadow-lg shrink-0" />
+                <div>
+                  <p className="font-display text-2xl text-forest">Greenforce Verified Volunteer</p>
+                  <p className="text-base text-slate-500 mt-1">Your official badge. Share it with pride.</p>
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-2 mt-5">
+                <a href={linkedinAdd} target="_blank" rel="noopener noreferrer" className="py-3 rounded-xl bg-[#0A66C2] text-white text-base font-medium flex items-center justify-center gap-2"><Share2 size={16} /> Add to LinkedIn profile</a>
+                <a href={linkedinShare} target="_blank" rel="noopener noreferrer" className="py-3 rounded-xl border border-[#0A66C2] text-[#0A66C2] text-base font-medium flex items-center justify-center gap-2"><Share2 size={16} /> Share a LinkedIn post</a>
+                <a href={`/certificate/${t}/badge`} download="Greenforce-Verified-Volunteer-Badge.png" className="py-3 rounded-xl border border-slate-200 text-slate-700 text-base flex items-center justify-center gap-2"><Download size={16} /> Download badge</a>
+                <button onClick={() => { navigator.clipboard.writeText(verifyUrl); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 1800); }} className="py-3 rounded-xl border border-slate-200 text-slate-700 text-base flex items-center justify-center gap-2">{copiedLink ? <><Check size={16} /> Link copied</> : <><Link2 size={16} /> Copy verification link</>}</button>
+              </div>
+            </div>
+          );
+        })()}
 
         {error && <p className="text-base text-red-600 mb-4">{error}</p>}
 
