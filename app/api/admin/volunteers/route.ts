@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql, ensureSchema, makeCode, isAdmin, getSetting, hashPassword } from "../../../lib/volunteer-db";
+import { emailEnabled, sendApproved, sendCertificate } from "../../../lib/email";
 
 export const dynamic = "force-dynamic";
 const deny = () => NextResponse.json({ error: "Access denied" }, { status: 401 });
@@ -60,7 +61,7 @@ export async function GET(request: Request) {
       ORDER BY (c.id IS NOT NULL), done DESC`;
     const galleryOps = await sql`SELECT id, username, created_at FROM vol_gallery_ops ORDER BY id`;
     const activeGroup = await getSetting("active_group");
-    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, galleryOps, activeGroup });
+    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, galleryOps, activeGroup, emailEnabled: emailEnabled() });
   } catch {
     return NextResponse.json({ error: "Failed to load" }, { status: 500 });
   }
@@ -105,10 +106,26 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "set_status") {
+      const id = Number(body.volunteerId);
+      const [before] = await sql`SELECT status, name, email, code FROM vol_volunteers WHERE id = ${id}`;
       await sql`UPDATE vol_volunteers SET status = ${body.status === "inactive" ? "inactive" : "active"},
         approved_at = CASE WHEN ${body.status === "inactive"} THEN approved_at ELSE COALESCE(approved_at, now()) END
-        WHERE id = ${Number(body.volunteerId)}`;
-      return NextResponse.json({ success: true });
+        WHERE id = ${id}`;
+      // First approval: email the volunteer their ID (a no-op until email is connected)
+      let emailed = false;
+      if (before && body.status !== "inactive" && before.status === "pending") {
+        emailed = await sendApproved(before.email, before.name, before.code, new URL(request.url).origin, await getSetting("active_group"));
+      }
+      return NextResponse.json({ success: true, emailed });
+    }
+
+    if (body.action === "email_certificate") {
+      const [c] = await sql`SELECT v.name, v.email, c.token FROM vol_certificates c
+        JOIN vol_volunteers v ON v.id = c.volunteer_id WHERE v.id = ${Number(body.volunteerId)}`;
+      if (!c?.email) return NextResponse.json({ error: "This volunteer has no email address" }, { status: 400 });
+      const ok = await sendCertificate(c.email, c.name, c.token, new URL(request.url).origin);
+      if (!ok) return NextResponse.json({ error: "The email could not be sent. Check the email connection in Settings." }, { status: 502 });
+      return NextResponse.json({ success: true, emailed: true });
     }
 
     if (body.action === "set_active_group") {
