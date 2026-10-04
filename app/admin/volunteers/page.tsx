@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { TRACKS, TASK_TEMPLATES } from "../../lib/tracks";
-import { Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, Copy, Check, AlertTriangle, MessageCircle, Download } from "lucide-react";
+import { LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, Copy, Check, AlertTriangle, MessageCircle, Download } from "lucide-react";
 
 
 type Vol = { cert_token: string | null; id: number; code: string; name: string; email: string | null; whatsapp: string | null; track: string | null; status: string; assigned: number; done: number; confirmed: number; last_login: string | null };
@@ -48,6 +48,8 @@ export default function VolunteerAdmin() {
     const a = `Bearer ${u}:${p}`;
     try { await load(a); sessionStorage.setItem("gf_admin_auth", a); setAuth(a); } catch (x) { setErr((x as Error).message); }
   };
+
+  const logout = () => { sessionStorage.removeItem("gf_admin_auth"); setAuth(null); setData(null); setU(""); setP(""); };
 
   const post = async (body: Record<string, unknown>, ok?: string) => {
     if (!auth) return null;
@@ -99,8 +101,10 @@ export default function VolunteerAdmin() {
           </div>
           <div className="flex gap-2">
             <button onClick={() => post({ action: "sync_hubspot" }, "Imported {n} new volunteers from HubSpot")} disabled={busy} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><Download size={15} /> Sync HubSpot</button>
+            <Link href="/admin" className="px-5 py-3 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage">Gallery</Link>
             <Link href="/admin/volunteers/training" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><BookOpen size={15} /> Coordinator guide</Link>
             <button onClick={() => load(auth)} className="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sage" aria-label="Refresh"><RefreshCw size={16} /></button>
+            <button onClick={logout} className="px-5 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200 text-base font-medium flex items-center gap-2 hover:bg-red-600 hover:text-white"><LogOut size={16} /> Log out</button>
           </div>
         </div>
 

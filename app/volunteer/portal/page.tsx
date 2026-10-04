@@ -98,7 +98,7 @@ export default function PortalPage() {
             <p className="text-sm tracking-[0.2em] uppercase text-sage">{data.volunteer.code}{data.volunteer.track ? ` · ${data.volunteer.track}` : ""}</p>
             <h1 className="font-display text-4xl text-forest mt-1">Hello, {first}</h1>
           </div>
-          <button onClick={logout} className="p-2.5 rounded-xl bg-white border border-slate-100 text-slate-500 hover:text-forest" aria-label="Log out"><LogOut size={18} /></button>
+          <button onClick={logout} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-base flex items-center gap-2"><LogOut size={18} /> Log out</button>
         </div>
 
         <div className="bg-forest text-white rounded-3xl p-6 flex items-center gap-6 mb-6">

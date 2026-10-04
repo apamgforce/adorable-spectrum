@@ -211,7 +211,10 @@ export default function AdminPage() {
           <img src="/logo.jpg" alt="" className="h-12 w-auto object-contain rounded-lg" onError={(e)=>{e.currentTarget.style.display="none"}} />
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">Website Photo Manager <ShieldCheck className="text-emerald-600" size={20} /></h1>
         </div>
+        <div className="flex items-center gap-3">
+        <a href="/admin/volunteers" className="text-sm font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-5 py-2.5 rounded-xl border border-emerald-200">Volunteer Admin</a>
         <button onClick={handleLogout} className="text-sm font-bold text-red-600 hover:text-white bg-red-50 hover:bg-red-600 px-5 py-2.5 rounded-xl transition border border-red-200 flex items-center gap-2 shadow-sm"><LogOut size={16} /> Log Out</button>
+        </div>
       </div>
 
       {apiError && <div className="p-4 mb-6 text-sm text-red-800 bg-red-50 rounded-xl border border-red-100"><strong>Error:</strong> {apiError}</div>}
