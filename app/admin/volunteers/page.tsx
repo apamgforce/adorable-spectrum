@@ -15,7 +15,7 @@ type Dash = {
   kpi: { total: number; done: number; verified: number; overdue: number; missing_group: number; avg_hours: number | null };
   byTrack: { track: string; total: number; done: number }[];
   eligible: { id: number; name: string; email: string | null; whatsapp: string | null; assigned: number; done: number; issued: boolean; token: string | null; kind: string | null }[];
-  galleryOps: { id: number; username: string }[];
+  galleryOps: { id: number; username: string; role: string }[];
   activeGroup: string;
 };
 
@@ -26,9 +26,8 @@ export default function VolunteerAdmin() {
   const [msg, setMsg] = useState(""); const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
-  const [tab, setTab] = useState<"assign" | "queue" | "people" | "certs" | "traffic" | "settings">("assign");
-  const [traffic, setTraffic] = useState<{ totals: { kind: string; d7: number; d30: number }[]; pages: { path: string; n: number }[]; daily: { day: string; n: number }[] } | null>(null);
-  const [group, setGroup] = useState(""); const [gop, setGop] = useState({ username: "", password: "" });
+  const [tab, setTab] = useState<"assign" | "queue" | "people" | "certs" | "settings">("assign");
+  const [group, setGroup] = useState(""); const [gop, setGop] = useState({ username: "", password: "", role: "gallery" });
 
   const [sel, setSel] = useState<number[]>([]);
   const [task, setTask] = useState({ title: "", details: "", track: "", dueDate: "" });
@@ -44,11 +43,6 @@ export default function VolunteerAdmin() {
     const s = sessionStorage.getItem("gf_admin_auth");
     if (s) load(s).then(() => setAuth(s)).catch(() => sessionStorage.removeItem("gf_admin_auth"));
   }, [load]);
-
-  useEffect(() => {
-    if (tab !== "traffic" || !auth) return;
-    fetch("/api/admin/traffic", { headers: { Authorization: auth }, cache: "no-store" }).then((r) => r.json()).then((d) => { if (d.totals) setTraffic(d); }).catch(() => {});
-  }, [tab, auth]);
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault(); setErr("");
@@ -108,6 +102,7 @@ export default function VolunteerAdmin() {
             <h1 className="font-display text-4xl text-forest">Volunteer Operations</h1>
           </div>
           <div className="flex gap-2">
+            <Link href="/insights" className="px-5 py-3 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage">Insights</Link>
             <Link href="/gallery-admin" className="px-5 py-3 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage">Gallery</Link>
             <Link href="/admin/volunteers/training" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><BookOpen size={15} /> Coordinator guide</Link>
             <button onClick={() => load(auth)} className="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sage" aria-label="Refresh"><RefreshCw size={16} /></button>
@@ -150,7 +145,7 @@ export default function VolunteerAdmin() {
         )}
 
         <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-100 w-fit mb-5">
-          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", `Volunteers${pending.length ? ` (${pending.length} new)` : ""}`], ["certs", `Certificates${data?.eligible.filter((e) => !e.issued).length ? ` (${data.eligible.filter((e) => !e.issued).length})` : ""}`], ["traffic", "Traffic"], ["settings", "Settings"]] as const).map(([id, l]) => (
+          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", `Volunteers${pending.length ? ` (${pending.length} new)` : ""}`], ["certs", `Certificates${data?.eligible.filter((e) => !e.issued).length ? ` (${data.eligible.filter((e) => !e.issued).length})` : ""}`], ["settings", "Settings"]] as const).map(([id, l]) => (
             <button key={id} onClick={() => setTab(id)} className={`px-4 py-2 rounded-lg text-base ${tab === id ? "bg-forest text-white" : "text-slate-600"}`}>{l}</button>
           ))}
         </div>
@@ -304,49 +299,6 @@ export default function VolunteerAdmin() {
           </div>
         )}
 
-        {tab === "traffic" && (() => {
-          const get = (k: string) => traffic?.totals.find((t) => t.kind === k) || { d7: 0, d30: 0 };
-          const cards = [
-            ["Visits", "pageview"], ["Donate button clicks", "donate_click"], ["GiveSendGo clicks", "givesendgo_click"],
-            ["Support applications", "apply_submit"], ["Volunteer signups", "volunteer_submit"], ["Contact messages", "contact_submit"], ["WhatsApp clicks", "whatsapp_click"],
-          ] as const;
-          const max = Math.max(1, ...(traffic?.daily.map((d) => d.n) || [1]));
-          return (
-            <div className="space-y-5">
-              <p className="text-base text-slate-500">Counts public pages only. No cookies and no personal data. Form numbers count submit attempts.</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {cards.map(([label, kind]) => (
-                  <div key={kind} className="bg-white rounded-2xl p-5 border border-slate-100">
-                    <p className="font-display text-4xl text-forest">{get(kind).d7}</p>
-                    <p className="text-base text-slate-600">{label}</p>
-                    <p className="text-sm text-slate-400">last 7 days · {get(kind).d30} in 30</p>
-                  </div>
-                ))}
-              </div>
-              <div className="grid lg:grid-cols-2 gap-5">
-                <div className="bg-white rounded-2xl p-6 border border-slate-100">
-                  <h2 className="font-display text-2xl text-forest mb-4">Visits, last 14 days</h2>
-                  {(traffic?.daily.length || 0) === 0 && <p className="text-base text-slate-400">No visits recorded yet. Counting started with this update.</p>}
-                  <div className="flex items-end gap-1.5 h-32">
-                    {traffic?.daily.map((d) => (
-                      <div key={d.day} className="flex-1 flex flex-col items-center justify-end h-full" title={`${d.day}: ${d.n}`}>
-                        <div className="w-full bg-sage rounded-t" style={{ height: `${Math.max(4, (d.n / max) * 100)}%` }} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-white rounded-2xl p-6 border border-slate-100">
-                  <h2 className="font-display text-2xl text-forest mb-4">Top pages, 30 days</h2>
-                  {(traffic?.pages.length || 0) === 0 && <p className="text-base text-slate-400">Nothing yet.</p>}
-                  <ul className="divide-y divide-slate-100">
-                    {traffic?.pages.map((p) => <li key={p.path} className="flex justify-between py-2 text-base"><span className="font-mono text-sm">{p.path}</span><span>{p.n}</span></li>)}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
         {tab === "settings" && (
           <div className="grid lg:grid-cols-2 gap-5">
             <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3 h-fit">
@@ -356,17 +308,18 @@ export default function VolunteerAdmin() {
               <button disabled={busy} onClick={() => post({ action: "set_active_group", link: group }, "Group link saved")} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium">Save link</button>
             </div>
             <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3">
-              <h2 className="font-display text-2xl text-forest">Gallery-only logins</h2>
-              <p className="text-base text-slate-500">Give a trusted volunteer their own login for the gallery page (<code>/gallery-admin</code>). It can upload and edit images only, and never reveals your admin password.</p>
+              <h2 className="font-display text-2xl text-forest">Helper logins</h2>
+              <p className="text-base text-slate-500">Give a trusted person their own login that opens one area only and never reveals your admin password. <b>Gallery manager</b> opens <code>/gallery-admin</code>. <b>Insights viewer</b> opens <code>/insights</code>.</p>
               {data?.galleryOps.map((g) => (
                 <div key={g.id} className="flex items-center justify-between text-base bg-mist rounded-xl px-4 py-2.5">
-                  <span>{g.username}</span>
+                  <span>{g.username} <span className="text-sm text-slate-400">· {g.role === "insights" ? "Insights viewer" : "Gallery manager"}</span></span>
                   <button onClick={() => post({ action: "remove_gallery_op", id: g.id }, "Login removed")} className="text-sm text-red-600">Remove</button>
                 </div>
               ))}
+              <select className={input} value={gop.role} onChange={(e) => setGop({ ...gop, role: e.target.value })}><option value="gallery">Gallery manager</option><option value="insights">Insights viewer</option></select>
               <input className={input} placeholder="New username" value={gop.username} onChange={(e) => setGop({ ...gop, username: e.target.value })} />
               <input className={input} type="text" placeholder="New password (8+ characters)" value={gop.password} onChange={(e) => setGop({ ...gop, password: e.target.value })} />
-              <button disabled={busy || !gop.username || !gop.password} onClick={async () => { const r = await post({ action: "add_gallery_op", ...gop }, "Gallery login saved. Share it privately."); if (r) setGop({ username: "", password: "" }); }} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium disabled:opacity-40">Create gallery login</button>
+              <button disabled={busy || !gop.username || !gop.password} onClick={async () => { const r = await post({ action: "add_gallery_op", ...gop }, "Login saved. Share it privately."); if (r) setGop({ username: "", password: "", role: "gallery" }); }} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium disabled:opacity-40">Create login</button>
             </div>
           </div>
         )}

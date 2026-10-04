@@ -88,6 +88,8 @@ export function ensureSchema(): Promise<void> {
         hash TEXT NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
+
+      await sql`ALTER TABLE vol_gallery_ops ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'gallery'`;
     })().catch((e) => {
       ready = null;
       throw e;
@@ -117,14 +119,17 @@ export function hashPassword(password: string, salt = randomBytes(16).toString("
 }
 
 // Gallery-only logins that never learn the main admin password.
-export async function isGalleryOperator(auth: string | null): Promise<boolean> {
+export const isGalleryOperator = (auth: string | null) => hasRole(auth, "gallery");
+
+// Helper logins created from the admin. Each one is limited to a single role.
+export async function hasRole(auth: string | null, role: "gallery" | "insights"): Promise<boolean> {
   if (!auth?.startsWith("Bearer ")) return false;
   const cred = auth.slice(7);
   const i = cred.indexOf(":");
   if (i < 1) return false;
   try {
     await ensureSchema();
-    const [row] = await sql`SELECT salt, hash FROM vol_gallery_ops WHERE username = ${cred.slice(0, i)}`;
+    const [row] = await sql`SELECT salt, hash FROM vol_gallery_ops WHERE username = ${cred.slice(0, i)} AND role = ${role}`;
     if (!row) return false;
     const a = Buffer.from(hashPassword(cred.slice(i + 1), row.salt).hash);
     const b = Buffer.from(row.hash);

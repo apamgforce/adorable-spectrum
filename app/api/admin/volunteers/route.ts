@@ -58,7 +58,7 @@ export async function GET(request: Request) {
         AND COUNT(a.id) >= 4
         AND COUNT(a.id) FILTER (WHERE a.status IN ('done','verified')) * 2 >= COUNT(a.id)
       ORDER BY (c.id IS NOT NULL), done DESC`;
-    const galleryOps = await sql`SELECT id, username, created_at FROM vol_gallery_ops ORDER BY id`;
+    const galleryOps = await sql`SELECT id, username, role, created_at FROM vol_gallery_ops ORDER BY id`;
     const activeGroup = await getSetting("active_group");
     return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, galleryOps, activeGroup });
   } catch {
@@ -125,8 +125,9 @@ export async function POST(request: Request) {
       if (username.length < 3 || username.includes(":") || password.length < 8)
         return NextResponse.json({ error: "Username 3+ characters (no colon) and password 8+ characters" }, { status: 400 });
       const { salt, hash } = hashPassword(password);
-      await sql`INSERT INTO vol_gallery_ops (username, salt, hash) VALUES (${username}, ${salt}, ${hash})
-        ON CONFLICT (username) DO UPDATE SET salt = EXCLUDED.salt, hash = EXCLUDED.hash`;
+      const role = body.role === "insights" ? "insights" : "gallery";
+      await sql`INSERT INTO vol_gallery_ops (username, salt, hash, role) VALUES (${username}, ${salt}, ${hash}, ${role})
+        ON CONFLICT (username) DO UPDATE SET salt = EXCLUDED.salt, hash = EXCLUDED.hash, role = EXCLUDED.role`;
       return NextResponse.json({ success: true });
     }
 
