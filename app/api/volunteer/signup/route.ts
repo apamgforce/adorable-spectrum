@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql, ensureSchema, makeCode } from "../../../lib/volunteer-db";
+import { sendApplicationReceived } from "../../../lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,8 @@ export async function POST(request: Request) {
 
     await sql`INSERT INTO vol_volunteers (code, name, email, whatsapp, track, status)
       VALUES (${makeCode()}, ${name}, ${email}, ${whatsapp}, ${track}, 'pending') ON CONFLICT (email) DO NOTHING`;
-    return NextResponse.json({ ok: true });
+    const emailed = await sendApplicationReceived(email, name);
+    return NextResponse.json({ ok: true, emailed });
   } catch {
     return NextResponse.json({ ok: false }, { status: 500 });
   }
