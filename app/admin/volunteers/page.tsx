@@ -7,7 +7,8 @@ import { Trash2, LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, 
 
 
 type Vol = { cert_token: string | null; id: number; code: string; name: string; email: string | null; whatsapp: string | null; track: string | null; status: string; assigned: number; done: number; confirmed: number; last_login: string | null };
-type Q = { id: number; name: string; code: string; title: string; done_at: string; group_confirmed_at: string | null; note: string | null };
+type Sub = { kind: string; url: string | null; name: string | null; type: string | null; text: string | null };
+type Q = { subs: Sub[]; id: number; name: string; code: string; title: string; done_at: string; group_confirmed_at: string | null; note: string | null };
 type Dash = {
   volunteers: Vol[]; queue: Q[];
   tasks: { id: number; title: string; track: string | null; assigned: number; done: number; due_date: string | null }[];
@@ -200,6 +201,21 @@ export default function VolunteerAdmin() {
                   <p className="font-medium text-forest">{q.title}</p>
                   <p className="text-sm text-slate-500">{q.name} · {q.code} · {new Date(q.done_at).toLocaleString()}</p>
                   {q.note && <p className="text-sm text-slate-600 mt-1 italic">&ldquo;{q.note}&rdquo;</p>}
+                  {q.subs?.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {q.subs.filter((x) => x.kind === "text").map((x, i) => <p key={i} className="text-base text-slate-700 bg-mist rounded-xl p-3 whitespace-pre-wrap">{x.text}</p>)}
+                      <div className="flex flex-wrap gap-2">
+                        {q.subs.filter((x) => x.kind === "file" && x.url).map((x, i) => x.type?.startsWith("image/") ? (
+                          <a key={i} href={x.url!} target="_blank" rel="noopener noreferrer" title={x.name || ""}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={x.url!} alt={x.name || "submission"} className="w-24 h-24 object-cover rounded-xl border border-slate-200 hover:opacity-80" />
+                          </a>
+                        ) : (
+                          <a key={i} href={x.url!} target="_blank" rel="noopener noreferrer" className="px-3 py-2 rounded-xl border border-slate-200 text-sm text-leaf hover:bg-mist">📎 {x.name || "File"}</a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <span className={`text-sm px-3 py-1 rounded-full ${q.group_confirmed_at ? "bg-lime/20 text-leaf" : "bg-amber/20 text-earth"}`}>{q.group_confirmed_at ? "Posted DONE in group" : "No DONE in group yet"}</span>
                 <button onClick={() => post({ action: "verify", assignmentId: q.id }, "Verified")} className="btn-shimmer px-4 py-2 rounded-lg text-white text-base">Verify</button>

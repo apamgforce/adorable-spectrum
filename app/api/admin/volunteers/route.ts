@@ -23,7 +23,9 @@ export async function GET(request: Request) {
       FROM vol_tasks t LEFT JOIN vol_assignments a ON a.task_id = t.id
       GROUP BY t.id ORDER BY t.created_at DESC LIMIT 50`;
     const queue = await sql`
-      SELECT a.id, v.name, v.code, t.title, a.status, a.done_at, a.group_confirmed_at, a.note
+      SELECT a.id, v.name, v.code, t.title, a.status, a.done_at, a.group_confirmed_at, a.note,
+        (SELECT COALESCE(json_agg(json_build_object('kind', s.kind, 'url', s.url, 'name', s.filename, 'type', s.content_type, 'text', s.text) ORDER BY s.id), '[]'::json)
+         FROM vol_submissions s WHERE s.assignment_id = a.id) AS subs
       FROM vol_assignments a
       JOIN vol_volunteers v ON v.id = a.volunteer_id JOIN vol_tasks t ON t.id = a.task_id
       WHERE a.status = 'done' ORDER BY a.done_at DESC LIMIT 100`;
