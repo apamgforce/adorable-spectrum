@@ -2,15 +2,30 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles } from "lucide-react";
+import { Paperclip, X, CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles } from "lucide-react";
 
 
 type Assignment = {
   id: number; status: "assigned" | "done" | "verified";
-  done_at: string | null; group_confirmed_at: string | null; verified_at: string | null;
+  attachments?: number; done_at: string | null; group_confirmed_at: string | null; verified_at: string | null;
   title: string; details: string | null; track: string | null; due_date: string | null;
 };
 type Data = { volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[]; certificate: { token: string; kind: string } | null; activeGroup: string };
+
+
+// Shrink phone photos before upload so they stay well under the 4MB request limit.
+async function shrink(file: File): Promise<File> {
+  if (!file.type.startsWith("image/") || file.type === "image/gif") return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob: Blob | null = await new Promise((r) => canvas.toBlob(r, "image/jpeg", 0.85));
+    return blob ? new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" }) : file;
+  } catch { return file; }
+}
 
 const fmt = (d: string) => new Date(d).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
 
@@ -20,6 +35,10 @@ export default function PortalPage() {
   const [busy, setBusy] = useState<number | "login" | null>(null);
   const [error, setError] = useState("");
   const [boot, setBoot] = useState(true);
+  const [openId, setOpenId] = useState<number | null>(null);
+  const [text, setText] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [progress, setProgress] = useState("");
 
   const call = useCallback(async (c: string, extra: Record<string, unknown> = {}) => {
     const res = await fetch("/api/volunteer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: c, ...extra }) });
@@ -48,6 +67,26 @@ export default function PortalPage() {
     if (!data) return;
     setBusy(id);
     try { setData(await call(data.volunteer.code, { action, assignmentId: id })); } catch (err) { setError((err as Error).message); }
+    setBusy(null);
+  };
+
+  const submitDone = async (id: number) => {
+    if (!data) return;
+    setBusy(id); setError("");
+    try {
+      for (let i = 0; i < files.length; i++) {
+        setProgress(`Uploading ${i + 1} of ${files.length}...`);
+        const f = await shrink(files[i]);
+        const fd = new FormData();
+        fd.append("code", data.volunteer.code); fd.append("assignmentId", String(id)); fd.append("file", f);
+        const r = await fetch("/api/volunteer/upload", { method: "POST", body: fd });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || "Upload failed");
+      }
+      setProgress("");
+      setData(await call(data.volunteer.code, { action: "done", assignmentId: id, text }));
+      setOpenId(null); setText(""); setFiles([]);
+    } catch (err) { setProgress(""); setError((err as Error).message); }
     setBusy(null);
   };
 
@@ -146,9 +185,37 @@ export default function PortalPage() {
                   {a.due_date && <p className="text-sm text-slate-400 mt-2 flex items-center gap-1"><CalendarDays size={13} /> Due {fmt(a.due_date)}</p>}
                 </div>
               </div>
-              <button onClick={() => act(a.id, "done")} disabled={busy === a.id} className="btn-shimmer mt-4 w-full py-3 rounded-xl text-white text-base font-medium flex items-center justify-center gap-2">
-                {busy === a.id ? <Loader2 size={16} className="animate-spin" /> : <><CheckCircle2 size={16} /> Mark as done</>}
-              </button>
+              {openId !== a.id ? (
+                <button onClick={() => { setOpenId(a.id); setText(""); setFiles([]); setError(""); }} className="btn-shimmer mt-4 w-full py-3 rounded-xl text-white text-base font-medium flex items-center justify-center gap-2">
+                  <CheckCircle2 size={16} /> Mark as done
+                </button>
+              ) : (
+                <div className="mt-4 rounded-2xl bg-mist p-4 space-y-3">
+                  <p className="text-sm font-medium text-forest">Add your work (optional)</p>
+                  <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} placeholder="Type your text or notes here, if the task asks for it" className="w-full rounded-xl border border-slate-200 p-3 text-base outline-none focus:border-sage bg-white" />
+                  <label className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-sage/50 text-leaf text-base cursor-pointer hover:bg-white">
+                    <Paperclip size={18} /> Attach images or files
+                    <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx" className="hidden" onChange={(e) => { const picked = Array.from(e.target.files || []); setFiles((prev) => [...prev, ...picked].slice(0, 8)); e.target.value = ""; }} />
+                  </label>
+                  {files.length > 0 && (
+                    <ul className="space-y-1">
+                      {files.map((f, i) => (
+                        <li key={i} className="flex items-center justify-between text-sm bg-white rounded-lg px-3 py-2">
+                          <span className="truncate pr-2">{f.name}</span>
+                          <button onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label="Remove"><X size={16} className="text-slate-400" /></button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {progress && <p className="text-sm text-leaf">{progress}</p>}
+                  <div className="flex gap-2">
+                    <button onClick={() => submitDone(a.id)} disabled={busy === a.id} className="btn-shimmer flex-1 py-3 rounded-xl text-white text-base font-medium flex items-center justify-center gap-2 disabled:opacity-60">
+                      {busy === a.id ? <Loader2 size={16} className="animate-spin" /> : <><CheckCircle2 size={16} /> Submit &amp; mark done</>}
+                    </button>
+                    <button onClick={() => setOpenId(null)} disabled={busy === a.id} className="px-4 rounded-xl border border-slate-200 text-slate-600 text-base bg-white">Cancel</button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -162,7 +229,7 @@ export default function PortalPage() {
                 <div className="flex-1">
                   <p className="font-medium text-slate-600 line-through decoration-slate-300">{a.title}</p>
                   <p className="text-sm mt-1 text-slate-400">
-                    {a.status === "verified" ? "Verified by coordinator ✓" : a.group_confirmed_at ? "Posted in group · awaiting verification" : "Marked done"}
+                    {a.status === "verified" ? "Verified by coordinator ✓" : a.group_confirmed_at ? "Posted in group · awaiting verification" : "Marked done"}{a.attachments ? ` · ${a.attachments} item${a.attachments > 1 ? "s" : ""} submitted` : ""}
                   </p>
                 </div>
                 {a.status === "done" && !a.group_confirmed_at && (

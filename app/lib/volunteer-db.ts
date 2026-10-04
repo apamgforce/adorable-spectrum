@@ -49,6 +49,16 @@ export function ensureSchema(): Promise<void> {
         kind TEXT NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
+      await sql`CREATE TABLE IF NOT EXISTS vol_submissions (
+        id SERIAL PRIMARY KEY,
+        assignment_id INT NOT NULL REFERENCES vol_assignments(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL,
+        url TEXT,
+        filename TEXT,
+        content_type TEXT,
+        text TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )`;
       await sql`CREATE TABLE IF NOT EXISTS vol_settings (
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL

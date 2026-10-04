@@ -22,7 +22,7 @@ const MODULES = [
   ] },
   { id: "os", title: "2. How the Volunteer OS works", mins: 5, points: [
     "Tasks are assigned by the coordinator, once or twice a week, to your personal ID.",
-    "Open the Volunteer Portal, enter your ID, and your tasks appear. Tap Mark as done when finished.",
+    "Open the Volunteer Portal, enter your ID, and your tasks appear. Tap Mark as done when finished. If the task asked for images, files or text, attach them or type them right there before you submit.",
     "Most tasks are remote and take 30 minutes to 2 hours a week: social posts, AI content, Canva designs, gallery updates and more.",
     "Then type DONE in the Active Volunteers group. A task is only fully complete after both steps.",
     "Made a mistake? Use the undo arrow before posting in the group, or tell the coordinator.",

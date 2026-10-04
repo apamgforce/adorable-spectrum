@@ -8,7 +8,7 @@ async function load(code: string) {
     WHERE code = ${code} AND status = 'active'`;
   if (!v) return null;
   const assignments = await sql`
-    SELECT a.id, a.status, a.done_at, a.group_confirmed_at, a.verified_at,
+    SELECT a.id, a.status, a.done_at, (SELECT COUNT(*)::int FROM vol_submissions s WHERE s.assignment_id = a.id) AS attachments, a.group_confirmed_at, a.verified_at,
            t.title, t.details, t.track, t.week_of, t.due_date
     FROM vol_assignments a JOIN vol_tasks t ON t.id = a.task_id
     WHERE a.volunteer_id = ${v.id}
@@ -27,14 +27,18 @@ async function load(code: string) {
 export async function POST(request: Request) {
   try {
     await ensureSchema();
-    const { code, action, assignmentId, note } = await request.json();
+    const { code, action, assignmentId, text } = await request.json();
     const clean = String(code || "").trim().toUpperCase();
     const [v] = await sql`SELECT id FROM vol_volunteers WHERE code = ${clean} AND status = 'active'`;
     if (!v) return NextResponse.json({ error: "We couldn't find that ID. Check your message from the coordinator." }, { status: 404 });
 
     if (action === "done") {
-      await sql`UPDATE vol_assignments SET status = 'done', done_at = COALESCE(done_at, now()), note = ${note ? String(note).slice(0, 500) : null}
-        WHERE id = ${Number(assignmentId)} AND volunteer_id = ${v.id} AND status = 'assigned'`;
+      const done = await sql`UPDATE vol_assignments SET status = 'done', done_at = COALESCE(done_at, now())
+        WHERE id = ${Number(assignmentId)} AND volunteer_id = ${v.id} AND status = 'assigned' RETURNING id`;
+      const clean = String(text || "").trim().slice(0, 5000);
+      if (done.length && clean) {
+        await sql`INSERT INTO vol_submissions (assignment_id, kind, text) VALUES (${Number(assignmentId)}, 'text', ${clean})`;
+      }
       await sql`INSERT INTO vol_events (volunteer_id, assignment_id, kind) VALUES (${v.id}, ${Number(assignmentId)}, 'marked_done')`;
     } else if (action === "group_confirmed") {
       await sql`UPDATE vol_assignments SET group_confirmed_at = COALESCE(group_confirmed_at, now())
