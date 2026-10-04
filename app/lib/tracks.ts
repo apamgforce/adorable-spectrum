@@ -31,10 +31,10 @@ export type TaskTemplate = {
 export const TASK_TEMPLATES: TaskTemplate[] = [
   {
     key: "status", job: "WhatsApp Status posting", track: "Social Media Posting", mins: "10 min / day",
-    title: "Post Greenforce updates on your WhatsApp Status (Mon, Wed, Fri)",
-    details: "Download the 3 images/quotes shared in the group and post one on your WhatsApp Status each day (Mon, Wed, Fri). Screenshot each posted Status and send the screenshots in the Active Volunteers group.",
-    who: "Only volunteers who said they are happy to post on their Status.",
-    prompt: "Write 12 short, warm WhatsApp Status captions (max 20 words each) for VTO Greenforce Foundation Africa, a Ghana/Gambia NGO doing school greenhouses, youth agriculture training, education sponsorships and community care. End half of them with a gentle call to follow or donate.",
+    title: "Post the Greenforce flyers on your WhatsApp Status",
+    details: "Download the flyers shared in the group and post one on your WhatsApp Status each day this week. Screenshot each posted Status and send the screenshots in the Active Volunteers group.",
+    who: "Only volunteers who are happy to post on their Status.",
+    prompt: "(No AI needed. Just share the flyers in the group.)",
   },
   {
     key: "quotes", job: "AI quote content refresh", track: "AI Content Creation", mins: "45 min",

@@ -9,12 +9,13 @@ export async function GET(request: Request) {
   try {
     await ensureSchema();
     const volunteers = await sql`
-      SELECT v.id, v.code, v.name, v.email, v.whatsapp, v.track, v.status, v.last_login,
+      SELECT v.id, v.code, v.name, v.email, v.whatsapp, v.track, v.status, v.last_login, c.token AS cert_token,
         COUNT(a.id)::int AS assigned,
         COUNT(a.id) FILTER (WHERE a.status IN ('done','verified'))::int AS done,
         COUNT(a.id) FILTER (WHERE a.group_confirmed_at IS NOT NULL)::int AS confirmed
       FROM vol_volunteers v LEFT JOIN vol_assignments a ON a.volunteer_id = v.id
-      GROUP BY v.id ORDER BY v.created_at DESC`;
+      LEFT JOIN vol_certificates c ON c.volunteer_id = v.id
+      GROUP BY v.id, c.id ORDER BY v.created_at DESC`;
     const tasks = await sql`
       SELECT t.id, t.title, t.track, t.week_of, t.due_date,
         COUNT(a.id)::int AS assigned,
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "issue_certificate") {
-      const kind = body.kind === "honour" ? "honour" : "service";
+      const kind = "service";
       const [row] = await sql`
         SELECT COUNT(*) FILTER (WHERE status IN ('done','verified'))::int AS done
         FROM vol_assignments WHERE volunteer_id = ${Number(body.volunteerId)}`;
