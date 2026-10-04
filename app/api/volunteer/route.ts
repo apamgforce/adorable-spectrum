@@ -14,11 +14,14 @@ async function load(code: string) {
     WHERE a.volunteer_id = ${v.id}
     ORDER BY (a.status = 'assigned') DESC, t.due_date NULLS LAST, a.id DESC
     LIMIT 100`;
+  const [badge] = await sql`UPDATE vol_volunteers SET badge_token = COALESCE(badge_token, gen_random_uuid()::text)
+    WHERE id = ${v.id} RETURNING badge_token AS token, COALESCE(approved_at, created_at) AS since`;
   const [cert] = await sql`SELECT token, kind, issued_at FROM vol_certificates WHERE volunteer_id = ${v.id}`;
   return {
     volunteer: { name: v.name, code: v.code, track: v.track },
     assignments,
     certificate: cert ?? null,
+    badge: badge ?? null,
     activeGroup: await getSetting("active_group"),
   };
 }

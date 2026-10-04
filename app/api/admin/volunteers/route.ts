@@ -105,7 +105,8 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "set_status") {
-      await sql`UPDATE vol_volunteers SET status = ${body.status === "inactive" ? "inactive" : "active"}
+      await sql`UPDATE vol_volunteers SET status = ${body.status === "inactive" ? "inactive" : "active"},
+        approved_at = CASE WHEN ${body.status === "inactive"} THEN approved_at ELSE COALESCE(approved_at, now()) END
         WHERE id = ${Number(body.volunteerId)}`;
       return NextResponse.json({ success: true });
     }

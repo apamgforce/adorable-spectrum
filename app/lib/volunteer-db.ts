@@ -21,6 +21,8 @@ export function ensureSchema(): Promise<void> {
         last_login TIMESTAMPTZ,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
+      await sql`ALTER TABLE vol_volunteers ADD COLUMN IF NOT EXISTS badge_token TEXT`;
+      await sql`ALTER TABLE vol_volunteers ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ`;
       await sql`CREATE TABLE IF NOT EXISTS vol_tasks (
         id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,

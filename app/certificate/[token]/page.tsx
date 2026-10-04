@@ -61,6 +61,8 @@ export default async function CertificatePage({ params }: { params: Promise<{ to
               <p className="font-display font-bold text-[9px] sm:text-sm text-forest">{date}</p>
               <p className="text-[6px] sm:text-[9px] font-bold text-leaf mt-1 sm:mt-2">CERTIFICATE ID</p>
               <p className="text-[8px] sm:text-xs text-forest">{serial}</p>
+              <p className="text-[6px] sm:text-[9px] font-bold text-leaf mt-1 sm:mt-2">VERIFY</p>
+              <p className="text-[8px] sm:text-xs text-forest">greenforceafrica.com/v/{serial.slice(3)}</p>
             </div>
             <div className="absolute bottom-2 sm:bottom-5 right-3 sm:right-8 w-9 h-9 sm:w-[72px] sm:h-[72px] rounded-full bg-leaf flex flex-col items-center justify-center text-white ring-2 ring-offset-0 ring-lime">
               <svg viewBox="0 0 24 24" className="w-4 h-4 sm:w-8 sm:h-8" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
@@ -70,7 +72,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ to
         </div>
       </div>
       <a href={`/certificate/${token}/pdf`} className="no-print btn-shimmer px-8 py-4 rounded-xl text-white text-lg font-medium">Download PDF</a>
-      <p className="no-print text-sm text-slate-500">Verified by VTO Greenforce Foundation Africa</p>
+      <p className="no-print text-sm text-slate-500">Verify at greenforceafrica.com/v/{serial.slice(3)}</p>
     </main>
   );
 }

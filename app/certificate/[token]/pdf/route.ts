@@ -125,7 +125,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ token: s
   page.drawLine({ start: { x: sx - 3, y: sy - 8 }, end: { x: sx + 14, y: sy + 12 }, thickness: 4, color: WHITE });
   centerAt(sx, "VERIFIED", sy - 26, 6.5, sansBold, WHITE);
 
-  const verify = `Verify this certificate at greenforceafrica.com/certificate/${token}`;
+  const verify = `Verify this certificate at greenforceafrica.com/v/${serial.slice(3)}`;
   centerAt(CX, verify, 38, 8, sans, GREY);
 
   const bytes = await pdf.save();
