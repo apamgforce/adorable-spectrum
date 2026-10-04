@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { HUBSPOT_TRACK } from "../lib/tracks";
 import { Users, MapPin, Send, CheckCircle, AlertCircle, Clock } from "lucide-react";
 
 const VOLUNTEER_IMG = "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=900&q=85&auto=format&fit=crop";
@@ -58,7 +59,7 @@ export default function VolunteerPage() {
         { name: "lastname", value: lastName },
         { name: "email", value: form.email },
         { name: "mobilephone", value: form.whatsapp },
-        { name: "volunteer_track", value: form.track },
+        { name: "volunteer_track", value: HUBSPOT_TRACK[form.track] || form.track },
         { name: "hours_per_month", value: form.hours },
         { name: "engagement_mode", value: form.mode }
       ],
@@ -253,6 +254,11 @@ export default function VolunteerPage() {
                         style={{ borderColor: 'rgba(74,140,82,0.2)', background: 'var(--mist)', color: form.track ? 'var(--charcoal)' : '#94a3b8' }}
                       >
                         <option value="">Select your primary skill / focus...</option>
+                        <option value="Social Media Posting">Social Media Posting (WhatsApp Status &amp; Facebook)</option>
+                        <option value="AI Content Creation">AI Content Creation (Quotes &amp; Captions)</option>
+                        <option value="Canva Design">Canva Design &amp; Templates</option>
+                        <option value="Gallery &amp; Image Updates">Website Gallery &amp; Image Updates</option>
+                        <option value="Post Scheduling">Post Scheduling</option>
                         <option value="Media & Creative">Media, Graphic Design & Video Editing</option>
                         <option value="Community Mobilization">Community Mobilization & Field Operations</option>
                         <option value="Research & Writing">Research, Grant Writing & Fundraising</option>

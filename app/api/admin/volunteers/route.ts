@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql, ensureSchema, makeCode, isAdmin } from "../../../lib/volunteer-db";
+import { sql, ensureSchema, makeCode, isAdmin, getSetting, hashPassword } from "../../../lib/volunteer-db";
 
 export const dynamic = "force-dynamic";
 const deny = () => NextResponse.json({ error: "Access denied" }, { status: 401 });
@@ -39,7 +39,25 @@ export async function GET(request: Request) {
       SELECT COALESCE(t.track, 'General') AS track, COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE a.status IN ('done','verified'))::int AS done
       FROM vol_assignments a JOIN vol_tasks t ON t.id = a.task_id GROUP BY 1 ORDER BY 2 DESC`;
-    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack });
+    // Certificate eligibility: 60+ days since first task, at least 4 tasks, half or more completed.
+    const eligible = await sql`
+      SELECT v.id, v.name, v.email, v.whatsapp, v.code,
+        COUNT(a.id)::int AS assigned,
+        COUNT(a.id) FILTER (WHERE a.status IN ('done','verified'))::int AS done,
+        MIN(a.created_at) AS first_task,
+        (c.id IS NOT NULL) AS issued, c.token, c.kind
+      FROM vol_volunteers v
+      JOIN vol_assignments a ON a.volunteer_id = v.id
+      LEFT JOIN vol_certificates c ON c.volunteer_id = v.id
+      WHERE v.status = 'active'
+      GROUP BY v.id, c.id
+      HAVING MIN(a.created_at) <= now() - interval '60 days'
+        AND COUNT(a.id) >= 4
+        AND COUNT(a.id) FILTER (WHERE a.status IN ('done','verified')) * 2 >= COUNT(a.id)
+      ORDER BY (c.id IS NOT NULL), done DESC`;
+    const galleryOps = await sql`SELECT id, username, created_at FROM vol_gallery_ops ORDER BY id`;
+    const activeGroup = await getSetting("active_group");
+    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, galleryOps, activeGroup });
   } catch {
     return NextResponse.json({ error: "Failed to load" }, { status: 500 });
   }
@@ -86,6 +104,41 @@ export async function POST(request: Request) {
     if (body.action === "set_status") {
       await sql`UPDATE vol_volunteers SET status = ${body.status === "inactive" ? "inactive" : "active"}
         WHERE id = ${Number(body.volunteerId)}`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "set_active_group") {
+      const link = String(body.link || "").trim();
+      if (link && !/^https:\/\/chat\.whatsapp\.com\//.test(link)) return NextResponse.json({ error: "Paste a WhatsApp group invite link (https://chat.whatsapp.com/...)" }, { status: 400 });
+      await sql`INSERT INTO vol_settings (key, value) VALUES ('active_group', ${link})
+        ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "add_gallery_op") {
+      const username = String(body.username || "").trim();
+      const password = String(body.password || "");
+      if (username.length < 3 || username.includes(":") || password.length < 8)
+        return NextResponse.json({ error: "Username 3+ characters (no colon) and password 8+ characters" }, { status: 400 });
+      const { salt, hash } = hashPassword(password);
+      await sql`INSERT INTO vol_gallery_ops (username, salt, hash) VALUES (${username}, ${salt}, ${hash})
+        ON CONFLICT (username) DO UPDATE SET salt = EXCLUDED.salt, hash = EXCLUDED.hash`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "remove_gallery_op") {
+      await sql`DELETE FROM vol_gallery_ops WHERE id = ${Number(body.id)}`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "issue_certificate") {
+      const kind = body.kind === "honour" ? "honour" : "service";
+      const [row] = await sql`
+        SELECT COUNT(*) FILTER (WHERE status IN ('done','verified'))::int AS done
+        FROM vol_assignments WHERE volunteer_id = ${Number(body.volunteerId)}`;
+      await sql`INSERT INTO vol_certificates (volunteer_id, kind, token, tasks_done)
+        VALUES (${Number(body.volunteerId)}, ${kind}, ${crypto.randomUUID()}, ${row?.done ?? 0})
+        ON CONFLICT (volunteer_id) DO UPDATE SET kind = EXCLUDED.kind`;
       return NextResponse.json({ success: true });
     }
 

@@ -2,8 +2,7 @@ import { neon } from "@neondatabase/serverless";
 
 export const sql = neon(process.env.POSTGRES_URL!);
 
-export const WHATSAPP_GROUP_LINK =
-  "https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0";
+import { scryptSync, randomBytes, timingSafeEqual } from "node:crypto";
 
 // Self-provisioning schema: first request creates the tables, no manual migration.
 let ready: Promise<void> | null = null;
@@ -50,6 +49,26 @@ export function ensureSchema(): Promise<void> {
         kind TEXT NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
+      await sql`CREATE TABLE IF NOT EXISTS vol_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )`;
+      await sql`CREATE TABLE IF NOT EXISTS vol_certificates (
+        id SERIAL PRIMARY KEY,
+        volunteer_id INT NOT NULL REFERENCES vol_volunteers(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL DEFAULT 'service',
+        token TEXT UNIQUE NOT NULL,
+        tasks_done INT NOT NULL DEFAULT 0,
+        issued_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        UNIQUE (volunteer_id)
+      )`;
+      await sql`CREATE TABLE IF NOT EXISTS vol_gallery_ops (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        salt TEXT NOT NULL,
+        hash TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )`;
     })().catch((e) => {
       ready = null;
       throw e;
@@ -67,4 +86,31 @@ export function makeCode(): string {
 export function isAdmin(request: Request): boolean {
   const token = process.env.ADMIN_SECURE_TOKEN;
   return !!token && request.headers.get("Authorization") === `Bearer ${token}`;
+}
+
+export async function getSetting(key: string): Promise<string> {
+  const [r] = await sql`SELECT value FROM vol_settings WHERE key = ${key}`;
+  return r?.value ?? "";
+}
+
+export function hashPassword(password: string, salt = randomBytes(16).toString("hex")) {
+  return { salt, hash: scryptSync(password, salt, 32).toString("hex") };
+}
+
+// Gallery-only logins that never learn the main admin password.
+export async function isGalleryOperator(auth: string | null): Promise<boolean> {
+  if (!auth?.startsWith("Bearer ")) return false;
+  const cred = auth.slice(7);
+  const i = cred.indexOf(":");
+  if (i < 1) return false;
+  try {
+    await ensureSchema();
+    const [row] = await sql`SELECT salt, hash FROM vol_gallery_ops WHERE username = ${cred.slice(0, i)}`;
+    if (!row) return false;
+    const a = Buffer.from(hashPassword(cred.slice(i + 1), row.salt).hash);
+    const b = Buffer.from(row.hash);
+    return a.length === b.length && timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
 }

@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, CheckCircle2, Circle, MessageCircle, ArrowRight, ClipboardList, Smartphone, CheckCheck, Users, BadgeCheck } from "lucide-react";
 
-const GROUP = "https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0";
 
 const FLOW = [
-  { icon: Users, title: "Join", text: "Sign up on the volunteer form and join the Active Volunteers WhatsApp group." },
-  { icon: Smartphone, title: "Get your ID", text: "The coordinator sends your personal ID, like GF-7K2QX. It's your key. No password needed." },
+  { icon: Users, title: "Sign up & get approved", text: "Fill in the volunteer form and join the main community group. Once the coordinator approves you, you're invited to the Active Volunteers group, where all work is reported." },
+  { icon: Smartphone, title: "Get your ID", text: "The coordinator sends your personal ID in the Active Volunteers group, like GF-7K2QX. It's your key. No password needed." },
   { icon: ClipboardList, title: "Receive tasks", text: "Tasks are assigned once or twice a week. Open the portal and enter your ID to see yours." },
   { icon: CheckCheck, title: "Mark done", text: "When you finish, tap Mark as done in the portal." },
   { icon: MessageCircle, title: "Type DONE in the group", text: "Then type DONE in the Active Volunteers group so the whole team sees it." },
@@ -24,6 +23,7 @@ const MODULES = [
   { id: "os", title: "2. How the Volunteer OS works", mins: 5, points: [
     "Tasks are assigned by the coordinator, once or twice a week, to your personal ID.",
     "Open the Volunteer Portal, enter your ID, and your tasks appear. Tap Mark as done when finished.",
+    "Most tasks are remote and take 30 minutes to 2 hours a week: social posts, AI content, Canva designs, gallery updates and more.",
     "Then type DONE in the Active Volunteers group. A task is only fully complete after both steps.",
     "Made a mistake? Use the undo arrow before posting in the group, or tell the coordinator.",
     "Missing tasks or ID problems: message the coordinator in the group.",
@@ -32,6 +32,7 @@ const MODULES = [
     "Be respectful, punctual and honest in everything you report.",
     "Protect children and vulnerable people. Never be alone with a minor; always work in pairs or groups.",
     "Never ask beneficiaries or donors for money or gifts.",
+    "Serve actively for 2 months and keep up with your tasks, and you may receive a Certificate of Service or Honour from the foundation.",
     "Report any concern immediately to the coordinator, privately.",
     "Represent the foundation well, online and offline.",
   ] },
@@ -51,8 +52,10 @@ const MODULES = [
 export default function TrainingPage() {
   const [open, setOpen] = useState<string | null>("os");
   const [done, setDone] = useState<string[]>([]);
+  const [group, setGroup] = useState("");
 
   useEffect(() => {
+    fetch("/api/volunteer/settings").then((r) => r.json()).then((d) => setGroup(d.activeGroup || "")).catch(() => {});
     try { setDone(JSON.parse(localStorage.getItem("gf_training") || "[]")); } catch {}
   }, []);
 
@@ -73,7 +76,7 @@ export default function TrainingPage() {
           <p className="text-white/70 mt-4 text-lg max-w-xl">Everything you need in about 20 minutes: how we work, how to stay safe, and how to report your tasks.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/volunteer/portal" className="btn-gold px-6 py-3 rounded-xl text-white font-medium inline-flex items-center gap-2">Open my tasks <ArrowRight size={16} /></Link>
-            <a href={GROUP} target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-xl border border-white/30 hover:bg-white/10 inline-flex items-center gap-2"><MessageCircle size={16} /> Active Volunteers group</a>
+            {group && <a href={group} target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-xl border border-white/30 hover:bg-white/10 inline-flex items-center gap-2"><MessageCircle size={16} /> Active Volunteers group</a>}
           </div>
         </div>
       </section>

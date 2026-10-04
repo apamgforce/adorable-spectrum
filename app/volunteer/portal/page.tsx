@@ -4,14 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles } from "lucide-react";
 
-const GROUP = "https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0";
 
 type Assignment = {
   id: number; status: "assigned" | "done" | "verified";
   done_at: string | null; group_confirmed_at: string | null; verified_at: string | null;
   title: string; details: string | null; track: string | null; due_date: string | null;
 };
-type Data = { volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[] };
+type Data = { volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[]; certificate: { token: string; kind: string } | null; activeGroup: string };
 
 const fmt = (d: string) => new Date(d).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
 
@@ -87,6 +86,7 @@ export default function PortalPage() {
   const finished = data.assignments.filter((a) => a.status !== "assigned");
   const total = data.assignments.length;
   const pct = total ? Math.round((finished.length / total) * 100) : 0;
+  const GROUP = data.activeGroup;
   const waitingGroup = finished.filter((a) => !a.group_confirmed_at);
   const first = data.volunteer.name.split(" ")[0];
 
@@ -119,8 +119,16 @@ export default function PortalPage() {
           <div className="rounded-3xl border-2 border-gold/40 bg-amber/10 p-5 mb-6">
             <p className="font-medium text-forest">Last step: type <b>DONE</b> in the Active Volunteers group</p>
             <p className="text-sm text-slate-600 mt-1">Your task only counts once the team sees it in the group.</p>
-            <a href={GROUP} target="_blank" rel="noopener noreferrer" className="btn-gold mt-4 inline-flex items-center gap-2 px-5 py-3 rounded-xl text-white text-sm font-medium"><MessageCircle size={16} /> Open the group</a>
+            {GROUP && <a href={GROUP} target="_blank" rel="noopener noreferrer" className="btn-gold mt-4 inline-flex items-center gap-2 px-5 py-3 rounded-xl text-white text-sm font-medium"><MessageCircle size={16} /> Open the group</a>}
           </div>
+        )}
+
+        {data.certificate && (
+          <a href={`/certificate/${data.certificate.token}`} className="block rounded-3xl bg-gradient-to-r from-earth via-gold to-amber p-6 mb-6 text-white shadow-lg">
+            <p className="text-xs tracking-[0.2em] uppercase opacity-80">Congratulations</p>
+            <p className="font-display text-3xl">Your Certificate of {data.certificate.kind === "honour" ? "Honour" : "Service"} is ready</p>
+            <p className="text-sm mt-1 opacity-90 flex items-center gap-1">View &amp; download <ArrowRight size={14} /></p>
+          </a>
         )}
 
         {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
@@ -163,7 +171,7 @@ export default function PortalPage() {
               </div>
               {a.status === "done" && !a.group_confirmed_at && (
                 <div className="mt-4 flex flex-col sm:flex-row gap-2">
-                  <a href={GROUP} target="_blank" rel="noopener noreferrer" className="flex-1 py-3 rounded-xl bg-[#25D366] text-white text-sm font-medium flex items-center justify-center gap-2"><MessageCircle size={16} /> Type DONE in the group</a>
+                  {GROUP && <a href={GROUP} target="_blank" rel="noopener noreferrer" className="flex-1 py-3 rounded-xl bg-[#25D366] text-white text-sm font-medium flex items-center justify-center gap-2"><MessageCircle size={16} /> Type DONE in the group</a>}
                   <button onClick={() => act(a.id, "group_confirmed")} disabled={busy === a.id} className="flex-1 py-3 rounded-xl border border-sage text-leaf text-sm font-medium hover:bg-mist">I typed DONE ✓</button>
                 </div>
               )}

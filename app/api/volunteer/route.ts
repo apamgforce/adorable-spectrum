@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql, ensureSchema } from "../../lib/volunteer-db";
+import { sql, ensureSchema, getSetting } from "../../lib/volunteer-db";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,13 @@ async function load(code: string) {
     WHERE a.volunteer_id = ${v.id}
     ORDER BY (a.status = 'assigned') DESC, t.due_date NULLS LAST, a.id DESC
     LIMIT 100`;
-  return { volunteer: { name: v.name, code: v.code, track: v.track }, assignments };
+  const [cert] = await sql`SELECT token, kind FROM vol_certificates WHERE volunteer_id = ${v.id}`;
+  return {
+    volunteer: { name: v.name, code: v.code, track: v.track },
+    assignments,
+    certificate: cert ?? null,
+    activeGroup: await getSetting("active_group"),
+  };
 }
 
 // Login / refresh
