@@ -61,6 +61,13 @@ export function ensureSchema(): Promise<void> {
         text TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
+      await sql`CREATE TABLE IF NOT EXISTS site_events (
+        day DATE NOT NULL,
+        kind TEXT NOT NULL,
+        path TEXT NOT NULL,
+        n INT NOT NULL DEFAULT 0,
+        PRIMARY KEY (day, kind, path)
+      )`;
       await sql`CREATE TABLE IF NOT EXISTS vol_settings (
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL

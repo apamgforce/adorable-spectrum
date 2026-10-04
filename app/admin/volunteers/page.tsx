@@ -26,7 +26,8 @@ export default function VolunteerAdmin() {
   const [msg, setMsg] = useState(""); const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
-  const [tab, setTab] = useState<"assign" | "queue" | "people" | "certs" | "settings">("assign");
+  const [tab, setTab] = useState<"assign" | "queue" | "people" | "certs" | "traffic" | "settings">("assign");
+  const [traffic, setTraffic] = useState<{ totals: { kind: string; d7: number; d30: number }[]; pages: { path: string; n: number }[]; daily: { day: string; n: number }[] } | null>(null);
   const [group, setGroup] = useState(""); const [gop, setGop] = useState({ username: "", password: "" });
 
   const [sel, setSel] = useState<number[]>([]);
@@ -43,6 +44,11 @@ export default function VolunteerAdmin() {
     const s = sessionStorage.getItem("gf_admin_auth");
     if (s) load(s).then(() => setAuth(s)).catch(() => sessionStorage.removeItem("gf_admin_auth"));
   }, [load]);
+
+  useEffect(() => {
+    if (tab !== "traffic" || !auth) return;
+    fetch("/api/admin/traffic", { headers: { Authorization: auth }, cache: "no-store" }).then((r) => r.json()).then((d) => { if (d.totals) setTraffic(d); }).catch(() => {});
+  }, [tab, auth]);
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault(); setErr("");
@@ -144,7 +150,7 @@ export default function VolunteerAdmin() {
         )}
 
         <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-100 w-fit mb-5">
-          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", `Volunteers${pending.length ? ` (${pending.length} new)` : ""}`], ["certs", `Certificates${data?.eligible.filter((e) => !e.issued).length ? ` (${data.eligible.filter((e) => !e.issued).length})` : ""}`], ["settings", "Settings"]] as const).map(([id, l]) => (
+          {([["assign", "Assign tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["people", `Volunteers${pending.length ? ` (${pending.length} new)` : ""}`], ["certs", `Certificates${data?.eligible.filter((e) => !e.issued).length ? ` (${data.eligible.filter((e) => !e.issued).length})` : ""}`], ["traffic", "Traffic"], ["settings", "Settings"]] as const).map(([id, l]) => (
             <button key={id} onClick={() => setTab(id)} className={`px-4 py-2 rounded-lg text-base ${tab === id ? "bg-forest text-white" : "text-slate-600"}`}>{l}</button>
           ))}
         </div>
@@ -297,6 +303,49 @@ export default function VolunteerAdmin() {
             {(data?.volunteers.length ?? 0) === 0 && <p className="p-8 text-center text-lg text-slate-400">No volunteers yet.</p>}
           </div>
         )}
+
+        {tab === "traffic" && (() => {
+          const get = (k: string) => traffic?.totals.find((t) => t.kind === k) || { d7: 0, d30: 0 };
+          const cards = [
+            ["Visits", "pageview"], ["Donate button clicks", "donate_click"], ["GiveSendGo clicks", "givesendgo_click"],
+            ["Support applications", "apply_submit"], ["Volunteer signups", "volunteer_submit"], ["Contact messages", "contact_submit"], ["WhatsApp clicks", "whatsapp_click"],
+          ] as const;
+          const max = Math.max(1, ...(traffic?.daily.map((d) => d.n) || [1]));
+          return (
+            <div className="space-y-5">
+              <p className="text-base text-slate-500">Counts public pages only. No cookies and no personal data. Form numbers count submit attempts.</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {cards.map(([label, kind]) => (
+                  <div key={kind} className="bg-white rounded-2xl p-5 border border-slate-100">
+                    <p className="font-display text-4xl text-forest">{get(kind).d7}</p>
+                    <p className="text-base text-slate-600">{label}</p>
+                    <p className="text-sm text-slate-400">last 7 days · {get(kind).d30} in 30</p>
+                  </div>
+                ))}
+              </div>
+              <div className="grid lg:grid-cols-2 gap-5">
+                <div className="bg-white rounded-2xl p-6 border border-slate-100">
+                  <h2 className="font-display text-2xl text-forest mb-4">Visits, last 14 days</h2>
+                  {(traffic?.daily.length || 0) === 0 && <p className="text-base text-slate-400">No visits recorded yet. Counting started with this update.</p>}
+                  <div className="flex items-end gap-1.5 h-32">
+                    {traffic?.daily.map((d) => (
+                      <div key={d.day} className="flex-1 flex flex-col items-center justify-end h-full" title={`${d.day}: ${d.n}`}>
+                        <div className="w-full bg-sage rounded-t" style={{ height: `${Math.max(4, (d.n / max) * 100)}%` }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 border border-slate-100">
+                  <h2 className="font-display text-2xl text-forest mb-4">Top pages, 30 days</h2>
+                  {(traffic?.pages.length || 0) === 0 && <p className="text-base text-slate-400">Nothing yet.</p>}
+                  <ul className="divide-y divide-slate-100">
+                    {traffic?.pages.map((p) => <li key={p.path} className="flex justify-between py-2 text-base"><span className="font-mono text-sm">{p.path}</span><span>{p.n}</span></li>)}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {tab === "settings" && (
           <div className="grid lg:grid-cols-2 gap-5">
