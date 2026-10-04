@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { TRACKS, TASK_TEMPLATES } from "../../lib/tracks";
-import { LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, Copy, Check, AlertTriangle, MessageCircle, Download } from "lucide-react";
+import { Trash2, LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, Copy, Check, AlertTriangle, MessageCircle } from "lucide-react";
 
 
 type Vol = { cert_token: string | null; id: number; code: string; name: string; email: string | null; whatsapp: string | null; track: string | null; status: string; assigned: number; done: number; confirmed: number; last_login: string | null };
@@ -100,7 +100,6 @@ export default function VolunteerAdmin() {
             <h1 className="font-display text-4xl text-forest">Volunteer Operations</h1>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => post({ action: "sync_hubspot" }, "Imported {n} new volunteers from HubSpot")} disabled={busy} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><Download size={15} /> Sync HubSpot</button>
             <Link href="/admin" className="px-5 py-3 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage">Gallery</Link>
             <Link href="/admin/volunteers/training" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><BookOpen size={15} /> Coordinator guide</Link>
             <button onClick={() => load(auth)} className="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sage" aria-label="Refresh"><RefreshCw size={16} /></button>
@@ -224,6 +223,7 @@ export default function VolunteerAdmin() {
                       <td className="text-right pr-4 whitespace-nowrap">
                         <button onClick={() => copy(v)} className="p-2 text-slate-400 hover:text-forest" title="Copy invite message">{copied === v.code ? <Check size={15} /> : <Copy size={15} />}</button>
                         <button onClick={() => post({ action: "set_status", volunteerId: v.id, status: v.status === "active" ? "inactive" : "active" })} className="text-sm text-slate-400 hover:text-forest px-2">{v.status === "active" ? "Pause" : "Activate"}</button>
+                        <button onClick={() => { if (confirm(`Delete ${v.name} permanently? Their tasks and certificate are deleted too.`)) post({ action: "delete_volunteer", volunteerId: v.id }, "Volunteer deleted"); }} className="text-sm text-red-500 hover:text-red-700 px-2" title="Delete volunteer"><Trash2 size={15} /></button>
                       </td>
                     </tr>
                   ))}

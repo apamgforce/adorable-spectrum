@@ -143,33 +143,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true });
     }
 
-    // Pull new signups from HubSpot (needs HUBSPOT_ACCESS_TOKEN: a private-app token with crm.objects.contacts.read)
-    if (body.action === "sync_hubspot") {
-      const token = process.env.HUBSPOT_ACCESS_TOKEN;
-      if (!token) return NextResponse.json({ error: "Add HUBSPOT_ACCESS_TOKEN in your environment variables to enable sync." }, { status: 400 });
-      let after: string | undefined;
-      let added = 0;
-      for (let page = 0; page < 20; page++) {
-        const url = new URL("https://api.hubapi.com/crm/v3/objects/contacts");
-        url.searchParams.set("limit", "100");
-        url.searchParams.set("properties", "firstname,lastname,email,mobilephone,volunteer_track");
-        if (after) url.searchParams.set("after", after);
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) return NextResponse.json({ error: "HubSpot rejected the request. Check the token scopes." }, { status: 502 });
-        const data = await res.json();
-        for (const c of data.results || []) {
-          const p = c.properties || {};
-          if (!p.email || !p.volunteer_track) continue; // only people who used the volunteer form
-          const name = [p.firstname, p.lastname].filter(Boolean).join(" ").trim() || p.email;
-          const r = await sql`INSERT INTO vol_volunteers (code, name, email, whatsapp, track, hubspot_id)
-            VALUES (${makeCode()}, ${name}, ${p.email}, ${p.mobilephone || null}, ${p.volunteer_track}, ${c.id})
-            ON CONFLICT (email) DO NOTHING RETURNING id`;
-          added += r.length;
-        }
-        after = data.paging?.next?.after;
-        if (!after) break;
-      }
-      return NextResponse.json({ success: true, added });
+    if (body.action === "delete_volunteer") {
+      await sql`DELETE FROM vol_volunteers WHERE id = ${Number(body.volunteerId)}`;
+      return NextResponse.json({ success: true });
     }
 
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
