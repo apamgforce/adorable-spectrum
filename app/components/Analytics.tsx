@@ -2,9 +2,10 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 
 // Private or personal areas are never counted.
-const SKIP = /^\/(admin|gallery-admin|api|certificate|verified|v\/|volunteer\/portal)/;
+const SKIP = /^\/(admin|gallery-admin|insights|api|certificate|verified|v\/|volunteer\/portal)/;
 
 function send(kind: string, path: string) {
   try {
@@ -45,5 +46,6 @@ export default function Analytics() {
     return () => { document.removeEventListener("click", onClick); document.removeEventListener("submit", onSubmit); };
   }, []);
 
-  return null;
+  // Vercel Analytics too, minus the private areas
+  return <VercelAnalytics beforeSend={(e) => { try { return SKIP.test(new URL(e.url).pathname) ? null : e; } catch { return e; } }} />;
 }

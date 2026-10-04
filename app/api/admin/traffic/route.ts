@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { sql, ensureSchema, isAdmin } from "../../../lib/volunteer-db";
+import { sql, ensureSchema, isAdmin, hasRole } from "../../../lib/volunteer-db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  if (!isAdmin(request)) return NextResponse.json({ error: "Access denied" }, { status: 401 });
+  if (!isAdmin(request) && !(await hasRole(request.headers.get("Authorization"), "insights"))) return NextResponse.json({ error: "Access denied" }, { status: 401 });
   try {
     await ensureSchema();
     const totals = await sql`
