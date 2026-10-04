@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, Copy, Check, AlertTriangle, MessageCircle, Download } from "lucide-react";
+import Link from "next/link";
+import { TRACKS, TASK_TEMPLATES } from "../../lib/tracks";
+import { Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, Copy, Check, AlertTriangle, MessageCircle, Download } from "lucide-react";
 
-const TRACKS = ["Greenhouse", "Training", "Education", "Community", "Harvest", "Media"];
-const WA_GROUP = "https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0";
 
 type Vol = { id: number; code: string; name: string; email: string | null; whatsapp: string | null; track: string | null; status: string; assigned: number; done: number; confirmed: number; last_login: string | null };
 type Q = { id: number; name: string; code: string; title: string; done_at: string; group_confirmed_at: string | null; note: string | null };
@@ -13,6 +13,9 @@ type Dash = {
   tasks: { id: number; title: string; track: string | null; assigned: number; done: number; due_date: string | null }[];
   kpi: { total: number; done: number; verified: number; overdue: number; missing_group: number; avg_hours: number | null };
   byTrack: { track: string; total: number; done: number }[];
+  eligible: { id: number; name: string; email: string | null; whatsapp: string | null; assigned: number; done: number; issued: boolean; token: string | null; kind: string | null }[];
+  galleryOps: { id: number; username: string }[];
+  activeGroup: string;
 };
 
 export default function VolunteerAdmin() {
@@ -22,7 +25,8 @@ export default function VolunteerAdmin() {
   const [msg, setMsg] = useState(""); const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
-  const [tab, setTab] = useState<"assign" | "queue" | "people">("assign");
+  const [tab, setTab] = useState<"assign" | "queue" | "people" | "certs" | "settings">("assign");
+  const [group, setGroup] = useState(""); const [gop, setGop] = useState({ username: "", password: "" });
 
   const [sel, setSel] = useState<number[]>([]);
   const [task, setTask] = useState({ title: "", details: "", track: "", dueDate: "" });
@@ -31,7 +35,7 @@ export default function VolunteerAdmin() {
   const load = useCallback(async (a: string) => {
     const r = await fetch("/api/admin/volunteers", { headers: { Authorization: a }, cache: "no-store" });
     if (!r.ok) throw new Error(r.status === 401 ? "Invalid credentials" : "Failed to load");
-    setData(await r.json());
+    const d = await r.json(); setData(d); setGroup(d.activeGroup || "");
   }, []);
 
   useEffect(() => {
@@ -59,7 +63,7 @@ export default function VolunteerAdmin() {
   };
 
   const copy = (v: Vol) => {
-    const text = `Hi ${v.name.split(" ")[0]}! Your Greenforce volunteer ID is ${v.code}. Open ${location.origin}/volunteer/portal and enter it to see your tasks. New? Start here: ${location.origin}/volunteer/training`;
+    const text = `Hi ${v.name.split(" ")[0]}, welcome to the Active Volunteers group! Your Greenforce volunteer ID is ${v.code}. Open ${location.origin}/volunteer/portal and enter it to see your tasks. New? Start here: ${location.origin}/volunteer/training`;
     navigator.clipboard.writeText(text); setCopied(v.code); setTimeout(() => setCopied(""), 1800);
   };
 
@@ -94,6 +98,7 @@ export default function VolunteerAdmin() {
           </div>
           <div className="flex gap-2">
             <button onClick={() => post({ action: "sync_hubspot" }, "Imported {n} new volunteers from HubSpot")} disabled={busy} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm flex items-center gap-2 hover:border-sage"><Download size={15} /> Sync HubSpot</button>
+            <Link href="/admin/volunteers/training" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm flex items-center gap-2 hover:border-sage"><BookOpen size={15} /> Coordinator guide</Link>
             <button onClick={() => load(auth)} className="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sage" aria-label="Refresh"><RefreshCw size={16} /></button>
           </div>
         </div>
@@ -142,6 +147,10 @@ export default function VolunteerAdmin() {
           <div className="grid lg:grid-cols-2 gap-5">
             <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3">
               <h2 className="font-display text-2xl text-forest">New task</h2>
+              <select className={input} value="" onChange={(e) => { const t = TASK_TEMPLATES.find((x) => x.key === e.target.value); if (t) setTask({ ...task, title: t.title, details: t.details, track: t.track }); }}>
+                <option value="">⚡ Start from a ready-made task...</option>
+                {TASK_TEMPLATES.map((t) => <option key={t.key} value={t.key}>{t.job}</option>)}
+              </select>
               <input className={input} placeholder="Task title" value={task.title} onChange={(e) => setTask({ ...task, title: e.target.value })} />
               <textarea className={input} rows={3} placeholder="Details / instructions" value={task.details} onChange={(e) => setTask({ ...task, details: e.target.value })} />
               <div className="grid grid-cols-2 gap-3">
@@ -223,7 +232,60 @@ export default function VolunteerAdmin() {
               <input className={input} placeholder="WhatsApp" value={nv.whatsapp} onChange={(e) => setNv({ ...nv, whatsapp: e.target.value })} />
               <select className={input} value={nv.track} onChange={(e) => setNv({ ...nv, track: e.target.value })}><option value="">Track</option>{TRACKS.map((t) => <option key={t}>{t}</option>)}</select>
               <button disabled={busy || !nv.name} onClick={async () => { const r = await post({ action: "add_volunteer", ...nv }); if (r) { setMsg(`Created ID ${r.code}`); setNv({ name: "", email: "", whatsapp: "", track: "" }); } }} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium flex items-center justify-center gap-2 disabled:opacity-40"><Plus size={16} /> Create ID</button>
-              <a href={WA_GROUP} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-xs text-leaf pt-1"><MessageCircle size={14} /> Open Active Volunteers group</a>
+              {data?.activeGroup && <a href={data.activeGroup} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-xs text-leaf pt-1"><MessageCircle size={14} /> Open Active Volunteers group</a>}
+            </div>
+          </div>
+        )}
+
+        {tab === "certs" && (
+          <div className="bg-white rounded-2xl border border-slate-100 divide-y divide-slate-100">
+            <p className="p-5 text-sm text-slate-500">Volunteers who have served for 2+ months with steady completion appear here automatically.</p>
+            {data?.eligible.length === 0 && <p className="p-8 text-center text-sm text-slate-400">No one qualifies yet.</p>}
+            {data?.eligible.map((e) => {
+              const link = e.token ? `${location.origin}/certificate/${e.token}` : "";
+              const body = `Dear ${e.name.split(" ")[0]},\n\nThank you for your faithful service with VTO Greenforce Foundation Africa. Your certificate is ready to view and download here:\n${link}\n\nWith gratitude,\nVTO Greenforce Foundation Africa`;
+              return (
+                <div key={e.id} className="p-5 flex flex-wrap items-center gap-3">
+                  <div className="flex-1 min-w-[180px]"><p className="font-medium text-forest">{e.name}</p><p className="text-xs text-slate-500">{e.done} of {e.assigned} tasks completed</p></div>
+                  {!e.issued ? (
+                    <>
+                      <button onClick={() => post({ action: "issue_certificate", volunteerId: e.id, kind: "service" }, "Certificate of Service created")} className="btn-shimmer px-4 py-2 rounded-lg text-white text-sm flex items-center gap-2"><Award size={14} /> Service</button>
+                      <button onClick={() => post({ action: "issue_certificate", volunteerId: e.id, kind: "honour" }, "Certificate of Honour created")} className="btn-gold px-4 py-2 rounded-lg text-white text-sm flex items-center gap-2"><Award size={14} /> Honour</button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xs px-3 py-1 rounded-full bg-lime/20 text-leaf capitalize">{e.kind} issued</span>
+                      <a href={link} target="_blank" className="px-4 py-2 rounded-lg border border-slate-200 text-sm">View</a>
+                      {e.email && <a href={`mailto:${e.email}?subject=${encodeURIComponent("Your Greenforce Certificate")}&body=${encodeURIComponent(body)}`} className="px-4 py-2 rounded-lg bg-forest text-white text-sm">Email it</a>}
+                      {e.whatsapp && <a href={`https://wa.me/${e.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(body)}`} target="_blank" className="px-4 py-2 rounded-lg bg-[#25D366] text-white text-sm">WhatsApp</a>}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tab === "settings" && (
+          <div className="grid lg:grid-cols-2 gap-5">
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3 h-fit">
+              <h2 className="font-display text-2xl text-forest">Active Volunteers group</h2>
+              <p className="text-sm text-slate-500">Paste the invite link of the group where volunteers type DONE. It powers the buttons in the portal and training.</p>
+              <input className={input} placeholder="https://chat.whatsapp.com/..." value={group} onChange={(e) => setGroup(e.target.value)} />
+              <button disabled={busy} onClick={() => post({ action: "set_active_group", link: group }, "Group link saved")} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium">Save link</button>
+            </div>
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3">
+              <h2 className="font-display text-2xl text-forest">Gallery-only logins</h2>
+              <p className="text-sm text-slate-500">Give a trusted volunteer their own login for the gallery page (<code>/admin</code>). It can upload and edit images only, and never reveals your admin password.</p>
+              {data?.galleryOps.map((g) => (
+                <div key={g.id} className="flex items-center justify-between text-sm bg-mist rounded-xl px-4 py-2.5">
+                  <span>{g.username}</span>
+                  <button onClick={() => post({ action: "remove_gallery_op", id: g.id }, "Login removed")} className="text-xs text-red-600">Remove</button>
+                </div>
+              ))}
+              <input className={input} placeholder="New username" value={gop.username} onChange={(e) => setGop({ ...gop, username: e.target.value })} />
+              <input className={input} type="text" placeholder="New password (8+ characters)" value={gop.password} onChange={(e) => setGop({ ...gop, password: e.target.value })} />
+              <button disabled={busy || !gop.username || !gop.password} onClick={async () => { const r = await post({ action: "add_gallery_op", ...gop }, "Gallery login saved. Share it privately."); if (r) setGop({ username: "", password: "" }); }} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium disabled:opacity-40">Create gallery login</button>
             </div>
           </div>
         )}

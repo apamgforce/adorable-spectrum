@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { put, del } from "@vercel/blob";
+import { isGalleryOperator } from "../../lib/volunteer-db";
 
 export const dynamic = "force-dynamic";
 const sql = neon(process.env.POSTGRES_URL!);
 
 // Helper: Directly matches incoming temporary request credentials against Vercel env variable
-function isAuthorized(request: Request): boolean {
+async function isAuthorized(request: Request): Promise<boolean> {
   const authHeader = request.headers.get("Authorization");
   const secureToken = process.env.ADMIN_SECURE_TOKEN; // e.g., "greenforce_admin:Apam_Greenhouse_2026"
-  
-  if (!authHeader || !secureToken) return false;
-  return authHeader === `Bearer ${secureToken}`;
+
+  if (!authHeader) return false;
+  if (secureToken && authHeader === `Bearer ${secureToken}`) return true;
+  return isGalleryOperator(authHeader); // gallery-only logins created from the volunteer admin
 }
 
 // 1. GET ALL IMAGES (Public)
@@ -26,7 +28,7 @@ export async function GET() {
 
 // 2. UPLOAD IMAGE ROUTE (Authenticated on-demand)
 export async function POST(request: Request) {
-  if (!isAuthorized(request)) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
+  if (!(await isAuthorized(request))) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
   
   try {
     const formData = await request.formData();
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
 
 // 3. EDIT/UPDATE ROUTE (Authenticated on-demand)
 export async function PUT(request: Request) {
-  if (!isAuthorized(request)) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
+  if (!(await isAuthorized(request))) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
   
   try {
     const { id, caption, category } = await request.json();
@@ -61,7 +63,7 @@ export async function PUT(request: Request) {
 
 // 4. DELETE ROUTE (Authenticated on-demand)
 export async function DELETE(request: Request) {
-  if (!isAuthorized(request)) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
+  if (!(await isAuthorized(request))) return NextResponse.json({ error: "Access Denied: Invalid Credentials" }, { status: 401 });
   
   try {
     const { id, src } = await request.json();
