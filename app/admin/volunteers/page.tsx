@@ -101,7 +101,7 @@ export default function VolunteerAdmin() {
             <h1 className="font-display text-4xl text-forest">Volunteer Operations</h1>
           </div>
           <div className="flex gap-2">
-            <Link href="/admin" className="px-5 py-3 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage">Gallery</Link>
+            <Link href="/gallery-admin" className="px-5 py-3 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage">Gallery</Link>
             <Link href="/admin/volunteers/training" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><BookOpen size={15} /> Coordinator guide</Link>
             <button onClick={() => load(auth)} className="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sage" aria-label="Refresh"><RefreshCw size={16} /></button>
             <button onClick={logout} className="px-5 py-3 rounded-xl bg-red-50 text-red-600 border border-red-200 text-base font-medium flex items-center gap-2 hover:bg-red-600 hover:text-white"><LogOut size={16} /> Log out</button>
@@ -292,7 +292,7 @@ export default function VolunteerAdmin() {
             </div>
             <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3">
               <h2 className="font-display text-2xl text-forest">Gallery-only logins</h2>
-              <p className="text-base text-slate-500">Give a trusted volunteer their own login for the gallery page (<code>/admin</code>). It can upload and edit images only, and never reveals your admin password.</p>
+              <p className="text-base text-slate-500">Give a trusted volunteer their own login for the gallery page (<code>/gallery-admin</code>). It can upload and edit images only, and never reveals your admin password.</p>
               {data?.galleryOps.map((g) => (
                 <div key={g.id} className="flex items-center justify-between text-base bg-mist rounded-xl px-4 py-2.5">
                   <span>{g.username}</span>
