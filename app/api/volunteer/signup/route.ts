@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 const tail = (v: string | null | undefined) => String(v || "").replace(/\D/g, "").slice(-9);
 
 // Called by the public volunteer form after the HubSpot submission succeeds.
-// New volunteers get their ID straight away. Someone re-registering gets the same ID back
-// only if the WhatsApp number matches the one on file, so IDs can't be fished out with just an email.
+// Signups are stored as "pending". The coordinator approves them in the admin, which is when they
+// receive their ID. Re-registering with a matching WhatsApp number just refreshes name and track.
 export async function POST(request: Request) {
   try {
     await ensureSchema();
@@ -18,19 +18,17 @@ export async function POST(request: Request) {
     const track = String(b.track || "").trim().slice(0, 60) || null;
     if (!name || !email.includes("@")) return NextResponse.json({ ok: false }, { status: 400 });
 
-    const [existing] = await sql`SELECT code, whatsapp FROM vol_volunteers WHERE email = ${email}`;
+    const [existing] = await sql`SELECT whatsapp FROM vol_volunteers WHERE email = ${email}`;
     if (existing) {
       if (tail(whatsapp).length >= 7 && tail(whatsapp) === tail(existing.whatsapp)) {
         await sql`UPDATE vol_volunteers SET name = ${name}, track = COALESCE(${track}, track) WHERE email = ${email}`;
-        return NextResponse.json({ ok: true, code: existing.code, returning: true });
       }
-      return NextResponse.json({ ok: true, code: null, existing: true });
+      return NextResponse.json({ ok: true });
     }
 
-    const code = makeCode();
-    await sql`INSERT INTO vol_volunteers (code, name, email, whatsapp, track)
-      VALUES (${code}, ${name}, ${email}, ${whatsapp}, ${track}) ON CONFLICT (email) DO NOTHING`;
-    return NextResponse.json({ ok: true, code });
+    await sql`INSERT INTO vol_volunteers (code, name, email, whatsapp, track, status)
+      VALUES (${makeCode()}, ${name}, ${email}, ${whatsapp}, ${track}, 'pending') ON CONFLICT (email) DO NOTHING`;
+    return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false }, { status: 500 });
   }
