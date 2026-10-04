@@ -14,7 +14,7 @@ async function load(code: string) {
     WHERE a.volunteer_id = ${v.id}
     ORDER BY (a.status = 'assigned') DESC, t.due_date NULLS LAST, a.id DESC
     LIMIT 100`;
-  const [cert] = await sql`SELECT token, kind FROM vol_certificates WHERE volunteer_id = ${v.id}`;
+  const [cert] = await sql`SELECT token, kind, issued_at FROM vol_certificates WHERE volunteer_id = ${v.id}`;
   return {
     volunteer: { name: v.name, code: v.code, track: v.track },
     assignments,
