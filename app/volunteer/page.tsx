@@ -79,6 +79,12 @@ export default function VolunteerPage() {
       );
 
       if (response.ok) {
+        // Register in the volunteer system (best-effort; never blocks the signup)
+        fetch("/api/volunteer/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: form.fullName, email: form.email, whatsapp: form.whatsapp, track: form.track }),
+        }).catch(() => {});
         setStatus("success");
         setForm({ fullName: "", whatsapp: "", email: "", track: "", hours: "", mode: "" });
         
