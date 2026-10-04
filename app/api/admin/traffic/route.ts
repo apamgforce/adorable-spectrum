@@ -3,8 +3,17 @@ import { sql, ensureSchema, isAdmin, hasRole } from "../../../lib/volunteer-db";
 
 export const dynamic = "force-dynamic";
 
+// Insights has its own login: INSIGHTS_SECURE_TOKEN ("username:password") in the environment.
+// The main admin login and any "Insights viewer" helper login created in Settings also work.
+async function allowed(request: Request): Promise<boolean> {
+  const auth = request.headers.get("Authorization");
+  const own = process.env.INSIGHTS_SECURE_TOKEN;
+  if (own && auth === `Bearer ${own}`) return true;
+  return isAdmin(request) || (await hasRole(auth, "insights"));
+}
+
 export async function GET(request: Request) {
-  if (!isAdmin(request) && !(await hasRole(request.headers.get("Authorization"), "insights"))) return NextResponse.json({ error: "Access denied" }, { status: 401 });
+  if (!(await allowed(request))) return NextResponse.json({ error: "Access denied" }, { status: 401 });
   try {
     await ensureSchema();
     const totals = await sql`
