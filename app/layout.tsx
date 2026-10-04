@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import Analytics from "./components/Analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://greenforceafrica.com"),
@@ -52,12 +53,12 @@ export const metadata: Metadata = {
   publisher: "VTO Greenforce Foundation Africa",
 
   alternates: {
-    canonical: "/",
+    canonical: "./",
   },
 
   openGraph: {
     type: "website",
-    url: "https://greenforceafrica.com",
+    url: "./",
     siteName: "VTO Greenforce Foundation Africa",
     title:
       "VTO Greenforce Foundation Africa | Transforming Communities & Education in West Africa",
@@ -194,6 +195,7 @@ export default function RootLayout({
           }}
         />
 
+        <Analytics />
         <Navbar />
         {children}
         <Footer />
