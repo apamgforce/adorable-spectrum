@@ -22,7 +22,7 @@ async function boldFont(): Promise<ArrayBuffer | null> {
   }
 }
 
-// Shareable 1080x1080 PNG badge for volunteers who hold a certificate.
+// Shareable 1080x1080 PNG badge for every approved (active) volunteer.
 export async function GET(req: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   let name = "Sample Volunteer", issued = new Date(), serial = "GF-SAMPLE00";
@@ -30,10 +30,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ token: s
   if (token !== "sample") {
     await ensureSchema();
     const [c] = await sql`
-      SELECT c.issued_at, c.token, v.name FROM vol_certificates c
-      JOIN vol_volunteers v ON v.id = c.volunteer_id WHERE c.token = ${token}`;
+      SELECT badge_token AS token, name, COALESCE(approved_at, created_at) AS since FROM vol_volunteers
+      WHERE badge_token = ${token} AND status = 'active'`;
     if (!c) return new Response("Not found", { status: 404 });
-    name = c.name; issued = new Date(c.issued_at); serial = `GF-${String(c.token).slice(0, 8).toUpperCase()}`;
+    name = c.name; issued = new Date(c.since); serial = `GF-${String(c.token).slice(0, 8).toUpperCase()}`;
   }
 
   const [logo, font] = await Promise.all([logoDataUri(new URL(req.url).origin), boldFont()]);
