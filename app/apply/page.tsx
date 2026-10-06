@@ -11,9 +11,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const HUBSPOT_ENDPOINT =
-  "https://api-eu1.hsforms.com/submissions/v3/integration/submit/149113634/33c0e56b-9a54-4315-a0e0-6a9c80255b95";
-
 export default function ApplyPage() {
   const [form, setForm] = useState({
     email: "",
@@ -50,79 +47,15 @@ export default function ApplyPage() {
     setError("");
 
     try {
-      const response = await fetch(HUBSPOT_ENDPOINT, {
+      const response = await fetch("/api/apply", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fields: [
-            {
-              objectTypeId: "0-1",
-              name: "email",
-              value: form.email,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "firstname",
-              value: form.firstname,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "lastname",
-              value: form.lastname,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "date_of_birth",
-              value: form.date_of_birth,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "phone",
-              value: form.phone,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "gender",
-              value: form.gender,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "city",
-              value: form.city,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "school_name",
-              value: form.school_name,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "country",
-              value: form.country,
-            },
-            {
-              objectTypeId: "0-1",
-              name: "message",
-              value: form.message,
-            },
-          ],
-          context: {
-            pageUri:
-              typeof window !== "undefined"
-                ? window.location.href
-                : "https://greenforceafrica.com/apply",
-            pageName: "Apply for Support",
-          },
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
 
       if (!response.ok) {
         const result = await response.json().catch(() => null);
-        console.error("HubSpot submission error:", result);
-
-        throw new Error("Submission failed");
+        throw new Error(result?.error || "Submission failed");
       }
 
       setSubmitted(true);
@@ -142,7 +75,9 @@ export default function ApplyPage() {
     } catch (err) {
       console.error(err);
       setError(
-        "We couldn't submit your application right now. Please check your details and try again."
+        err instanceof Error && err.message !== "Submission failed"
+          ? err.message
+          : "We couldn't submit your application right now. Please check your details and try again."
       );
     } finally {
       setSubmitting(false);
@@ -402,7 +337,7 @@ export default function ApplyPage() {
                         value={form.phone}
                         onChange={handleChange}
                         className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                        placeholder="+233..."
+                        placeholder="024 123 4567"
                       />
                     </div>
                   </div>

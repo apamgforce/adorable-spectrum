@@ -26,7 +26,7 @@ function props(v: HsVolunteer) {
   return p;
 }
 
-async function timed(url: string, init: RequestInit) {
+export async function timed(url: string, init: RequestInit) {
   const c = new AbortController();
   const t = setTimeout(() => c.abort(), 8000);
   try { return await fetch(url, { ...init, signal: c.signal }); } finally { clearTimeout(t); }
