@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       const fields = Object.entries(props).filter(([, v]) => v).map(([name, value]) => ({ objectTypeId: "0-1", name, value }));
       const r = await timed(`https://api-${REGION}.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_ID}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fields, context: { pageUri: request.headers.get("referer") || "https://greenforceafrica.com/apply", pageName: "Apply for Support" } }),
+        body: JSON.stringify({ fields, context: { pageUri: request.headers.get("referer") || "https://greenforceafrica.com/apply", pageName: "Apply for Support", ...(request.headers.get("x-forwarded-for") ? { ipAddress: request.headers.get("x-forwarded-for")!.split(",")[0].trim() } : {}) } }),
       });
       if (!r.ok) formError = `Form ${r.status}: ${(await r.text()).slice(0, 300)}`;
     } catch (e) { formError = `Form: ${(e as Error).message}`; }

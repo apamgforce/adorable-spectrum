@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     const v = { name, email, whatsapp, track, hours, mode, hubspotId };
-    const [formErr, direct] = await Promise.all([submitHubSpotForm(v, request.headers.get("referer") || undefined), upsertHubSpotContact(v)]);
+    const [formErr, direct] = await Promise.all([submitHubSpotForm(v, request.headers.get("referer") || undefined, request.headers.get("x-forwarded-for")?.split(",")[0].trim() || undefined), upsertHubSpotContact(v)]);
     const error = direct.error || (direct.id ? null : formErr);
     await sql`UPDATE vol_volunteers SET hubspot_id = COALESCE(${direct.id ?? null}, hubspot_id),
       hubspot_synced_at = CASE WHEN ${!error} THEN now() ELSE hubspot_synced_at END, hubspot_error = ${error}
