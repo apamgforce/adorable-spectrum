@@ -23,6 +23,29 @@ export const HUBSPOT_TRACK: Record<string, string> = {
   "Post Scheduling": "Event Support",
 };
 
+// Form options. "value" is what we store; HubSpot gets the matching HUBSPOT_* value.
+export const HOURS = ["2-4 hours", "5-6 hours", "7-8 hours"];
+export const MODES = [
+  { value: "Virtual (Remote)", label: "Virtual / Remote" },
+  { value: "On-Site (Ghana)", label: "On-Site (Ghana)" },
+  { value: "On-Site (Gambia)", label: "On-Site (The Gambia)" },
+  { value: "Hybrid", label: "Hybrid" },
+];
+export const TRACK_LABELS: Record<string, string> = {
+  "Social Media Posting": "Social Media Posting (WhatsApp Status & Facebook)",
+  "AI Content Creation": "AI Content Creation (Quotes & Captions)",
+  "Canva Design": "Canva Design & Templates",
+  "Gallery & Image Updates": "Website Gallery & Image Updates",
+  "Post Scheduling": "Post Scheduling",
+  "Media & Creative": "Media, Graphic Design & Video Editing",
+  "Community Mobilization": "Community Mobilization & Field Operations",
+  "Research & Writing": "Research, Grant Writing & Fundraising",
+  "Translation": "Translation (Twi, Hausa, Ga, Fante)",
+  "Event Support": "Event Planning & On-Ground Hype",
+};
+// HubSpot's "Hours Per Month" dropdown has "7-14 hours" instead of "7-8 hours".
+export const HUBSPOT_HOURS: Record<string, string> = { "7-8 hours": "7-14 hours" };
+
 export type TaskTemplate = {
   key: string; job: string; track: string; mins: string;
   title: string; details: string; who: string; prompt: string;

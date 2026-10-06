@@ -5,13 +5,24 @@ import Link from "next/link";
 import { ArrowLeft, Check, Copy, Clock, Laptop, Sparkles } from "lucide-react";
 import { TASK_TEMPLATES } from "../../../lib/tracks";
 
+const FAQ = [
+  { q: "Send on WhatsApp opens the wrong number or nothing", a: "Tap the person's name and fix their WhatsApp number. Ghana numbers can be typed as 024 123 4567. Other countries need the + and country code, e.g. +220 712 3456." },
+  { q: "A volunteer lost their ID", a: "Volunteers tab, search their name, press Send ID. It sends the same ID again." },
+  { q: "Someone applied twice", a: "Applying again with the same email just updates their details. If they used two emails, keep one and delete the other." },
+  { q: "A volunteer says their ID doesn't work", a: "Check their status. Only Active volunteers can open the portal. New applicants and Paused volunteers can't." },
+  { q: "I gave a task to the wrong person", a: "Tasks tab, open the task, press Remove next to their name. To add someone, use Add another volunteer." },
+  { q: "Work was marked done but isn't good enough", a: "Verify tab, press Send back, then press Chat and tell them what to fix. The task returns to their to-do list." },
+  { q: "The welcome message has no group link", a: "Settings tab: paste the Active Volunteers group invite link and press Save." },
+  { q: "Numbers on the dashboard look old", a: "Press the refresh arrow at the top." },
+];
+
 const STEPS = [
-  { t: "Sync (5 min)", d: "Open the Volunteer Admin. Check the Verify tab and the red 'Done, not in group' counter." },
-  { t: "Generate tasks with AI (10 min)", d: "Pick a job type below, copy its prompt into ChatGPT, Claude or Gemini, and tweak the result." },
-  { t: "Assign (10 min)", d: "Assign tab → choose a ready-made task, edit if needed, tick the volunteers (or filter by track), set a due date, press Assign." },
-  { t: "Announce (2 min)", d: "Post in the Active Volunteers group: 'New tasks are live. Open the portal with your ID.'" },
-  { t: "Verify (10-30 min)", d: "Verify tab: check each completed task and press Verify, or Reopen if it needs fixing. Nudge anyone overdue." },
-  { t: "Certificates (monthly)", d: "Certificates tab: when volunteers appear, press Create certificate, then email or WhatsApp it in one click." },
+  { t: "Welcome new applicants (5 min)", d: "Volunteers tab. New applicants are at the top in orange. Tap a name to check their details, then press Approve. A green box appears: press Send on WhatsApp and their ID, group link and portal link go to them in one message. Not a fit? Press Decline." },
+  { t: "Plan the week with AI (10 min)", d: "Pick a job type below, copy its prompt into ChatGPT, Claude or Gemini, and adjust the result." },
+  { t: "Give tasks (10 min)", d: "Give a task tab. Choose a ready-made task or write your own, set a due date, tick the volunteers (or press the track button to pick everyone in that track), then press Give." },
+  { t: "Announce (2 min)", d: "Post in the Active Volunteers group: \u201cNew tasks are live. Open the portal with your ID.\u201d" },
+  { t: "Chase and check (10-30 min)", d: "Tasks tab shows who hasn't finished. Press Remind next to a name to send a polite WhatsApp nudge. Verify tab: look at what they sent, then press Verify, or Send back with a note on WhatsApp." },
+  { t: "Certificates (monthly)", d: "Certificates tab. People with a green Qualifies tag have earned one. Press Create certificate, then Email it or WhatsApp it." },
 ];
 
 export default function CoordinatorTraining() {
@@ -50,13 +61,24 @@ export default function CoordinatorTraining() {
         <div className="bg-white rounded-3xl p-7 border border-slate-100">
           <h2 className="font-display text-3xl text-forest mb-3">Golden rules</h2>
           <ul className="list-disc ml-5 space-y-2 text-base text-slate-600">
-            <li>Never share the main admin password. Gallery helpers get their own login from <b>Settings → Gallery-only logins</b>.</li>
+            <li>Never share the main admin password. Helpers get their own login from <b>Settings → Helper logins</b>.</li>
             <li>Give tasks that fit a volunteer&apos;s track. Keep each task under 2 hours.</li>
             <li>Always give a clear title, instructions and a due date.</li>
-            <li>New volunteers: approve them, add them to the Active Volunteers group, then send their ID using the copy icon in the Volunteers tab.</li>
+            <li>Keep records correct. When someone changes their number, email, track or hours, tap their name in the Volunteers tab and edit it. Use Private notes for anything you want to remember.</li>
+            <li>Someone stepping back? Set them to <b>Paused</b> instead of deleting. Delete only removes duplicates or test entries, and it can&apos;t be undone.</li>
+            <li>Press <b>Export</b> in the Volunteers tab once a month and keep the spreadsheet as a backup.</li>
             <li>Tell volunteers that active service brings recognition. Review the Certificates tab monthly.</li>
             <li>Use AI for first drafts, but always read the result before assigning.</li>
           </ul>
+        </div>
+
+        <div className="bg-white rounded-3xl p-7 border border-slate-100">
+          <h2 className="font-display text-3xl text-forest mb-3">If something goes wrong</h2>
+          <div className="space-y-4">
+            {FAQ.map((f) => (
+              <div key={f.q}><p className="font-medium text-forest">{f.q}</p><p className="text-base text-slate-600">{f.a}</p></div>
+            ))}
+          </div>
         </div>
 
         <div>
