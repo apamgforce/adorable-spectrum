@@ -6,8 +6,8 @@ import { ChevronDown, CheckCircle2, Circle, MessageCircle, ArrowRight, Clipboard
 
 
 const FLOW = [
-  { icon: Users, title: "Sign up", text: "Fill in the volunteer form and join the main community group." },
-  { icon: Smartphone, title: "Get approved & receive your ID", text: "Once the coordinator approves you, you're added to the Active Volunteers group, where all work is reported. Your personal ID, like GF-7K2QX, is sent to you there. It's your key, no password needed." },
+  { icon: Users, title: "Sign up", text: "Fill in the volunteer form on the website and join the community group." },
+  { icon: Smartphone, title: "Get approved & receive your ID", text: "When the coordinator approves you, you get a WhatsApp message with your personal ID (like GF-7K2QX) and the link to the Active Volunteers group, where all work is reported. Your ID is your key. No password needed, so keep it to yourself." },
   { icon: ClipboardList, title: "Receive tasks", text: "Tasks are assigned once or twice a week. Open the portal and enter your ID to see yours." },
   { icon: CheckCheck, title: "Mark done", text: "When you finish, tap Mark as done in the portal." },
   { icon: MessageCircle, title: "Type DONE in the group", text: "Then type DONE in the Active Volunteers group so the whole team sees it." },
@@ -26,7 +26,7 @@ const MODULES = [
     "Most tasks are remote and take 30 minutes to 2 hours a week: social posts, AI content, Canva designs, gallery updates and more.",
     "Then type DONE in the Active Volunteers group. A task is only fully complete after both steps.",
     "Made a mistake? Use the undo arrow before posting in the group, or tell the coordinator.",
-    "Missing tasks or ID problems: message the coordinator in the group.",
+    "Lost your ID or it stopped working? Message the coordinator privately. Changed your number or email? Tell the coordinator so your record stays correct.",
   ] },
   { id: "conduct", title: "3. Conduct & safeguarding", mins: 5, points: [
     "Be respectful, punctual and honest in everything you report.",
