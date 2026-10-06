@@ -32,12 +32,12 @@ export async function timed(url: string, init: RequestInit) {
   try { return await fetch(url, { ...init, signal: c.signal }); } finally { clearTimeout(t); }
 }
 
-export async function submitHubSpotForm(v: HsVolunteer, pageUri?: string): Promise<string | null> {
+export async function submitHubSpotForm(v: HsVolunteer, pageUri?: string, ipAddress?: string): Promise<string | null> {
   try {
     const fields = Object.entries(props(v)).filter(([, val]) => val).map(([name, value]) => ({ name, value }));
     const r = await timed(`https://api-${REGION}.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_ID}`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fields, context: { pageUri: pageUri || "https://greenforceafrica.com/volunteer", pageName: "Volunteer Application Page" } }),
+      body: JSON.stringify({ fields, context: { pageUri: pageUri || "https://greenforceafrica.com/volunteer", pageName: "Volunteer Application Page", ...(ipAddress ? { ipAddress } : {}) } }),
     });
     return r.ok ? null : `Form ${r.status}: ${(await r.text()).slice(0, 300)}`;
   } catch (e) { return `Form: ${(e as Error).message}`; }
@@ -45,10 +45,16 @@ export async function submitHubSpotForm(v: HsVolunteer, pageUri?: string): Promi
 
 // Returns { id } on success, { error } on failure, or {} when no token is configured.
 export async function upsertHubSpotContact(v: HsVolunteer): Promise<{ id?: string; error?: string }> {
-  const token = process.env.HUBSPOT_ACCESS_TOKEN;
-  if (!token) return {};
-  const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-  const p = props(v);
+  if (!process.env.HUBSPOT_ACCESS_TOKEN) return {};
+  // Also fill HubSpot's own "WhatsApp Phone Number" property. If HubSpot refuses it (400), save everything else.
+  const withWa = { ...props(v), ...(v.whatsapp ? { hs_whatsapp_phone_number: v.whatsapp } : {}) };
+  const r = await writeContact(v, withWa);
+  if (r.error?.startsWith("HubSpot 400") && v.whatsapp) return writeContact(v, props(v));
+  return r;
+}
+
+async function writeContact(v: HsVolunteer, p: Record<string, string>): Promise<{ id?: string; error?: string }> {
+  const headers = { "Content-Type": "application/json", Authorization: `Bearer ${process.env.HUBSPOT_ACCESS_TOKEN}` };
   try {
     let r: Response;
     if (v.hubspotId) {
