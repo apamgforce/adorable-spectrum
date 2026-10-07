@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { TRACKS, TASK_TEMPLATES, HOURS, MODES, TRACK_LABELS } from "../../lib/tracks";
 import { waLink, prettyPhone } from "../../lib/phone";
-import { Trash2, LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, AlertTriangle, MessageCircle, Mail, Pencil, X, Search, Download, Check, UserCheck, UserX } from "lucide-react";
+import { Megaphone, Pin, Trash2, LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, AlertTriangle, MessageCircle, Mail, Pencil, X, Search, Download, Check, UserCheck, UserX } from "lucide-react";
 
 type Vol = {
   cert_token: string | null; id: number; code: string; name: string; email: string | null; whatsapp: string | null;
@@ -21,9 +21,11 @@ type Dash = {
   kpi: { total: number; done: number; verified: number; overdue: number; missing_group: number; avg_hours: number | null };
   byTrack: { track: string; total: number; done: number }[];
   eligible: { id: number; name: string; email: string | null; whatsapp: string | null; assigned: number; done: number; issued: boolean; token: string | null; kind: string | null }[];
+  news: News[];
   galleryOps: { id: number; username: string; role: string }[];
   activeGroup: string; hubspotDirect: boolean;
 };
+type News = { id: number; title: string; body: string; track: string | null; pinned: boolean; created_at: string };
 type Edit = { id?: number; name: string; email: string; whatsapp: string; track: string; hours: string; mode: string; notes: string; status: string };
 
 const blank: Edit = { name: "", email: "", whatsapp: "", track: "", hours: "", mode: "", notes: "", status: "active" };
@@ -51,9 +53,10 @@ export default function VolunteerAdmin() {
   const [data, setData] = useState<Dash | null>(null);
   const [msg, setMsg] = useState(""); const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState<"assign" | "queue" | "tasks" | "people" | "certs" | "settings">("people");
+  const [tab, setTab] = useState<"assign" | "queue" | "tasks" | "people" | "certs" | "news" | "settings">("people");
   const [group, setGroup] = useState(""); const [gop, setGop] = useState({ username: "", password: "", role: "gallery" });
 
+  const [post_, setPost_] = useState({ title: "", body: "", track: "", pinned: false });
   const [sel, setSel] = useState<number[]>([]);
   const [task, setTask] = useState({ title: "", details: "", track: "", dueDate: "" });
   const [edit, setEdit] = useState<Edit | null>(null);
@@ -218,7 +221,7 @@ export default function VolunteerAdmin() {
         </div>
 
         <div className="flex gap-1 bg-white rounded-xl p-1 border border-slate-100 mb-5 overflow-x-auto">
-          {([["people", `Volunteers${pending.length ? ` (${pending.length} new)` : ""}`], ["assign", "Give a task"], ["tasks", "Tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["certs", "Certificates"], ["settings", "Settings"]] as const).map(([id, l]) => (
+          {([["people", `Volunteers${pending.length ? ` (${pending.length} new)` : ""}`], ["assign", "Give a task"], ["tasks", "Tasks"], ["queue", `Verify (${data?.queue.length ?? 0})`], ["certs", "Certificates"], ["news", "News"], ["settings", "Settings"]] as const).map(([id, l]) => (
             <button key={id} onClick={() => setTab(id)} className={`px-4 py-2 rounded-lg text-base whitespace-nowrap ${tab === id ? "bg-forest text-white" : "text-slate-600"}`}>{l}</button>
           ))}
         </div>
@@ -434,6 +437,40 @@ export default function VolunteerAdmin() {
               );
             })}
             {active.length === 0 && <p className="p-8 text-center text-base text-slate-400">No active volunteers yet.</p>}
+          </div>
+        )}
+
+        {tab === "news" && (
+          <div className="grid lg:grid-cols-2 gap-5">
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3 h-fit">
+              <h2 className="font-display text-2xl text-forest flex items-center gap-2"><Megaphone size={20} /> Post an update</h2>
+              <p className="text-base text-slate-500">Shows at the top of every volunteer&apos;s portal. Use it for announcements, wins and deadlines.</p>
+              <input className={input} placeholder="Headline" maxLength={150} value={post_.title} onChange={(e) => setPost_({ ...post_, title: e.target.value })} />
+              <textarea className={input} rows={5} placeholder="What do volunteers need to know?" maxLength={5000} value={post_.body} onChange={(e) => setPost_({ ...post_, body: e.target.value })} />
+              <select className={input} value={post_.track} onChange={(e) => setPost_({ ...post_, track: e.target.value })}>
+                <option value="">Everyone</option>
+                {TRACKS.map((t) => <option key={t} value={t}>Only {TRACK_LABELS[t] || t} volunteers</option>)}
+              </select>
+              <label className="flex items-center gap-2 text-base text-slate-600"><input type="checkbox" checked={post_.pinned} onChange={(e) => setPost_({ ...post_, pinned: e.target.checked })} /> Pin to the top</label>
+              <button disabled={busy || !post_.title.trim() || !post_.body.trim()} onClick={async () => { const r = await post({ action: "post_news", title: post_.title, body: post_.body, track: post_.track, pinned: post_.pinned }, "Update posted. Volunteers see it next time they open the portal."); if (r) setPost_({ title: "", body: "", track: "", pinned: false }); }} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium disabled:opacity-40">Post update</button>
+            </div>
+            <div className="space-y-3">
+              {(data?.news.length ?? 0) === 0 && <p className="bg-white rounded-2xl p-8 text-center text-slate-400 border border-slate-100">No updates yet.</p>}
+              {data?.news.map((n) => (
+                <div key={n.id} className="bg-white rounded-2xl p-5 border border-slate-100">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <p className="font-medium text-forest flex-1 min-w-[160px]">{n.pinned && <Pin size={13} className="inline mr-1 text-amber" />}{n.title}</p>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-mist text-leaf">{n.track ? (TRACK_LABELS[n.track] || n.track) : "Everyone"}</span>
+                  </div>
+                  <p className="text-sm text-slate-400 mb-2">{day(n.created_at)}</p>
+                  <p className="text-base text-slate-600 whitespace-pre-line">{n.body}</p>
+                  <div className="flex gap-3 mt-3 text-sm">
+                    <button disabled={busy} onClick={() => post({ action: "pin_news", newsId: n.id, pinned: !n.pinned }, n.pinned ? "Unpinned" : "Pinned")} className="text-leaf">{n.pinned ? "Unpin" : "Pin to top"}</button>
+                    <button disabled={busy} onClick={() => { if (confirm(`Delete “${n.title}”?`)) post({ action: "delete_news", newsId: n.id }, "Update deleted"); }} className="text-red-600">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

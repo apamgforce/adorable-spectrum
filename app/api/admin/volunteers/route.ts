@@ -77,9 +77,10 @@ export async function GET(request: Request) {
         AND COUNT(a.id) >= 4
         AND COUNT(a.id) FILTER (WHERE a.status IN ('done','verified')) * 2 >= COUNT(a.id)
       ORDER BY (c.id IS NOT NULL), done DESC`;
+    const news = await sql`SELECT id, title, body, track, pinned, created_at FROM vol_news ORDER BY pinned DESC, created_at DESC LIMIT 100`;
     const galleryOps = await sql`SELECT id, username, role, created_at FROM vol_gallery_ops ORDER BY id`;
     const activeGroup = await getSetting("active_group");
-    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, galleryOps, activeGroup, hubspotDirect: hubspotDirectEnabled() });
+    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, news, galleryOps, activeGroup, hubspotDirect: hubspotDirectEnabled() });
   } catch {
     return NextResponse.json({ error: "Failed to load" }, { status: 500 });
   }
@@ -180,6 +181,25 @@ export async function POST(request: Request) {
       if (link && !/^https:\/\/chat\.whatsapp\.com\//.test(link)) return NextResponse.json({ error: "Paste a WhatsApp group invite link (https://chat.whatsapp.com/...)" }, { status: 400 });
       await sql`INSERT INTO vol_settings (key, value) VALUES ('active_group', ${link})
         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "post_news") {
+      const title = String(body.title || "").trim().slice(0, 150);
+      const text = String(body.body || "").trim().slice(0, 5000);
+      if (!title || !text) return NextResponse.json({ error: "Add a headline and the update itself." }, { status: 400 });
+      await sql`INSERT INTO vol_news (title, body, track, pinned)
+        VALUES (${title}, ${text}, ${pick(body.track, TRACKS)}, ${!!body.pinned})`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "pin_news") {
+      await sql`UPDATE vol_news SET pinned = ${!!body.pinned} WHERE id = ${Number(body.newsId)}`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "delete_news") {
+      await sql`DELETE FROM vol_news WHERE id = ${Number(body.newsId)}`;
       return NextResponse.json({ success: true });
     }
 

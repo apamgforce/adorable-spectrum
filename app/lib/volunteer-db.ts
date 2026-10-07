@@ -94,6 +94,15 @@ export function ensureSchema(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
 
+      await sql`CREATE TABLE IF NOT EXISTS vol_news (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        track TEXT,
+        pinned BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )`;
+
       await sql`ALTER TABLE vol_gallery_ops ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'gallery'`;
     })().catch((e) => {
       ready = null;
