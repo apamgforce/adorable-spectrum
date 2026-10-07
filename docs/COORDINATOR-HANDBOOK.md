@@ -2,6 +2,8 @@
 
 You run Greenforce's volunteers from one page: **greenforceafrica.com/coordinator**. It works on a phone or a laptop. Sign in with the username and password you were given, and never share them. If someone else needs to help with photos or website numbers, give them their own login (see *Helper logins* below).
 
+To change your password, press **Password** at the top of the dashboard and enter your current one and a new one (10 or more characters). If you forget it, ask the owner to reset it.
+
 The dashboard has a short guide built in. Press **How to use this** at the top.
 
 ---

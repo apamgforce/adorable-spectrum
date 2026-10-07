@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql, ensureSchema, makeCode, adminRole, getSetting, hashPassword } from "../../../lib/volunteer-db";
+import { sql, ensureSchema, makeCode, adminRole, getSetting, hashPassword, setLogin, loginStatus, type LoginRole } from "../../../lib/volunteer-db";
 import { normalizeWhatsApp } from "../../../lib/phone";
 import { TRACKS, HOURS, MODES } from "../../../lib/tracks";
 import { upsertHubSpotContact, hubspotDirectEnabled } from "../../../lib/hubspot";
@@ -20,10 +20,10 @@ export const dynamic = "force-dynamic";
 const deny = () => NextResponse.json({ error: "Access denied" }, { status: 401 });
 
 // Things only the owner may do. Everything else is open to coordinators too.
-const OWNER_ONLY = ["sync_hubspot", "set_active_group", "add_gallery_op", "remove_gallery_op", "delete_volunteer"];
+const OWNER_ONLY = ["sync_hubspot", "set_active_group", "add_gallery_op", "remove_gallery_op", "delete_volunteer", "set_login"];
 
 export async function GET(request: Request) {
-  const role = adminRole(request);
+  const role = await adminRole(request);
   if (!role) return deny();
   const owner = role === "owner";
   try {
@@ -84,15 +84,16 @@ export async function GET(request: Request) {
       ORDER BY (c.id IS NOT NULL), done DESC`;
     const news = await sql`SELECT id, title, body, track, pinned, created_at FROM vol_news ORDER BY pinned DESC, created_at DESC LIMIT 100`;
     const galleryOps = owner ? await sql`SELECT id, username, role, created_at FROM vol_gallery_ops ORDER BY id` : [];
+    const logins = owner ? await Promise.all((["coordinator", "insights"] as LoginRole[]).map(loginStatus)) : [];
     const activeGroup = await getSetting("active_group");
-    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, news, galleryOps, activeGroup, role, hubspotDirect: owner && hubspotDirectEnabled() });
+    return NextResponse.json({ logins, volunteers, tasks, queue, kpi, byTrack, eligible, news, galleryOps, activeGroup, role, hubspotDirect: owner && hubspotDirectEnabled() });
   } catch {
     return NextResponse.json({ error: "Failed to load" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
-  const role = adminRole(request);
+  const role = await adminRole(request);
   if (!role) return deny();
   try {
     await ensureSchema();
@@ -188,6 +189,29 @@ export async function POST(request: Request) {
       if (link && !/^https:\/\/chat\.whatsapp\.com\//.test(link)) return NextResponse.json({ error: "Paste a WhatsApp group invite link (https://chat.whatsapp.com/...)" }, { status: 400 });
       await sql`INSERT INTO vol_settings (key, value) VALUES ('active_group', ${link})
         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`;
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "change_password") {
+      const cred = (request.headers.get("Authorization") || "").slice(7);
+      const i = cred.indexOf(":");
+      const user = cred.slice(0, i), pass = cred.slice(i + 1);
+      const next = String(body.newPassword || "");
+      if (String(body.currentPassword ?? "") !== pass) return NextResponse.json({ error: "Your current password isn't right." }, { status: 400 });
+      if (next.length < 10 || next.length > 200) return NextResponse.json({ error: "Choose a new password of 10 or more characters." }, { status: 400 });
+      if (next === pass) return NextResponse.json({ error: "The new password must be different from the current one." }, { status: 400 });
+      await setLogin(role, user, next);
+      return NextResponse.json({ success: true });
+    }
+
+    if (body.action === "set_login") {
+      const target = body.role === "insights" ? "insights" : body.role === "coordinator" ? "coordinator" : null;
+      const username = String(body.username || "").trim();
+      const password = String(body.password || "");
+      if (!target) return NextResponse.json({ error: "Pick which login to set." }, { status: 400 });
+      if (username.length < 3 || username.length > 60 || username.includes(":") || password.length < 10 || password.length > 200)
+        return NextResponse.json({ error: "Username 3+ characters (no colon) and password 10+ characters." }, { status: 400 });
+      await setLogin(target, username, password);
       return NextResponse.json({ success: true });
     }
 

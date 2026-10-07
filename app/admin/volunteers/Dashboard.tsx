@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { TRACKS, TASK_TEMPLATES, HOURS, MODES, TRACK_LABELS } from "../../lib/tracks";
 import { waLink, prettyPhone } from "../../lib/phone";
-import { Megaphone, Pin, Trash2, LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, AlertTriangle, MessageCircle, Mail, Pencil, X, Search, Download, Check, UserCheck, UserX } from "lucide-react";
+import { KeyRound, Megaphone, Pin, Trash2, LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, AlertTriangle, MessageCircle, Mail, Pencil, X, Search, Download, Check, UserCheck, UserX } from "lucide-react";
 
 type Vol = {
   cert_token: string | null; id: number; code: string; name: string; email: string | null; whatsapp: string | null;
@@ -21,7 +21,7 @@ type Dash = {
   kpi: { total: number; done: number; verified: number; overdue: number; missing_group: number; avg_hours: number | null };
   byTrack: { track: string; total: number; done: number }[];
   eligible: { id: number; name: string; email: string | null; whatsapp: string | null; assigned: number; done: number; issued: boolean; token: string | null; kind: string | null }[];
-  news: News[];
+  news: News[]; logins: { role: "coordinator" | "insights"; username: string | null; source: "site" | "vercel" | "none" }[];
   galleryOps: { id: number; username: string; role: string }[];
   activeGroup: string; hubspotDirect: boolean; role: "owner" | "coordinator";
 };
@@ -60,6 +60,8 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
   const [group, setGroup] = useState(""); const [gop, setGop] = useState({ username: "", password: "", role: "gallery" });
 
   const [post_, setPost_] = useState({ title: "", body: "", track: "", pinned: false });
+  const [acct, setAcct] = useState<{ cur: string; next: string; again: string } | null>(null); const [aerr, setAerr] = useState("");
+  const [newLogin, setNewLogin] = useState({ role: "coordinator", username: "", password: "" });
   const [sel, setSel] = useState<number[]>([]);
   const [task, setTask] = useState({ title: "", details: "", track: "", dueDate: "" });
   const [edit, setEdit] = useState<Edit | null>(null);
@@ -100,6 +102,19 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
       await load(auth);
       return j;
     } catch (x) { setErr((x as Error).message); return null; } finally { setBusy(false); }
+  };
+
+  const changePw = async () => {
+    if (!acct || !auth) return;
+    if (acct.next !== acct.again) { setAerr("The new passwords don't match."); return; }
+    setBusy(true); setAerr("");
+    try {
+      const r = await fetch("/api/admin/volunteers", { method: "POST", headers: { "Content-Type": "application/json", Authorization: auth }, body: JSON.stringify({ action: "change_password", currentPassword: acct.cur, newPassword: acct.next }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || "That didn't save. Try again.");
+      const a = `Bearer ${auth.slice(7).split(":")[0]}:${acct.next}`;
+      sessionStorage.setItem(KEY, a); setAuth(a); setAcct(null); setMsg("Password changed. Use the new one next time you sign in.");
+    } catch (x) { setAerr((x as Error).message); } finally { setBusy(false); }
   };
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -179,6 +194,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
             {owner && <Link href="/insights" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base hover:border-sage">Insights</Link>}
             {owner && <Link href="/gallery-admin" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base hover:border-sage">Gallery</Link>}
             <button onClick={() => load(auth).then(() => setMsg("Up to date")).catch((x) => setErr(x.message))} className="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sage" aria-label="Refresh" title="Refresh"><RefreshCw size={16} /></button>
+            <button onClick={() => { setAcct({ cur: "", next: "", again: "" }); setAerr(""); }} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><KeyRound size={15} /> Password</button>
             <button onClick={logout} className="px-4 py-2.5 rounded-xl bg-red-50 text-red-600 border border-red-200 text-base font-medium flex items-center gap-2 hover:bg-red-600 hover:text-white"><LogOut size={16} /> Log out</button>
           </div>
         </div>
@@ -498,6 +514,21 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
                 ) : <p className="text-base text-slate-500">Applications reach HubSpot through the website form. Your edits here stay on this dashboard only. To make edits and phone numbers flow to HubSpot too, follow “Connect HubSpot” in the setup guide.</p>}
               </div>
             </div>
+            <div className="space-y-5">
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3 h-fit">
+              <h2 className="font-display text-2xl text-forest">Dashboard logins</h2>
+              <p className="text-base text-slate-500">Set or reset the coordinator&apos;s login and the Insights login here, with no need to open Vercel. Change your own password with the <b>Password</b> button at the top.</p>
+              {data?.logins.map((l) => (
+                <div key={l.role} className="flex items-center justify-between gap-3 text-base bg-mist rounded-xl px-4 py-2.5">
+                  <span>{l.role === "coordinator" ? "Coordinator" : "Insights"} <span className="text-sm text-slate-400">· {l.username ? `${l.username} (${l.source === "site" ? "set here" : "from Vercel"})` : "not set"}</span></span>
+                </div>
+              ))}
+              <select className={input} value={newLogin.role} onChange={(e) => setNewLogin({ ...newLogin, role: e.target.value })}><option value="coordinator">Coordinator login</option><option value="insights">Insights login</option></select>
+              <input className={input} placeholder="Username" autoCapitalize="none" value={newLogin.username} onChange={(e) => setNewLogin({ ...newLogin, username: e.target.value })} />
+              <input className={input} type="text" placeholder="Password (10+ characters)" value={newLogin.password} onChange={(e) => setNewLogin({ ...newLogin, password: e.target.value })} />
+              <p className="text-sm text-slate-400">Saving replaces that login straight away. Share the new details privately.</p>
+              <button disabled={busy || newLogin.username.trim().length < 3 || newLogin.password.length < 10} onClick={async () => { const r = await post({ action: "set_login", ...newLogin }, "Login saved. Share it privately."); if (r) setNewLogin({ role: newLogin.role, username: "", password: "" }); }} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium disabled:opacity-40">Save login</button>
+            </div>
             <div className="bg-white rounded-2xl p-6 border border-slate-100 space-y-3 h-fit">
               <h2 className="font-display text-2xl text-forest">Helper logins</h2>
               <p className="text-base text-slate-500">Give a trusted person their own login for one area only. They never see this dashboard or your password. <b>Gallery manager</b> uses <code>/gallery-admin</code>. <b>Insights viewer</b> uses <code>/insights</code>.</p>
@@ -513,11 +544,28 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
               <p className="text-sm text-slate-400">Using an existing username resets that person&apos;s password.</p>
               <button disabled={busy || !gop.username || gop.password.length < 8} onClick={async () => { const r = await post({ action: "add_gallery_op", ...gop }, "Login saved. Share it privately."); if (r) setGop({ username: "", password: "", role: "gallery" }); }} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium disabled:opacity-40">Create login</button>
             </div>
+            </div>
           </div>
         )}
 
         {(k?.overdue ?? 0) > 0 && tab !== "tasks" && <button onClick={() => setTab("tasks")} className="mt-6 text-sm text-earth flex items-center gap-2"><AlertTriangle size={14} /> {k?.overdue} assignments are past due. Open Tasks to send reminders.</button>}
       </div>
+
+      {acct && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => !busy && setAcct(null)}>
+          <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-2xl text-forest">Change my password</h2>
+              <button onClick={() => setAcct(null)} aria-label="Close"><X size={20} className="text-slate-400" /></button>
+            </div>
+            <input className={input} type="password" autoComplete="current-password" placeholder="Current password" value={acct.cur} onChange={(e) => setAcct({ ...acct, cur: e.target.value })} />
+            <input className={input} type="password" autoComplete="new-password" placeholder="New password (10+ characters)" value={acct.next} onChange={(e) => setAcct({ ...acct, next: e.target.value })} />
+            <input className={input} type="password" autoComplete="new-password" placeholder="Type the new password again" value={acct.again} onChange={(e) => setAcct({ ...acct, again: e.target.value })} />
+            {aerr && <p className="text-base text-red-600">{aerr}</p>}
+            <button disabled={busy || !acct.cur || acct.next.length < 10} onClick={changePw} className="btn-shimmer w-full py-3 rounded-xl text-white font-medium flex items-center justify-center gap-2 disabled:opacity-40">{busy ? <Loader2 size={16} className="animate-spin" /> : "Change password"}</button>
+          </div>
+        </div>
+      )}
 
       {/* Edit / add volunteer */}
       {edit && (() => {

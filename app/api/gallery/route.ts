@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { put, del } from "@vercel/blob";
-import { isGalleryOperator } from "../../lib/volunteer-db";
+import { checkLogin, isGalleryOperator } from "../../lib/volunteer-db";
 
 export const dynamic = "force-dynamic";
 const sql = neon(process.env.POSTGRES_URL!);
 
-// Helper: Directly matches incoming temporary request credentials against Vercel env variable
+// Helper: the owner login (changeable in the admin) or a gallery-only login
 async function isAuthorized(request: Request): Promise<boolean> {
   const authHeader = request.headers.get("Authorization");
-  const secureToken = process.env.ADMIN_SECURE_TOKEN; // e.g., "greenforce_admin:Apam_Greenhouse_2026"
 
   if (!authHeader) return false;
-  if (secureToken && authHeader === `Bearer ${secureToken}`) return true;
+  if (await checkLogin(authHeader, "owner")) return true;
   return isGalleryOperator(authHeader); // gallery-only logins created from the volunteer admin
 }
 

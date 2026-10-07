@@ -30,7 +30,14 @@ Vercel → the project → Settings → Environment Variables. After changing an
 | `INSIGHTS_SECURE_TOKEN` | A separate `username:password` that only opens `/insights` | Optional |
 | `HUBSPOT_ACCESS_TOKEN` | Lets the site write volunteer details straight into HubSpot (see below) | Strongly recommended |
 
-To change the admin password, edit `ADMIN_SECURE_TOKEN` and redeploy. Everyone logged in is signed out the next time they act.
+### Changing passwords
+
+The three `*_SECURE_TOKEN` values are the **starting** logins. After that, nobody needs Vercel:
+
+- **Anyone** (owner or coordinator): press **Password** at the top of the dashboard.
+- **The owner** can set or reset the coordinator's and the Insights login in **Settings → Dashboard logins**.
+
+Once a login has been changed on the site, the site password is the one that works and the old Vercel value stops working. If anyone is ever locked out, edit that variable in Vercel and redeploy: the Vercel value then works again, and the person can set a new password from the dashboard. Passwords are stored hashed in the database.
 
 ## HubSpot
 
