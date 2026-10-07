@@ -131,8 +131,9 @@ export function makeCode(): string {
 // The Vercel variable (username:password) is the starting login and the way back in: while it is
 // unchanged since the last in-site change, the site password rules; edit the variable and it wins again.
 export type LoginRole = "owner" | "coordinator" | "insights";
-const ENV_NAME: Record<LoginRole, string> = { owner: "ADMIN_SECURE_TOKEN", coordinator: "COORDINATOR_SECURE_TOKEN", insights: "INSIGHTS_SECURE_TOKEN" };
-const envToken = (role: LoginRole) => process.env[ENV_NAME[role]] || "";
+// The coordinator has no Vercel variable: the owner creates that login in the admin.
+const ENV_NAME: Partial<Record<LoginRole, string>> = { owner: "ADMIN_SECURE_TOKEN", insights: "INSIGHTS_SECURE_TOKEN" };
+const envToken = (role: LoginRole) => (ENV_NAME[role] ? process.env[ENV_NAME[role]!] || "" : "");
 const fingerprint = (s: string) => (s ? createHash("sha256").update(s).digest("hex") : "");
 const same = (a: string, b: string) => {
   const x = Buffer.from(a), y = Buffer.from(b);

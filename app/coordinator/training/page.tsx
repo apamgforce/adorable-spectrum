@@ -1,4 +1,4 @@
-import Guide from "../../admin/volunteers/training/Guide";
+import Guide from "../../admin/training/Guide";
 
 export default function Page() {
   return <Guide role="coordinator" />;

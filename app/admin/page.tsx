@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import Dashboard from "./Dashboard";
 
-export default function AdminIndex() {
-  redirect("/admin/volunteers");
+export default function Page() {
+  return <Dashboard role="owner" />;
 }

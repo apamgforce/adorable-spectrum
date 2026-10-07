@@ -1,4 +1,4 @@
-import Dashboard from "../admin/volunteers/Dashboard";
+import Dashboard from "../admin/Dashboard";
 
 export default function Page() {
   return <Dashboard role="coordinator" />;

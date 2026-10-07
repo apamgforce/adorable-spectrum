@@ -11,7 +11,7 @@ Day-to-day use is explained inside the dashboard (press **How to use this** at t
 | `/volunteer` | Anyone applying to volunteer |
 | `/volunteer/training` | New volunteers (about 20 minutes) |
 | `/volunteer/portal` | Volunteers, to see and finish their tasks with their ID |
-| `/admin` | The owner: everything, including Settings, helper logins, HubSpot and deleting volunteers |
+| `/admin` | Greenforce Admin (owner): everything, including Settings, logins, HubSpot and deleting volunteers |
 | `/coordinator` | The volunteer coordinator: approve, edit, assign, verify, certificates, news. No Settings or deleting |
 | `/coordinator/training` | The coordinator's guide |
 | `/gallery-admin` | Whoever updates website photos |
@@ -26,13 +26,12 @@ Vercel → the project → Settings → Environment Variables. After changing an
 | `POSTGRES_URL` | Database connection (added automatically when the Neon database was connected) | Yes |
 | `BLOB_READ_WRITE_TOKEN` | File storage for uploads (added automatically when Blob storage was connected) | Yes |
 | `ADMIN_SECURE_TOKEN` | The admin login written as `username:password`, e.g. `greenforce:SomeLongPassword2026` | Yes |
-| `COORDINATOR_SECURE_TOKEN` | A separate `username:password` for the volunteer coordinator. Opens `/coordinator` only | Recommended |
 | `INSIGHTS_SECURE_TOKEN` | A separate `username:password` that only opens `/insights` | Optional |
 | `HUBSPOT_ACCESS_TOKEN` | Lets the site write volunteer details straight into HubSpot (see below) | Strongly recommended |
 
 ### Changing passwords
 
-The three `*_SECURE_TOKEN` values are the **starting** logins. After that, nobody needs Vercel:
+`ADMIN_SECURE_TOKEN` (and `INSIGHTS_SECURE_TOKEN`, if used) are the **starting** logins. The coordinator has no variable: the owner creates that login in **Settings → Dashboard logins**. After that, nobody needs Vercel:
 
 - **Anyone** (owner or coordinator): press **Password** at the top of the dashboard.
 - **The owner** can set or reset the coordinator's and the Insights login in **Settings → Dashboard logins**.

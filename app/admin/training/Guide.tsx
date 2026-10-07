@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, Copy, Clock, Laptop, Sparkles } from "lucide-react";
-import { TASK_TEMPLATES } from "../../../lib/tracks";
+import { TASK_TEMPLATES } from "../../lib/tracks";
 
 const FAQ = [
   { q: "Send on WhatsApp opens the wrong number or nothing", a: "Tap the person's name and fix their WhatsApp number. Ghana numbers can be typed as 024 123 4567. Other countries need the + and country code, e.g. +220 712 3456." },
@@ -34,7 +34,7 @@ export default function Guide({ role }: { role: "owner" | "coordinator" }) {
     <main className="min-h-screen pt-24 pb-20 bg-cream">
       <section className="bg-forest text-white px-6 py-14">
         <div className="max-w-3xl mx-auto">
-          <Link href={owner ? "/admin/volunteers" : "/coordinator"} className="text-base text-lime flex items-center gap-1 mb-4"><ArrowLeft size={14} /> Back to dashboard</Link>
+          <Link href={owner ? "/admin" : "/coordinator"} className="text-base text-lime flex items-center gap-1 mb-4"><ArrowLeft size={14} /> Back to dashboard</Link>
           <h1 className="font-display text-5xl">Coordinator Guide</h1>
           <p className="text-white/70 mt-3 max-w-xl">You keep our volunteers busy, happy and on track, entirely remotely.</p>
           <div className="mt-6 flex flex-wrap gap-4 text-base">

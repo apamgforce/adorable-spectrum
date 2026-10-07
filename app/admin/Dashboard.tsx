@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { TRACKS, TASK_TEMPLATES, HOURS, MODES, TRACK_LABELS } from "../../lib/tracks";
-import { waLink, prettyPhone } from "../../lib/phone";
+import { TRACKS, TASK_TEMPLATES, HOURS, MODES, TRACK_LABELS } from "../lib/tracks";
+import { waLink, prettyPhone } from "../lib/phone";
 import { KeyRound, Megaphone, Pin, Trash2, LogOut, Award, BookOpen, Loader2, Lock, Plus, RefreshCw, Send, ShieldCheck, AlertTriangle, MessageCircle, Mail, Pencil, X, Search, Download, Check, UserCheck, UserX } from "lucide-react";
 
 type Vol = {
@@ -50,7 +50,7 @@ function csv(rows: Vol[]) {
 export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
   const owner = role === "owner";
   const KEY = `gf_${role}_auth`;
-  const guide = owner ? "/admin/volunteers/training" : "/coordinator/training";
+  const guide = owner ? "/admin/training" : "/coordinator/training";
   const [auth, setAuth] = useState<string | null>(null);
   const [u, setU] = useState(""); const [p, setP] = useState("");
   const [data, setData] = useState<Dash | null>(null);
@@ -165,7 +165,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
       <main className="min-h-screen pt-32 px-6 flex justify-center bg-mist">
         <form onSubmit={login} className="w-full max-w-sm bg-white rounded-3xl p-8 shadow-xl border border-slate-100 h-fit space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-forest text-lime flex items-center justify-center"><Lock size={20} /></div>
-          <h1 className="font-display text-3xl text-forest">{owner ? "Admin" : "Volunteer Coordinator"}</h1>
+          <h1 className="font-display text-3xl text-forest">{owner ? "Greenforce Admin" : "Volunteer Coordinator"}</h1>
           <input value={u} onChange={(e) => setU(e.target.value)} placeholder="Username" autoComplete="username" autoCapitalize="none" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-sage" />
           <input type="password" value={p} onChange={(e) => setP(e.target.value)} placeholder="Password" autoComplete="current-password" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-sage" />
           {err && <p className="text-base text-red-600">{err}</p>}
@@ -187,7 +187,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
             <p className="text-sm tracking-[0.2em] uppercase text-sage flex items-center gap-1"><ShieldCheck size={14} /> {owner ? "Owner" : "Coordinator"}</p>
-            <h1 className="font-display text-4xl text-forest">Volunteer Operations</h1>
+            <h1 className="font-display text-4xl text-forest">{owner ? "Greenforce Admin" : "Volunteer Operations"}</h1>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href={guide} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-base flex items-center gap-2 hover:border-sage"><BookOpen size={15} /> How to use this</Link>
