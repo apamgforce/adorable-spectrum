@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql, ensureSchema, makeCode, isAdmin, getSetting, hashPassword } from "../../../lib/volunteer-db";
+import { sql, ensureSchema, makeCode, adminRole, getSetting, hashPassword } from "../../../lib/volunteer-db";
 import { normalizeWhatsApp } from "../../../lib/phone";
 import { TRACKS, HOURS, MODES } from "../../../lib/tracks";
 import { upsertHubSpotContact, hubspotDirectEnabled } from "../../../lib/hubspot";
@@ -19,8 +19,13 @@ async function syncOne(id: number) {
 export const dynamic = "force-dynamic";
 const deny = () => NextResponse.json({ error: "Access denied" }, { status: 401 });
 
+// Things only the owner may do. Everything else is open to coordinators too.
+const OWNER_ONLY = ["sync_hubspot", "set_active_group", "add_gallery_op", "remove_gallery_op", "delete_volunteer"];
+
 export async function GET(request: Request) {
-  if (!isAdmin(request)) return deny();
+  const role = adminRole(request);
+  if (!role) return deny();
+  const owner = role === "owner";
   try {
     await ensureSchema();
     const volunteers = await sql`
@@ -78,19 +83,21 @@ export async function GET(request: Request) {
         AND COUNT(a.id) FILTER (WHERE a.status IN ('done','verified')) * 2 >= COUNT(a.id)
       ORDER BY (c.id IS NOT NULL), done DESC`;
     const news = await sql`SELECT id, title, body, track, pinned, created_at FROM vol_news ORDER BY pinned DESC, created_at DESC LIMIT 100`;
-    const galleryOps = await sql`SELECT id, username, role, created_at FROM vol_gallery_ops ORDER BY id`;
+    const galleryOps = owner ? await sql`SELECT id, username, role, created_at FROM vol_gallery_ops ORDER BY id` : [];
     const activeGroup = await getSetting("active_group");
-    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, news, galleryOps, activeGroup, hubspotDirect: hubspotDirectEnabled() });
+    return NextResponse.json({ volunteers, tasks, queue, kpi, byTrack, eligible, news, galleryOps, activeGroup, role, hubspotDirect: owner && hubspotDirectEnabled() });
   } catch {
     return NextResponse.json({ error: "Failed to load" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
-  if (!isAdmin(request)) return deny();
+  const role = adminRole(request);
+  if (!role) return deny();
   try {
     await ensureSchema();
     const body = await request.json();
+    if (role !== "owner" && OWNER_ONLY.includes(body.action)) return NextResponse.json({ error: "Only the owner can do that." }, { status: 403 });
 
     if (body.action === "add_volunteer" || body.action === "update_volunteer") {
       const name = String(body.name || "").trim().replace(/\s+/g, " ").slice(0, 120);

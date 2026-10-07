@@ -118,10 +118,22 @@ export function makeCode(): string {
   return "GF-" + Array.from(bytes, (b) => ALPHABET[b % ALPHABET.length]).join("");
 }
 
-export function isAdmin(request: Request): boolean {
-  const token = process.env.ADMIN_SECURE_TOKEN;
-  return !!token && request.headers.get("Authorization") === `Bearer ${token}`;
+function matches(request: Request, token: string | undefined): boolean {
+  if (!token) return false;
+  const a = Buffer.from(request.headers.get("Authorization") ?? "");
+  const b = Buffer.from(`Bearer ${token}`);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
+
+// Owner: the full admin. Coordinator: runs volunteers day to day, with no access to settings or logins.
+export type AdminRole = "owner" | "coordinator";
+export function adminRole(request: Request): AdminRole | null {
+  if (matches(request, process.env.ADMIN_SECURE_TOKEN)) return "owner";
+  if (matches(request, process.env.COORDINATOR_SECURE_TOKEN)) return "coordinator";
+  return null;
+}
+
+export const isAdmin = (request: Request) => adminRole(request) === "owner";
 
 export async function getSetting(key: string): Promise<string> {
   const [r] = await sql`SELECT value FROM vol_settings WHERE key = ${key}`;

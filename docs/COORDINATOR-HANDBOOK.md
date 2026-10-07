@@ -1,6 +1,6 @@
 # Volunteer Coordinator Handbook
 
-You run Greenforce's volunteers from one page: **greenforceafrica.com/admin**. It works on a phone or a laptop. Sign in with the username and password you were given, and never share them. If someone else needs to help with photos or website numbers, give them their own login (see *Helper logins* below).
+You run Greenforce's volunteers from one page: **greenforceafrica.com/coordinator**. It works on a phone or a laptop. Sign in with the username and password you were given, and never share them. If someone else needs to help with photos or website numbers, give them their own login (see *Helper logins* below).
 
 The dashboard has a short guide built in. Press **How to use this** at the top.
 
@@ -50,7 +50,9 @@ Tap any volunteer's name to open their details. You can change their name, Whats
 
 Changes you make here also update the contact in HubSpot when HubSpot is connected. If a volunteer shows *CRM not updated*, open them and save again, or press **Send missing details to HubSpot** in Settings.
 
-## Settings
+## Settings (owner only)
+
+The coordinator login does not show this tab. The owner signs in at `/admin` to change these.
 
 - **Active Volunteers group link.** In WhatsApp: open the group → tap the group name → *Invite via link* → *Copy link*. Paste it here and press Save. If you ever reset the group link in WhatsApp, paste the new one here too.
 - **Helper logins.** Create a login for a trusted person. *Gallery manager* can only upload and manage website photos at `/gallery-admin`. *Insights viewer* can only see website visits at `/insights`. Neither can see volunteers. Remove a login when the person no longer helps. Typing an existing username with a new password resets their password.
