@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { sql, ensureSchema, isAdmin, hasRole } from "../../../lib/volunteer-db";
+import { sql, ensureSchema, checkLogin, hasRole } from "../../../lib/volunteer-db";
 
 export const dynamic = "force-dynamic";
 
-// Insights has its own login: INSIGHTS_SECURE_TOKEN ("username:password") in the environment.
+// Insights has its own login (set by the owner in Settings, or INSIGHTS_SECURE_TOKEN as the starting one).
 // The main admin login and any "Insights viewer" helper login created in Settings also work.
 async function allowed(request: Request): Promise<boolean> {
   const auth = request.headers.get("Authorization");
-  const own = process.env.INSIGHTS_SECURE_TOKEN;
-  if (own && auth === `Bearer ${own}`) return true;
-  return isAdmin(request) || (await hasRole(auth, "insights"));
+  return (await checkLogin(auth, "insights")) || (await checkLogin(auth, "owner")) || (await hasRole(auth, "insights"));
 }
 
 export async function GET(request: Request) {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Share2, Download, Link2, Check, Paperclip, X, CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles } from "lucide-react";
+import { Share2, Download, Link2, Check, Paperclip, X, CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles, Megaphone, Pin } from "lucide-react";
 
 
 type Assignment = {
@@ -10,7 +10,8 @@ type Assignment = {
   attachments?: number; done_at: string | null; group_confirmed_at: string | null; verified_at: string | null;
   title: string; details: string | null; track: string | null; due_date: string | null;
 };
-type Data = { volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[]; certificate: { token: string; kind: string; issued_at: string } | null; badge: { token: string; since: string } | null; activeGroup: string };
+type News = { id: number; title: string; body: string; track: string | null; pinned: boolean; created_at: string };
+type Data = { news: News[]; volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[]; certificate: { token: string; kind: string; issued_at: string } | null; badge: { token: string; since: string } | null; activeGroup: string };
 
 
 // Shrink phone photos before upload so they stay well under the 4MB request limit.
@@ -196,6 +197,21 @@ export default function PortalPage() {
             </div>
           );
         })()}
+
+        {data.news.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-sm tracking-[0.2em] uppercase text-slate-500 mb-3 flex items-center gap-2"><Megaphone size={14} /> News &amp; updates</h2>
+            <div className="space-y-3">
+              {data.news.map((n) => (
+                <div key={n.id} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+                  <p className="font-medium text-forest">{n.pinned && <Pin size={14} className="inline mr-1.5 text-amber" />}{n.title}</p>
+                  <p className="text-sm text-slate-400 mt-0.5">{new Date(n.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</p>
+                  <p className="text-base text-slate-600 mt-2 whitespace-pre-line">{n.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && <p className="text-base text-red-600 mb-4">{error}</p>}
 

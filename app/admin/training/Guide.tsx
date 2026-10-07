@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, Copy, Clock, Laptop, Sparkles } from "lucide-react";
-import { TASK_TEMPLATES } from "../../../lib/tracks";
+import { TASK_TEMPLATES } from "../../lib/tracks";
 
 const FAQ = [
   { q: "Send on WhatsApp opens the wrong number or nothing", a: "Tap the person's name and fix their WhatsApp number. Ghana numbers can be typed as 024 123 4567. Other countries need the + and country code, e.g. +220 712 3456." },
@@ -25,7 +25,8 @@ const STEPS = [
   { t: "Certificates (monthly)", d: "Certificates tab. People with a green Qualifies tag have earned one. Press Create certificate, then Email it or WhatsApp it." },
 ];
 
-export default function CoordinatorTraining() {
+export default function Guide({ role }: { role: "owner" | "coordinator" }) {
+  const owner = role === "owner";
   const [copied, setCopied] = useState("");
   const copy = (k: string, v: string) => { navigator.clipboard.writeText(v); setCopied(k); setTimeout(() => setCopied(""), 1500); };
 
@@ -33,7 +34,7 @@ export default function CoordinatorTraining() {
     <main className="min-h-screen pt-24 pb-20 bg-cream">
       <section className="bg-forest text-white px-6 py-14">
         <div className="max-w-3xl mx-auto">
-          <Link href="/admin/volunteers" className="text-base text-lime flex items-center gap-1 mb-4"><ArrowLeft size={14} /> Back to dashboard</Link>
+          <Link href={owner ? "/admin" : "/coordinator"} className="text-base text-lime flex items-center gap-1 mb-4"><ArrowLeft size={14} /> Back to dashboard</Link>
           <h1 className="font-display text-5xl">Coordinator Guide</h1>
           <p className="text-white/70 mt-3 max-w-xl">You keep our volunteers busy, happy and on track, entirely remotely.</p>
           <div className="mt-6 flex flex-wrap gap-4 text-base">
@@ -61,7 +62,7 @@ export default function CoordinatorTraining() {
         <div className="bg-white rounded-3xl p-7 border border-slate-100">
           <h2 className="font-display text-3xl text-forest mb-3">Golden rules</h2>
           <ul className="list-disc ml-5 space-y-2 text-base text-slate-600">
-            <li>Never share the main admin password. Helpers get their own login from <b>Settings → Helper logins</b>.</li>
+            {owner ? <li>Never share the main admin password. Helpers get their own login from <b>Settings → Helper logins</b>.</li> : <li>Never share your login. If someone else needs to help, ask the owner to set them up.</li>}
             <li>Give tasks that fit a volunteer&apos;s track. Keep each task under 2 hours.</li>
             <li>Always give a clear title, instructions and a due date.</li>
             <li>Keep records correct. When someone changes their number, email, track or hours, tap their name in the Volunteers tab and edit it. Use Private notes for anything you want to remember.</li>
@@ -75,7 +76,7 @@ export default function CoordinatorTraining() {
         <div className="bg-white rounded-3xl p-7 border border-slate-100">
           <h2 className="font-display text-3xl text-forest mb-3">If something goes wrong</h2>
           <div className="space-y-4">
-            {FAQ.map((f) => (
+            {FAQ.filter((f) => owner || !f.q.startsWith("The welcome message")).map((f) => (
               <div key={f.q}><p className="font-medium text-forest">{f.q}</p><p className="text-base text-slate-600">{f.a}</p></div>
             ))}
           </div>

@@ -2,7 +2,7 @@ import { neon } from "@neondatabase/serverless";
 
 export const sql = neon(process.env.POSTGRES_URL!);
 
-import { scryptSync, randomBytes, timingSafeEqual } from "node:crypto";
+import { scryptSync, randomBytes, timingSafeEqual, createHash } from "node:crypto";
 
 // Self-provisioning schema: first request creates the tables, no manual migration.
 let ready: Promise<void> | null = null;
@@ -94,6 +94,24 @@ export function ensureSchema(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
 
+      await sql`CREATE TABLE IF NOT EXISTS vol_news (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        track TEXT,
+        pinned BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )`;
+
+      await sql`CREATE TABLE IF NOT EXISTS vol_accounts (
+        role TEXT PRIMARY KEY,
+        username TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        hash TEXT NOT NULL,
+        env_fp TEXT NOT NULL DEFAULT '',
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )`;
+
       await sql`ALTER TABLE vol_gallery_ops ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'gallery'`;
     })().catch((e) => {
       ready = null;
@@ -109,10 +127,64 @@ export function makeCode(): string {
   return "GF-" + Array.from(bytes, (b) => ALPHABET[b % ALPHABET.length]).join("");
 }
 
-export function isAdmin(request: Request): boolean {
-  const token = process.env.ADMIN_SECURE_TOKEN;
-  return !!token && request.headers.get("Authorization") === `Bearer ${token}`;
+// Dashboard logins. Day to day they live in the database so they can be changed from the site.
+// The Vercel variable (username:password) is the starting login and the way back in: while it is
+// unchanged since the last in-site change, the site password rules; edit the variable and it wins again.
+export type LoginRole = "owner" | "coordinator" | "insights";
+// The coordinator has no Vercel variable: the owner creates that login in the admin.
+const ENV_NAME: Partial<Record<LoginRole, string>> = { owner: "ADMIN_SECURE_TOKEN", insights: "INSIGHTS_SECURE_TOKEN" };
+const envToken = (role: LoginRole) => (ENV_NAME[role] ? process.env[ENV_NAME[role]!] || "" : "");
+const fingerprint = (s: string) => (s ? createHash("sha256").update(s).digest("hex") : "");
+const same = (a: string, b: string) => {
+  const x = Buffer.from(a), y = Buffer.from(b);
+  return x.length === y.length && timingSafeEqual(x, y);
+};
+
+async function siteAccount(role: LoginRole) {
+  await ensureSchema();
+  const [row] = await sql`SELECT username, salt, hash, env_fp FROM vol_accounts WHERE role = ${role}`;
+  return row && (!envToken(role) || same(fingerprint(envToken(role)), row.env_fp)) ? row : null;
 }
+
+export async function checkLogin(auth: string | null, role: LoginRole): Promise<boolean> {
+  if (!auth?.startsWith("Bearer ")) return false;
+  const cred = auth.slice(7);
+  const i = cred.indexOf(":");
+  try {
+    const row = await siteAccount(role);
+    if (row) return i > 0 && same(cred.slice(0, i), row.username) && same(hashPassword(cred.slice(i + 1), row.salt).hash, row.hash);
+  } catch {
+    return false;
+  }
+  const env = envToken(role);
+  return !!env && same(cred, env);
+}
+
+export async function setLogin(role: LoginRole, username: string, password: string) {
+  const { salt, hash } = hashPassword(password);
+  await ensureSchema();
+  await sql`INSERT INTO vol_accounts (role, username, salt, hash, env_fp) VALUES (${role}, ${username}, ${salt}, ${hash}, ${fingerprint(envToken(role))})
+    ON CONFLICT (role) DO UPDATE SET username = EXCLUDED.username, salt = EXCLUDED.salt, hash = EXCLUDED.hash, env_fp = EXCLUDED.env_fp, updated_at = now()`;
+}
+
+// Where each login currently comes from, for the owner's Settings.
+export async function loginStatus(role: LoginRole): Promise<{ role: LoginRole; username: string | null; source: "site" | "vercel" | "none" }> {
+  const row = await siteAccount(role);
+  if (row) return { role, username: row.username, source: "site" };
+  const env = envToken(role);
+  return env ? { role, username: env.split(":")[0], source: "vercel" } : { role, username: null, source: "none" };
+}
+
+// Owner: the full admin. Coordinator: runs volunteers day to day, with no access to settings or logins.
+export type AdminRole = "owner" | "coordinator";
+export async function adminRole(request: Request): Promise<AdminRole | null> {
+  const auth = request.headers.get("Authorization");
+  if (await checkLogin(auth, "owner")) return "owner";
+  if (await checkLogin(auth, "coordinator")) return "coordinator";
+  return null;
+}
+
+export const isAdmin = async (request: Request) => (await adminRole(request)) === "owner";
 
 export async function getSetting(key: string): Promise<string> {
   const [r] = await sql`SELECT value FROM vol_settings WHERE key = ${key}`;

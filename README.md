@@ -11,8 +11,9 @@ Day-to-day use is explained inside the dashboard (press **How to use this** at t
 | `/volunteer` | Anyone applying to volunteer |
 | `/volunteer/training` | New volunteers (about 20 minutes) |
 | `/volunteer/portal` | Volunteers, to see and finish their tasks with their ID |
-| `/admin` | The coordinator: approve, edit, assign, verify, certificates |
-| `/admin/volunteers/training` | The coordinator's guide |
+| `/admin` | Greenforce Admin (owner): everything, including Settings, logins, HubSpot and deleting volunteers |
+| `/coordinator` | The volunteer coordinator: approve, edit, assign, verify, certificates, news. No Settings or deleting |
+| `/coordinator/training` | The coordinator's guide |
 | `/gallery-admin` | Whoever updates website photos |
 | `/insights` | Website traffic numbers |
 
@@ -28,7 +29,14 @@ Vercel → the project → Settings → Environment Variables. After changing an
 | `INSIGHTS_SECURE_TOKEN` | A separate `username:password` that only opens `/insights` | Optional |
 | `HUBSPOT_ACCESS_TOKEN` | Lets the site write volunteer details straight into HubSpot (see below) | Strongly recommended |
 
-To change the admin password, edit `ADMIN_SECURE_TOKEN` and redeploy. Everyone logged in is signed out the next time they act.
+### Changing passwords
+
+`ADMIN_SECURE_TOKEN` (and `INSIGHTS_SECURE_TOKEN`, if used) are the **starting** logins. The coordinator has no variable: the owner creates that login in **Settings → Dashboard logins**. After that, nobody needs Vercel:
+
+- **Anyone** (owner or coordinator): press **Password** at the top of the dashboard.
+- **The owner** can set or reset the coordinator's and the Insights login in **Settings → Dashboard logins**.
+
+Once a login has been changed on the site, the site password is the one that works and the old Vercel value stops working. If anyone is ever locked out, edit that variable in Vercel and redeploy: the Vercel value then works again, and the person can set a new password from the dashboard. Passwords are stored hashed in the database.
 
 ## HubSpot
 

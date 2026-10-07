@@ -17,9 +17,13 @@ async function load(code: string) {
   const [badge] = await sql`UPDATE vol_volunteers SET badge_token = COALESCE(badge_token, gen_random_uuid()::text)
     WHERE id = ${v.id} RETURNING badge_token AS token, COALESCE(approved_at, created_at) AS since`;
   const [cert] = await sql`SELECT token, kind, issued_at FROM vol_certificates WHERE volunteer_id = ${v.id}`;
+  const news = await sql`SELECT id, title, body, track, pinned, created_at FROM vol_news
+    WHERE track IS NULL OR track = ${v.track ?? ""}
+    ORDER BY pinned DESC, created_at DESC LIMIT 20`;
   return {
     volunteer: { name: v.name, code: v.code, track: v.track },
     assignments,
+    news,
     certificate: cert ?? null,
     badge: badge ?? null,
     activeGroup: await getSetting("active_group"),
