@@ -8,14 +8,14 @@ const IMGS = {
   hero: "/hero.jpg",
   hunger: "/hunger.jpg",
   bloom: "/bloom.jpg",
-  greenhouse: "greenhouse.png",
+  greenhouse: "greenhouse.jpg",
   harvest: "/harvest.jpg",
-  kids: "hostellers.png",
-  farm: "ama.png",
+  kids: "hostellers.jpg",
+  farm: "ama.jpg",
   community: "/community.jpg",
   ama: "/img/photo-1530099486328-e021101a494a-1200.jpg",
   sitting: "sitting.jpg",
-  founder: "founder.png",
+  founder: "founder.jpg",
 };
 
 function useInView(threshold = 0.15) {

@@ -5,7 +5,7 @@ import { X, ZoomIn, Loader2 } from "lucide-react";
 
 // Hardcoded backup array ensures the layout looks great instantly
 const BACKUP_IMAGES = [
-  { id: 1, src: "hostellers.png", caption: "Youth agri-training in Apam", category: "Training" },
+  { id: 1, src: "hostellers.jpg", caption: "Youth agri-training in Apam", category: "Training" },
   { id: 2, src: "sitting.jpg", caption: "Greenhouse at Apam SHS", category: "Greenhouse" },
   { id: 5, src: "/beansharvest.jpg", caption: "Harvest season — Central Ghana", category: "Harvest" }
 ];
