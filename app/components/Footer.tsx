@@ -119,6 +119,7 @@ export default function Footer() {
               { href: "/gallery", label: "Gallery" },
               { href: "/contact", label: "Contact" },
               { href: "/donate", label: "Donate Now" },
+              { href: "/policies/child-protection-and-safeguarding-policy.pdf", label: "Child Safeguarding Policy" },
             ].map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="footer-nav-link">
