@@ -1,518 +1,259 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import {
-  ArrowRight,
-  CheckCircle2,
-  GraduationCap,
-  HeartHandshake,
-  Leaf,
-  Loader2,
-  ShieldCheck,
-} from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
+import { CheckCircle, GraduationCap, Leaf, HeartHandshake, Send, AlertCircle } from "lucide-react";
+
+// Same Web3Forms key the Contact page uses, so applications are emailed with no extra setup.
+const WEB3FORMS_KEY = "84b28010-14e6-4d41-8b6c-7da6f3580552";
+
+const EMPTY = { email: "", firstname: "", lastname: "", date_of_birth: "", phone: "", gender: "", city: "", school_name: "", country: "", message: "" };
+const INPUT = "w-full px-4 py-3 rounded-xl border text-sm outline-none focus:ring-2 transition-all disabled:opacity-50";
+const INPUT_STYLE = { borderColor: "rgba(74,140,82,0.2)", background: "var(--mist)", "--tw-ring-color": "rgba(74,140,82,0.3)" } as React.CSSProperties;
+
+const AREAS = [
+  { icon: GraduationCap, title: "Education", text: "School support, scholarships and learning materials." },
+  { icon: Leaf, title: "Skills & Opportunity", text: "Agriculture, vocational training and youth opportunities." },
+  { icon: HeartHandshake, title: "Community Care", text: "Support for vulnerable people and community wellbeing." },
+];
+
+function Label({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
+  return (
+    <label htmlFor={htmlFor} className="text-xs font-medium tracking-wide uppercase mb-1.5 block" style={{ color: "var(--forest)" }}>
+      {children}
+    </label>
+  );
+}
 
 export default function ApplyPage() {
-  const [form, setForm] = useState({
-    email: "",
-    firstname: "",
-    lastname: "",
-    date_of_birth: "",
-    phone: "",
-    gender: "",
-    city: "",
-    school_name: "",
-    country: "",
-    message: "",
-  });
-
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState(EMPTY);
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState("");
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("visible"); observer.unobserve(e.target); } }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  const set = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    setSubmitting(true);
+    setStatus("submitting");
     setError("");
 
-    try {
-      const response = await fetch("/api/apply", {
+    const fullName = `${form.firstname} ${form.lastname}`.trim();
+    const details = [
+      ["Name", fullName], ["Email", form.email], ["Phone", form.phone], ["Gender", form.gender],
+      ["Date of birth", form.date_of_birth], ["City", form.city], ["Country", form.country],
+      ["School", form.school_name || "—"],
+    ].map(([k, v]) => `${k}: ${v}`).join("\n");
+
+    // Email the team (browser -> Web3Forms) and record in HubSpot (server) in parallel.
+    const [mail, crm] = await Promise.allSettled([
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          name: fullName,
+          email: form.email,
+          subject: `GFA Support Application: ${fullName}`,
+          message: `${details}\n\nWhat support is needed and why:\n${form.message}`,
+          from_name: "GreenForce Support Application",
+        }),
+      }).then(async (r) => r.ok && (await r.json()).success === true),
+      fetch("/api/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
-      });
+      }).then(async (r) => {
+        if (r.ok) return { ok: true as const };
+        const j = await r.json().catch(() => null);
+        return { ok: false as const, error: j?.error as string | undefined };
+      }),
+    ]);
 
-      if (!response.ok) {
-        const result = await response.json().catch(() => null);
-        throw new Error(result?.error || "Submission failed");
-      }
+    const mailOk = mail.status === "fulfilled" && mail.value;
+    const crmRes = crm.status === "fulfilled" ? crm.value : { ok: false as const, error: undefined };
 
-      setSubmitted(true);
-
-      setForm({
-        email: "",
-        firstname: "",
-        lastname: "",
-        date_of_birth: "",
-        phone: "",
-        gender: "",
-        city: "",
-        school_name: "",
-        country: "",
-        message: "",
-      });
-    } catch (err) {
-      console.error(err);
-      setError(
-        err instanceof Error && err.message !== "Submission failed"
-          ? err.message
-          : "We couldn't submit your application right now. Please check your details and try again."
-      );
-    } finally {
-      setSubmitting(false);
+    if (mailOk || crmRes.ok) {
+      setStatus("success");
+      setForm(EMPTY);
+    } else {
+      setError(crmRes.error || "We couldn't submit your application right now. Please check your details and try again.");
+      setStatus("error");
     }
   };
 
+  const busy = status === "submitting";
+
   return (
-    <main className="min-h-screen bg-[#f7f8f5] text-gray-900">
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-[#173f35]">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full border-[70px] border-white" />
-          <div className="absolute -bottom-40 -left-24 h-96 w-96 rounded-full border-[50px] border-white" />
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28">
-          <div className="max-w-3xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur">
-              <HeartHandshake className="h-4 w-4" />
-              GreenForce Support
-            </div>
-
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-6xl">
+    <main>
+      {/* HEADER */}
+      <section className="pt-32 pb-16 px-6" style={{ background: "var(--cream)" }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="reveal max-w-xl">
+            <span className="text-xs tracking-[0.25em] uppercase font-medium" style={{ color: "var(--sage)" }}>
+              Request Support
+            </span>
+            <h1 className="font-display text-5xl lg:text-6xl font-light mt-2 leading-tight" style={{ color: "var(--forest)" }}>
               Need support?
               <br />
-              <span className="text-[#d9e8c8]">Start here.</span>
+              <em style={{ color: "var(--sage)" }}>Start here.</em>
             </h1>
-
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/80 md:text-xl">
-              If you or someone in your community needs support, tell us a
-              little about your situation. Our team will review your
-              application and get back to you if we need more information or
-              are able to provide support.
+            <p className="text-slate-500 mt-5 leading-relaxed">
+              Tell us a little about your situation. Our team will review your application and get back to you if we
+              need more information or are able to provide support.
             </p>
           </div>
         </div>
       </section>
 
-      {/* SUPPORT AREAS */}
-      <section className="border-b border-gray-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-0 md:grid-cols-3">
-          <div className="flex gap-4 border-b border-gray-200 px-6 py-7 md:border-b-0 md:border-r md:px-10">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#eef4e8] text-[#315b43]">
-              <GraduationCap className="h-5 w-5" />
-            </div>
-
-            <div>
-              <h3 className="font-semibold">Education</h3>
-              <p className="mt-1 text-sm leading-6 text-gray-600">
-                School support, scholarships, materials and related needs.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 border-b border-gray-200 px-6 py-7 md:border-b-0 md:border-r md:px-10">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f3eee4] text-[#765d35]">
-              <Leaf className="h-5 w-5" />
-            </div>
-
-            <div>
-              <h3 className="font-semibold">Skills & Opportunity</h3>
-              <p className="mt-1 text-sm leading-6 text-gray-600">
-                Agriculture, vocational training and youth opportunities.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-4 px-6 py-7 md:px-10">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f3eaea] text-[#744747]">
-              <HeartHandshake className="h-5 w-5" />
-            </div>
-
-            <div>
-              <h3 className="font-semibold">Community Care</h3>
-              <p className="mt-1 text-sm leading-6 text-gray-600">
-                Support for vulnerable people and community wellbeing.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FORM AREA */}
-      <section className="px-6 py-16 md:px-10 md:py-24">
-        <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-          {/* LEFT SIDE */}
-          <div className="lg:pt-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#477057]">
-              Request support
-            </p>
-
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-              Tell us what you need.
-            </h2>
-
-            <p className="mt-5 max-w-lg text-base leading-7 text-gray-600">
-              Complete the form with enough information for our team to
-              understand your situation. You do not need to know exactly what
-              programme you belong to — simply explain what support you need
-              and why.
-            </p>
-
-            <div className="mt-10 space-y-5">
-              <div className="flex items-start gap-4">
-                <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e9f0e6] text-[#315b43]">
-                  <ShieldCheck className="h-4 w-4" />
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    Your information is reviewed carefully
-                  </h3>
-                  <p className="mt-1 text-sm leading-6 text-gray-600">
-                    Your application goes to GreenForce for review. We may
-                    contact you if additional information is needed.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e9f0e6] text-[#315b43]">
-                  <ArrowRight className="h-4 w-4" />
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    What happens next?
-                  </h3>
-                  <p className="mt-1 text-sm leading-6 text-gray-600">
-                    Once submitted, our team will review your request and get
-                    back to you if we are able to assist or need more details.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* FORM CARD */}
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-[0_15px_50px_rgba(0,0,0,0.06)] md:p-10">
-            {submitted ? (
-              <div className="flex min-h-[520px] flex-col items-center justify-center text-center">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e9f3e5] text-[#315b43]">
-                  <CheckCircle2 className="h-10 w-10" />
-                </div>
-
-                <h2 className="mt-7 text-3xl font-bold text-gray-900">
-                  Application Received
-                </h2>
-
-                <p className="mt-4 max-w-md text-base leading-7 text-gray-600">
-                  Thank you for submitting your application to GreenForce
-                  Foundation Africa.
-                </p>
-
-                <p className="mt-3 max-w-md text-base leading-7 text-gray-600">
-                  We have received your information and will review your
-                  request. If we need any additional information or are able to
-                  provide support, a member of our team will contact you.
-                </p>
-
-                <p className="mt-6 text-sm font-medium text-gray-500">
-                  Thank you for reaching out to GreenForce Foundation Africa.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Beneficiary Application
-                  </h2>
-
-                  <p className="mt-2 text-sm leading-6 text-gray-500">
-                    Please provide your details below. Fields marked with *
-                    are required.
-                  </p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* NAME */}
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="firstname"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        First Name *
-                      </label>
-
-                      <input
-                        id="firstname"
-                        name="firstname"
-                        type="text"
-                        required
-                        value={form.firstname}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                        placeholder="Your first name"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="lastname"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        Last Name *
-                      </label>
-
-                      <input
-                        id="lastname"
-                        name="lastname"
-                        type="text"
-                        required
-                        value={form.lastname}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                        placeholder="Your last name"
-                      />
-                    </div>
+      <section className="pb-24 px-6" style={{ background: "var(--cream)" }}>
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16">
+          {/* LEFT */}
+          <div className="reveal">
+            <div className="space-y-5">
+              {AREAS.map(({ icon: Icon, title, text }) => (
+                <div key={title} className="flex gap-4 items-start p-5 rounded-2xl" style={{ background: "var(--mist)" }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(74,140,82,0.12)" }}>
+                    <Icon size={18} style={{ color: "var(--sage)" }} />
                   </div>
-
-                  {/* EMAIL + PHONE */}
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        Email *
-                      </label>
-
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        value={form.email}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                        placeholder="you@example.com"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="phone"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        Phone Number *
-                      </label>
-
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        required
-                        value={form.phone}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                        placeholder="024 123 4567"
-                      />
-                    </div>
-                  </div>
-
-                  {/* DOB + GENDER */}
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="date_of_birth"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        Date of Birth *
-                      </label>
-
-                      <input
-                        id="date_of_birth"
-                        name="date_of_birth"
-                        type="date"
-                        required
-                        value={form.date_of_birth}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="gender"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        Gender *
-                      </label>
-
-                      <select
-                        id="gender"
-                        name="gender"
-                        required
-                        value={form.gender}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                      >
-                        <option value="">Select gender</option>
-                        <option value="Female">Female</option>
-                        <option value="Male">Male</option>
-                        <option value="Other">Other</option>
-                        <option value="Prefer not to say">
-                          Prefer not to say
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* CITY + COUNTRY */}
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="city"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        City *
-                      </label>
-
-                      <input
-                        id="city"
-                        name="city"
-                        type="text"
-                        required
-                        value={form.city}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                        placeholder="e.g. Apam"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="country"
-                        className="mb-2 block text-sm font-semibold text-gray-800"
-                      >
-                        Country *
-                      </label>
-
-                      <select
-                        id="country"
-                        name="country"
-                        required
-                        value={form.country}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                      >
-                        <option value="">Select country</option>
-                        <option value="Ghana">Ghana</option>
-                        <option value="The Gambia">The Gambia</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* SCHOOL */}
                   <div>
-                    <label
-                      htmlFor="school_name"
-                      className="mb-2 block text-sm font-semibold text-gray-800"
-                    >
-                      School Name
-                      <span className="ml-2 font-normal text-gray-400">
-                        If applicable
-                      </span>
-                    </label>
-
-                    <input
-                      id="school_name"
-                      name="school_name"
-                      type="text"
-                      value={form.school_name}
-                      onChange={handleChange}
-                      className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                      placeholder="Enter your school name"
-                    />
+                    <p className="font-medium text-sm" style={{ color: "var(--forest)" }}>{title}</p>
+                    <p className="text-slate-500 text-sm mt-1 leading-relaxed">{text}</p>
                   </div>
+                </div>
+              ))}
+            </div>
 
-                  {/* SUPPORT MESSAGE */}
-                  <div>
-                    <label
-                      htmlFor="message"
-                      className="mb-2 block text-sm font-semibold text-gray-800"
-                    >
-                      What support do you need and why? *
-                    </label>
+            <div className="scripture mt-8 px-6 py-5 rounded-2xl">
+              <p className="font-display text-lg italic" style={{ color: "var(--forest)" }}>
+                &ldquo;Two are better than one... if either of them falls down, one can help the other up.&rdquo;
+              </p>
+              <span className="text-sm mt-2 block" style={{ color: "var(--gold)" }}>— Ecclesiastes 4:9–10</span>
+            </div>
+          </div>
 
-                    <textarea
-                      id="message"
-                      name="message"
-                      required
-                      rows={7}
-                      value={form.message}
-                      onChange={handleChange}
-                      className="w-full resize-none rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-sm leading-6 outline-none transition focus:border-[#477057] focus:ring-2 focus:ring-[#477057]/10"
-                      placeholder="Please explain your situation, the support you need, and any details you think our team should know."
-                    />
-                  </div>
-
-                  {/* ERROR */}
-                  {error && (
-                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
-                      {error}
-                    </div>
-                  )}
-
-                  {/* SUBMIT */}
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#173f35] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#245648] disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Sending application...
-                      </>
-                    ) : (
-                      <>
-                        Submit Application
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
+          {/* FORM */}
+          <div className="reveal">
+            <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-sm">
+              {status === "success" ? (
+                <div className="text-center py-12">
+                  <CheckCircle size={48} className="mx-auto mb-4" style={{ color: "var(--sage)" }} />
+                  <h3 className="font-display text-3xl font-light mb-3" style={{ color: "var(--forest)" }}>
+                    Application received.
+                  </h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">
+                    Thank you for reaching out to GreenForce Foundation Africa. Our team will review your request and
+                    contact you if we need more information or are able to provide support.
+                  </p>
+                  <button onClick={() => setStatus("idle")} className="mt-6 text-sm font-medium" style={{ color: "var(--leaf)" }}>
+                    Submit another application
                   </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="font-display text-3xl font-light mb-2" style={{ color: "var(--forest)" }}>
+                    Beneficiary application
+                  </h2>
+                  <p className="text-slate-400 text-sm mb-8">All fields are required unless marked optional.</p>
 
-                  <p className="text-center text-xs leading-5 text-gray-400">
-                    By submitting this form, you are providing your information
-                    to GreenForce Foundation Africa for the purpose of
-                    reviewing your request for support.
-                  </p>
-                </form>
-              </>
-            )}
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <Label htmlFor="firstname">First name</Label>
+                        <input id="firstname" name="firstname" required value={form.firstname} onChange={set} disabled={busy} placeholder="Your first name" className={INPUT} style={INPUT_STYLE} />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastname">Last name</Label>
+                        <input id="lastname" name="lastname" required value={form.lastname} onChange={set} disabled={busy} placeholder="Your last name" className={INPUT} style={INPUT_STYLE} />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <input id="email" name="email" type="email" required value={form.email} onChange={set} disabled={busy} placeholder="your@email.com" className={INPUT} style={INPUT_STYLE} />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone</Label>
+                        <input id="phone" name="phone" type="tel" required value={form.phone} onChange={set} disabled={busy} placeholder="024 123 4567" className={INPUT} style={INPUT_STYLE} />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <Label htmlFor="date_of_birth">Date of birth</Label>
+                        <input id="date_of_birth" name="date_of_birth" type="date" required value={form.date_of_birth} onChange={set} disabled={busy} className={INPUT} style={INPUT_STYLE} />
+                      </div>
+                      <div>
+                        <Label htmlFor="gender">Gender</Label>
+                        <select id="gender" name="gender" required value={form.gender} onChange={set} disabled={busy} className={INPUT} style={INPUT_STYLE}>
+                          <option value="">Select gender</option>
+                          <option>Female</option>
+                          <option>Male</option>
+                          <option>Other</option>
+                          <option>Prefer not to say</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <Label htmlFor="city">City</Label>
+                        <input id="city" name="city" required value={form.city} onChange={set} disabled={busy} placeholder="e.g. Apam" className={INPUT} style={INPUT_STYLE} />
+                      </div>
+                      <div>
+                        <Label htmlFor="country">Country</Label>
+                        <select id="country" name="country" required value={form.country} onChange={set} disabled={busy} className={INPUT} style={INPUT_STYLE}>
+                          <option value="">Select country</option>
+                          <option>Ghana</option>
+                          <option>The Gambia</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="school_name">School name (optional)</Label>
+                      <input id="school_name" name="school_name" value={form.school_name} onChange={set} disabled={busy} placeholder="If applicable" className={INPUT} style={INPUT_STYLE} />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="message">What support do you need and why?</Label>
+                      <textarea id="message" name="message" required rows={6} value={form.message} onChange={set} disabled={busy} placeholder="Please explain your situation and the support you need." className={`${INPUT} resize-none`} style={INPUT_STYLE} />
+                    </div>
+
+                    {status === "error" && (
+                      <p className="flex items-start gap-2 text-sm text-red-600" role="alert">
+                        <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                        {error}
+                      </p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={busy}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90 disabled:opacity-60"
+                      style={{ background: "var(--forest)" }}
+                    >
+                      {busy ? "Sending…" : "Submit application"}
+                      {!busy && <Send size={15} />}
+                    </button>
+
+                    <p className="text-center text-xs text-slate-400 leading-relaxed">
+                      By submitting, you share your information with GreenForce Foundation Africa for the purpose of
+                      reviewing your request for support.
+                    </p>
+                  </form>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </section>
