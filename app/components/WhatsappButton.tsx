@@ -80,7 +80,7 @@ export default function WhatsAppButton() {
             minHeight: "180px", 
             maxHeight: "300px", 
             overflowY: "auto", 
-            backgroundImage: "linear-gradient(rgba(229, 221, 213, 0.6), rgba(229, 221, 213, 0.6)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')",
+            backgroundImage: "linear-gradient(rgba(229, 221, 213, 0.6), rgba(229, 221, 213, 0.6)), url('/img/whatsapp-bg.jpg')",
             backgroundBlendMode: "overlay"
           }}>
             

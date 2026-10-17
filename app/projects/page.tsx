@@ -5,11 +5,11 @@ import Link from "next/link";
 import { Heart, ArrowRight, Home, Leaf, ShieldCheck, GraduationCap, ClipboardList } from "lucide-react";
 
 // Asset URLs
-const PROJ_HERO = "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1800&q=85&auto=format&fit=crop";
+const PROJ_HERO = "/img/photo-1416879595882-3373a0480b5b-1800.jpg";
 const GH1 = "/hostel.jpg";
-const YOUTH2 = "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=85&auto=format&fit=crop";
-const YOUTH1 = "/farmland.png";
-const GH2 = "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=800&q=85&auto=format&fit=crop";
+const YOUTH2 = "/img/photo-1592982537447-7440770cbfc9-800.jpg";
+const YOUTH1 = "/farmland.jpg";
+const GH2 = "/img/photo-1509099836639-18ba1795216d-800.jpg";
 const EDU1 = "/agriedu.jpg";
 const EDU2 = "/smilingboy.jpg";
 

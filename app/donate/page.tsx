@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Heart, BookOpen, TreePine, Users, Globe, Smartphone, Copy, Check, CreditCard } from "lucide-react";
 
-const DONATE_HERO = "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1800&q=85&auto=format&fit=crop";
+const DONATE_HERO = "/img/photo-1488521787991-ed7bbaae773c-1800.jpg";
 const GIVESENDGO_LINK = "https://www.givesendgo.com/greenforcefoundation?utm_source=sharelink&utm_medium=copy_link&utm_campaign=greenforcefoundation";
 
 const s = {

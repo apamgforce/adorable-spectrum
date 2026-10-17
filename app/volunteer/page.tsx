@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TRACKS, TRACK_LABELS, HOURS, MODES } from "../lib/tracks";
 import { Users, MapPin, Send, CheckCircle, AlertCircle, Clock } from "lucide-react";
 
-const VOLUNTEER_IMG = "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=900&q=85&auto=format&fit=crop";
+const VOLUNTEER_IMG = "/img/photo-1542601906990-b4d3fb778b09-900.jpg";
 
 // Main community group new applicants join right after applying.
 const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/Fit8eH747BLAna15s6RE92?s=cl&p=a&ilr=0";

@@ -5,7 +5,7 @@ import { Phone, Mail, MapPin } from "lucide-react";
 import ContactForm from "../components/ContactForm";
 
 const CONTACT_IMG =
-  "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=900&q=85&auto=format&fit=crop";
+  "/img/photo-1531206715517-5c0ba140b2b8-900.jpg";
 
 function useRevealAll() {
   useEffect(() => {

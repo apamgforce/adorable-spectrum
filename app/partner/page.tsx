@@ -90,7 +90,7 @@ export default function PartnerPage() {
           alignItems: "flex-end",
           padding: "160px 60px 110px",
           color: "#fff",
-          backgroundImage: `linear-gradient(to top, rgba(14,30,12,.92) 10%, rgba(14,30,12,.45) 60%, rgba(14,30,12,.25)), url(/hostellers.png)`,
+          backgroundImage: `linear-gradient(to top, rgba(14,30,12,.92) 10%, rgba(14,30,12,.45) 60%, rgba(14,30,12,.25)), url(/hostellers.jpg)`,
           backgroundSize: "cover",
           backgroundPosition: "center 30%",
         }}
@@ -179,7 +179,7 @@ export default function PartnerPage() {
       {/* Greenhouse */}
       <section className="pt-sec">
         <div className="pt-wrap pt-two">
-          <img src="/greenhouse.png" alt="The GreenForce greenhouse at Botsio" className="pt-photo" />
+          <img src="/greenhouse.jpg" alt="The GreenForce greenhouse at Botsio" className="pt-photo" />
           <div>
             <span style={{ ...eyebrow, fontSize: 13, color: gold }}>The Botsio greenhouse</span>
             <h2 style={{ ...display, fontSize: "clamp(36px,4.8vw,58px)", fontWeight: 300, lineHeight: 1.1, color: forest, margin: "16px 0 28px" }}>

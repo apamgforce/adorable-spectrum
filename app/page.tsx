@@ -7,13 +7,13 @@ import WhatsAppButton from "./components/WhatsappButton";
 const IMGS = {
   hero: "/hero.jpg",
   hunger: "/hunger.jpg",
-  bloom: "/bloom.png",
+  bloom: "/bloom.jpg",
   greenhouse: "greenhouse.png",
   harvest: "/harvest.jpg",
   kids: "hostellers.png",
   farm: "ama.png",
   community: "/community.jpg",
-  ama: "https://images.unsplash.com/photo-1530099486328-e021101a494a?w=1200&q=85&auto=format&fit=crop",
+  ama: "/img/photo-1530099486328-e021101a494a-1200.jpg",
   sitting: "sitting.jpg",
   founder: "founder.png",
 };
@@ -516,7 +516,7 @@ export default function HomePage() {
       {/* Left Column: Visual Portrait & Core Quote */}
       <Reveal>
         <div style={{ position: "relative", overflow: "hidden", height: 500, marginBottom: 32 }}>
-          <img src="/founder.png" alt="Victor Tokunbo Ogundipe" className="img-hover" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }} />
+          <img src="/founder.jpg" alt="Victor Tokunbo Ogundipe" className="img-hover" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top, rgba(30,61,26,0.95), transparent)", padding: "32px" }}>
             <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 28, color: "#ffffff", fontWeight: 500, marginBottom: 4 }}>Victor Tokunbo Ogundipe</p>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "#e8b84b" }}>Educationist · Administrator · Humanitarian</p>

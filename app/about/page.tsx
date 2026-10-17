@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 // Updated high-end Unsplash imagery matching agriculture, youth, and West African infrastructure themes
 const ABOUT_HERO = "/aboutbanner.jpg";
 const COOPERATIVE_IMG = "/unbroken.jpg";
-const FOUNDER_IMG = "/founder.png"; 
+const FOUNDER_IMG = "/founder.jpg"; 
 
 const s = {
   eyebrow: { fontFamily: "'DM Sans', sans-serif", fontSize: "11px", letterSpacing: "0.22em", textTransform: "uppercase" as const, fontWeight: 500 },
