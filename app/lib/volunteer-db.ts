@@ -28,6 +28,7 @@ export function ensureSchema(): Promise<void> {
       await sql`ALTER TABLE vol_volunteers ADD COLUMN IF NOT EXISTS notes TEXT`;
       await sql`ALTER TABLE vol_volunteers ADD COLUMN IF NOT EXISTS hubspot_synced_at TIMESTAMPTZ`;
       await sql`ALTER TABLE vol_volunteers ADD COLUMN IF NOT EXISTS hubspot_error TEXT`;
+      await sql`ALTER TABLE vol_volunteers ADD COLUMN IF NOT EXISTS on_break BOOLEAN NOT NULL DEFAULT false`;
       await sql`CREATE TABLE IF NOT EXISTS vol_tasks (
         id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,

@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   try {
     await ensureSchema();
     const volunteers = await sql`
-      SELECT v.id, v.code, v.name, v.email, v.whatsapp, v.track, v.hours, v.mode, v.notes, v.status, v.last_login,
+      SELECT v.id, v.code, v.name, v.email, v.whatsapp, v.track, v.hours, v.mode, v.notes, v.status, v.last_login, v.on_break,
         v.created_at, v.approved_at, v.hubspot_id, v.hubspot_error, c.token AS cert_token,
         MAX(a.done_at) AS last_done,
         COUNT(a.id)::int AS assigned,

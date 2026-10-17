@@ -8,7 +8,7 @@ import { KeyRound, Megaphone, Pin, Trash2, LogOut, Award, BookOpen, Loader2, Loc
 
 type Vol = {
   cert_token: string | null; id: number; code: string; name: string; email: string | null; whatsapp: string | null;
-  track: string | null; hours: string | null; mode: string | null; notes: string | null; status: string;
+  track: string | null; hours: string | null; mode: string | null; notes: string | null; status: string; on_break?: boolean;
   assigned: number; done: number; confirmed: number; last_login: string | null; last_done: string | null;
   created_at: string; approved_at: string | null; hubspot_id: string | null; hubspot_error: string | null;
 };
@@ -128,7 +128,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
     `Hi ${first(name)}, a gentle reminder about your Greenforce task: "${t.title}"${t.due_date ? `, due ${day(t.due_date)}` : ""}. Open ${origin}/volunteer/portal with your volunteer ID to mark it done. Thank you!`;
 
   const pending = (data?.volunteers || []).filter((v) => v.status === "pending");
-  const active = useMemo(() => (data?.volunteers || []).filter((v) => v.status === "active"), [data]);
+  const active = useMemo(() => (data?.volunteers || []).filter((v) => v.status === "active" && !v.on_break), [data]);
   const qualifies = (id: number) => !!data?.eligible.some((e) => e.id === id);
   const shown = useMemo(() => {
     const t = q.trim().toLowerCase(), digits = q.replace(/\D/g, "");
@@ -279,6 +279,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
                           <span className="font-medium text-forest text-lg">{v.name}</span>
                           <span className={`text-xs px-2.5 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
                           {v.status !== "pending" && <span className="font-mono text-sm text-slate-500">{v.code}</span>}
+                          {v.on_break && <span className="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700">On a break</span>}
                           {v.hubspot_error && data?.hubspotDirect && <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-600" title={v.hubspot_error}>CRM not updated</span>}
                         </div>
                         <p className="text-sm text-slate-500 mt-1">{[v.track, v.hours && `${v.hours}/month`, modeLabel(v.mode)].filter(Boolean).join(" · ") || "No track chosen"}</p>

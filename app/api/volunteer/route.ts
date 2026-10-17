@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { sql, ensureSchema, getSetting } from "../../lib/volunteer-db";
+import { TRACKS } from "../../lib/tracks";
+import { upsertHubSpotContact } from "../../lib/hubspot";
 
 export const dynamic = "force-dynamic";
 
 async function load(code: string) {
-  const [v] = await sql`SELECT id, code, name, track, status FROM vol_volunteers
+  const [v] = await sql`SELECT id, code, name, track, status, on_break FROM vol_volunteers
     WHERE code = ${code} AND status = 'active'`;
   if (!v) return null;
   const assignments = await sql`
@@ -21,7 +23,7 @@ async function load(code: string) {
     WHERE track IS NULL OR track = ${v.track ?? ""}
     ORDER BY pinned DESC, created_at DESC LIMIT 20`;
   return {
-    volunteer: { name: v.name, code: v.code, track: v.track },
+    volunteer: { name: v.name, code: v.code, track: v.track, onBreak: !!v.on_break },
     assignments,
     news,
     certificate: cert ?? null,
@@ -34,7 +36,7 @@ async function load(code: string) {
 export async function POST(request: Request) {
   try {
     await ensureSchema();
-    const { code, action, assignmentId, text } = await request.json();
+    const { code, action, assignmentId, text, track } = await request.json();
     const clean = String(code || "").trim().toUpperCase();
     const [v] = await sql`SELECT id FROM vol_volunteers WHERE code = ${clean} AND status = 'active'`;
     if (!v) return NextResponse.json({ error: "We couldn't find that ID. Check your message from the coordinator." }, { status: 404 });
@@ -51,6 +53,15 @@ export async function POST(request: Request) {
       await sql`UPDATE vol_assignments SET group_confirmed_at = COALESCE(group_confirmed_at, now())
         WHERE id = ${Number(assignmentId)} AND volunteer_id = ${v.id} AND status IN ('done','verified')`;
       await sql`INSERT INTO vol_events (volunteer_id, assignment_id, kind) VALUES (${v.id}, ${Number(assignmentId)}, 'group_confirmed')`;
+    } else if (action === "break" || action === "resume") {
+      await sql`UPDATE vol_volunteers SET on_break = ${action === "break"} WHERE id = ${v.id}`;
+      await sql`INSERT INTO vol_events (volunteer_id, kind) VALUES (${v.id}, ${action === "break" ? "took_break" : "resumed"})`;
+    } else if (action === "change_track") {
+      if (!TRACKS.includes(String(track))) return NextResponse.json({ error: "Choose a task type from the list." }, { status: 400 });
+      const [row] = await sql`UPDATE vol_volunteers SET track = ${String(track)} WHERE id = ${v.id}
+        RETURNING name, email, whatsapp, track, hours, mode, hubspot_id`;
+      await sql`INSERT INTO vol_events (volunteer_id, kind) VALUES (${v.id}, 'changed_track')`;
+      upsertHubSpotContact({ name: row.name, email: row.email, whatsapp: row.whatsapp, track: row.track, hours: row.hours, mode: row.mode, hubspotId: row.hubspot_id }).catch(() => {});
     } else if (action === "undo") {
       await sql`UPDATE vol_assignments SET status = 'assigned', done_at = NULL, group_confirmed_at = NULL
         WHERE id = ${Number(assignmentId)} AND volunteer_id = ${v.id} AND status = 'done'`;

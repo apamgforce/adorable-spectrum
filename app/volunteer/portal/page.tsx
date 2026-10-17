@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { TRACKS } from "../../lib/tracks";
 import { Share2, Download, Link2, Check, Paperclip, X, CheckCircle2, Circle, Loader2, LogOut, MessageCircle, BookOpen, Undo2, ArrowRight, CalendarDays, Sparkles, Megaphone, Pin } from "lucide-react";
 
 
@@ -11,7 +12,7 @@ type Assignment = {
   title: string; details: string | null; track: string | null; due_date: string | null;
 };
 type News = { id: number; title: string; body: string; track: string | null; pinned: boolean; created_at: string };
-type Data = { news: News[]; volunteer: { name: string; code: string; track: string | null }; assignments: Assignment[]; certificate: { token: string; kind: string; issued_at: string } | null; badge: { token: string; since: string } | null; activeGroup: string };
+type Data = { news: News[]; volunteer: { name: string; code: string; track: string | null; onBreak?: boolean }; assignments: Assignment[]; certificate: { token: string; kind: string; issued_at: string } | null; badge: { token: string; since: string } | null; activeGroup: string };
 
 
 // Shrink phone photos before upload so they stay well under the 4MB request limit.
@@ -69,6 +70,13 @@ export default function PortalPage() {
     if (!data) return;
     setBusy(id);
     try { setData(await call(data.volunteer.code, { action, assignmentId: id })); } catch (err) { setError((err as Error).message); }
+    setBusy(null);
+  };
+
+  const setPref = async (extra: Record<string, unknown>) => {
+    if (!data) return;
+    setBusy("login"); setError("");
+    try { setData(await call(data.volunteer.code, extra)); } catch (err) { setError((err as Error).message); }
     setBusy(null);
   };
 
@@ -155,6 +163,14 @@ export default function PortalPage() {
             <p className="text-white/60 text-base">{finished.length} of {total} completed</p>
           </div>
         </div>
+
+        {data.volunteer.onBreak && (
+          <div className="rounded-3xl border-2 border-orange-200 bg-orange-50 p-5 mb-6">
+            <p className="font-medium text-forest">You are on a break</p>
+            <p className="text-base text-slate-600 mt-1">No new tasks will come to you. Come back any time.</p>
+            <button onClick={() => setPref({ action: "resume" })} disabled={busy !== null} className="btn-shimmer mt-4 px-5 py-3 rounded-xl text-white text-base font-medium">I&apos;m back</button>
+          </div>
+        )}
 
         {waitingGroup.length > 0 && (
           <div className="rounded-3xl border-2 border-gold/40 bg-amber/10 p-5 mb-6">
@@ -287,6 +303,25 @@ export default function PortalPage() {
               )}
             </div>
           ))}
+        </div>
+
+        <div className="mt-10 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+          <p className="font-display text-2xl text-forest">My settings</p>
+          <label className="block text-sm tracking-[0.15em] uppercase text-slate-500 mt-5 mb-2">Tasks I want</label>
+          <select
+            value={data.volunteer.track || ""}
+            onChange={(e) => e.target.value && setPref({ action: "change_track", track: e.target.value })}
+            disabled={busy !== null}
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-mist text-base"
+          >
+            <option value="">Choose a task type</option>
+            {TRACKS.map((t) => <option key={t}>{t}</option>)}
+          </select>
+          <p className="text-sm text-slate-400 mt-2">New tasks will match this.</p>
+          <label className="block text-sm tracking-[0.15em] uppercase text-slate-500 mt-6 mb-2">Life got busy?</label>
+          {data.volunteer.onBreak
+            ? <button onClick={() => setPref({ action: "resume" })} disabled={busy !== null} className="btn-shimmer w-full py-3 rounded-xl text-white text-base font-medium">I&apos;m back</button>
+            : <button onClick={() => { if (confirm("Take a break? No new tasks will come to you until you come back.")) setPref({ action: "break" }); }} disabled={busy !== null} className="w-full py-3 rounded-xl border border-slate-200 text-slate-700 text-base">Take a break</button>}
         </div>
 
         <Link href="/volunteer/training" className="mt-10 flex items-center justify-center gap-2 text-base text-leaf hover:text-forest"><BookOpen size={16} /> Volunteer training &amp; how this works</Link>
