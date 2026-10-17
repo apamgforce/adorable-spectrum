@@ -25,15 +25,16 @@ const impact = [
 ];
 
 const ways = [
-  { t: "Your Scholars", d: "One student, a group, or a whole year group, carrying your name." },
-  { t: "Your Exam Class", d: "A named group of WASSCE candidates, such as “The Fidelity Exam Class of 2027”." },
-  { t: "Your Excellence Award", d: "A yearly prize in your name for the best WASSCE result among our students." },
-  { t: "Your Greenhouse", d: "A greenhouse that carries your name, like ours at Botsio, where students learn farming and food production." },
+  { t: "Sponsor a Scholar", d: "Cover a bright student's hostel, food and school needs for a term or a full year. You choose one student or several, and each one is known as your scholar. They write to you, and you get their progress every term." },
+  { t: "Sponsor Exam Candidates", d: "Pay the WASSCE registration for students who would otherwise miss the exam. Sponsor one candidate or a whole group, and that year's group carries your name. When results come out, you see how they did." },
+  { t: "Your Excellence Award", d: "A yearly prize in your name for the best WASSCE result among our students. It rewards hard work and gives every student something to aim for." },
+  { t: "Your Greenhouse", d: "Fund a greenhouse that carries your name, like ours at Botsio, where students grow their own food and learn farming." },
   { t: "Your Classroom", d: "Help build the free school for orphans in Apam, with a plaque at the classroom door. Building materials welcome." },
-  { t: "Your Reading Corner", d: "Books and maths sets for students, with a named shelf." },
-  { t: "Your Care Circle", d: "Monthly stipends for a group of widows for a full year." },
-  { t: "Your Health Cover", d: "NHIS registration or renewal for the widows we support." },
-  { t: "Your Feeding Term", d: "Feed our students for a full school term." },
+  { t: "Reach a New Community", d: "Help us go to a new school or town and take in children we cannot reach yet. Your support opens the door for the next group of students." },
+  { t: "Your Reading Corner", d: "Stock books and maths sets for our students, on a shelf that carries your name." },
+  { t: "Your Care Circle", d: "Give a group of widows their monthly support for a full year." },
+  { t: "Your Health Cover", d: "Pay health insurance (NHIS) registration or renewal for the widows we support." },
+  { t: "Your Feeding Term", d: "Feed 5, 10 or all of our students for a full school term. You choose the number." },
 ];
 
 const receives = [
@@ -136,7 +137,7 @@ export default function PartnerPage() {
             Choose what carries <em style={{ color: gold }}>your name.</em>
           </h2>
           <p className="pt-big" style={{ maxWidth: 680, marginBottom: 24 }}>
-            Every gift becomes something a child can touch. Pick one, or bring your own idea.
+            Everyone can do something. A child is waiting for you to show up. Pick one, or bring your own idea.
           </p>
           <div className="pt-ways">
             {ways.map((w, i) => (
@@ -149,7 +150,7 @@ export default function PartnerPage() {
               </div>
             ))}
             <div className="pt-way">
-              <span className="pt-way-n">10</span>
+              <span className="pt-way-n">{ways.length + 1}</span>
               <div>
                 <h3>Your own idea</h3>
                 <p>Have something else on your heart? Tell us, and we will make it happen together.</p>
@@ -244,7 +245,7 @@ export default function PartnerPage() {
       <section id="partner-form" className="pt-sec" style={{ scrollMarginTop: 64 }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <p style={{ ...display, fontSize: "clamp(32px,4.4vw,52px)", fontWeight: 300, color: forest, textAlign: "center", marginBottom: 44, lineHeight: 1.2 }}>
-            One child. One name. One decision.<br /><em style={{ color: gold }}>Let it be yours.</em>
+            A child is waiting.<br /><em style={{ color: gold }}>We are counting on you.</em>
           </p>
           <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-sm">
             <ContactForm
