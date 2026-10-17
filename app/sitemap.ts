@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "", priority: 1 },
     { path: "/about", priority: 0.8 },
     { path: "/projects", priority: 0.8 },
-    { path: "/partnerships", priority: 0.7 },
+    { path: "/partner", priority: 0.7 },
     { path: "/donate", priority: 0.9 },
     { path: "/apply", priority: 0.7 },
     { path: "/volunteer", priority: 0.7 },
