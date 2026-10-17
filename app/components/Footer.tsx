@@ -115,6 +115,7 @@ export default function Footer() {
               { href: "/", label: "Home" },
               { href: "/about", label: "About Us" },
               { href: "/projects", label: "Our Projects" },
+              { href: "/partnerships", label: "Partnerships" },
               { href: "/gallery", label: "Gallery" },
               { href: "/contact", label: "Contact" },
               { href: "/donate", label: "Donate Now" },
