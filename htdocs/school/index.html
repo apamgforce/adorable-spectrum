@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dunewood Academy — School Management</title>
+<style>
+:root{--bg:#f6efe3;--card:#fffaf1;--sand:#e8d9bd;--sand2:#d4bd92;--ink:#3b2f20;--mute:#8a7656;--accent:#b5651d;--accent2:#6b8e6b;--bad:#b3432f;--r:16px}
+*{box-sizing:border-box;margin:0}body{font:15px/1.5 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
+aside{width:236px;background:linear-gradient(180deg,#3b2f20,#5a4630);color:#f3e6cc;padding:22px 14px;position:sticky;top:0;height:100vh;overflow:auto;flex-shrink:0}
+aside h1{font:700 19px Georgia,serif;padding:0 10px 4px}aside small{padding:0 10px;color:#c9b48a;display:block;margin-bottom:18px}
+nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;color:#e8d9bd;text-decoration:none;cursor:pointer;margin-bottom:3px}
+nav a:hover{background:#ffffff14}nav a.on{background:var(--sand);color:var(--ink);font-weight:600}
+main{flex:1;padding:28px 34px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px;flex-wrap:wrap}
+h2{font:700 28px Georgia,serif}
+.btn{background:var(--accent);color:#fff;border:0;padding:9px 16px;border-radius:12px;cursor:pointer;font:600 14px inherit;font-family:inherit}
+.btn.alt{background:var(--sand);color:var(--ink)}.btn.sm{padding:4px 10px;font-size:12px}.btn.del{background:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:20px}
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:0 2px 0 var(--sand),0 8px 24px #8a765614}
+.stat b{font:700 32px Georgia,serif;display:block}.stat span{color:var(--mute);font-size:13px}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);padding:10px;border-bottom:2px solid var(--sand)}
+td{padding:10px;border-bottom:1px solid var(--sand)}tr:hover td{background:#f3e8d2}
+.tw{overflow:auto}input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--sand2);border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+.search{max-width:260px}.tag{padding:2px 10px;border-radius:99px;font-size:12px;background:var(--sand);display:inline-block}
+.tag.g{background:#d7e6d3;color:#2f5a2f}.tag.r{background:#f1d3cc;color:var(--bad)}.tag.y{background:#f5e3b5;color:#7a5a10}
+.modal{position:fixed;inset:0;background:#3b2f2088;display:none;align-items:center;justify-content:center;z-index:9;padding:16px}
+.modal.on{display:flex}.modal .card{width:520px;max-width:100%;max-height:90vh;overflow:auto}
+label{font-size:12px;color:var(--mute);font-weight:600;display:block;margin:10px 0 3px}
+.bars{display:flex;align-items:flex-end;gap:10px;height:150px}.bars div{flex:1;text-align:center;font-size:11px;color:var(--mute)}
+.bars i{display:block;background:linear-gradient(var(--accent),var(--sand2));border-radius:8px 8px 0 0;margin-bottom:4px}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:16px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tt td{text-align:center;font-size:13px;border:1px solid var(--sand)}.pill{cursor:pointer}
+@media(max-width:800px){body{flex-direction:column}aside{width:100%;height:auto;position:static}nav{display:flex;flex-wrap:wrap}main{padding:16px}.two{grid-template-columns:1fr}}
+@media print{aside,.top .btn,.noprint{display:none}}
+</style></head><body>
+<aside><h1>🏜️ Dunewood Academy</h1><small>School Management System</small><nav id="nav"></nav></aside>
+<main id="main"></main>
+<div class="modal" id="modal"><div class="card" id="mbox"></div></div>
+<script>
+const $=s=>document.querySelector(s),uid=()=>Math.random().toString(36).slice(2,9),today=()=>new Date().toISOString().slice(0,10);
+const first=["Amina","Liam","Sofia","Noah","Yara","Omar","Emma","Lucas","Zara","Ethan","Mia","Ivan","Leila","Jack","Nora","Adam","Chloe","Samir","Ella","Ryan","Hana","Leo","Maya","Karim","Ruby","Theo","Alice","Idris","Nina","Owen"];
+const last=["Hassan","Smith","Rossi","Khan","Nasser","Brown","Silva","Chen","Ali","Walker","Costa","Ahmed","Young","Perez","Moore"];
+const subjects=["Mathematics","English","Science","History","Geography","Art","Physical Ed.","Computer Science"];
+const classNames=["Grade 6-A","Grade 6-B","Grade 7-A","Grade 7-B","Grade 8-A","Grade 8-B"];
+const days=["Mon","Tue","Wed","Thu","Fri"];
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[rnd(0,a.length-1)];
+function seed(){
+ const D={settings:{name:"Dunewood Academy",year:"2026/2027",currency:"$",motto:"Rooted in learning"}};
+ D.teachers=subjects.map((s,i)=>({id:uid(),name:["Dr. Karen Bell","Mr. Tom Reed","Ms. Priya Nair","Mr. Hugo Blanc","Ms. Laila Saad","Mr. Dan Cole","Ms. Eva Berg","Mr. Ken Sato"][i],subject:s,phone:"555-01"+(10+i),email:`teacher${i+1}@dunewood.edu`,salary:rnd(2800,4500),status:"Active"}));
+ D.classes=classNames.map((n,i)=>({id:uid(),name:n,teacherId:D.teachers[i].id,room:"R"+(101+i),capacity:30}));
+ D.students=[];for(let i=0;i<30;i++){const c=D.classes[i%6];D.students.push({id:uid(),name:first[i]+" "+pick(last),classId:c.id,gender:i%2?"Male":"Female",dob:`${2012-(i%6>>1)}-0${rnd(1,9)}-1${rnd(0,9)}`,guardian:"Parent of "+first[i],phone:"555-02"+(10+i),address:rnd(10,99)+" Oasis Road",status:"Active"});}
+ D.exams=[{id:uid(),name:"Midterm 2026",date:"2026-10-20"},{id:uid(),name:"Final 2026",date:"2026-12-15"}];
+ D.grades=[];D.students.forEach(s=>subjects.slice(0,5).forEach(sub=>D.grades.push({id:uid(),studentId:s.id,examId:D.exams[0].id,subject:sub,score:rnd(48,98)})));
+ D.attendance=[];for(let d=0;d<5;d++){const dt=new Date(Date.now()-d*864e5).toISOString().slice(0,10);D.students.forEach(s=>D.attendance.push({id:uid(),studentId:s.id,date:dt,status:Math.random()<.9?"Present":pick(["Absent","Late"])}));}
+ D.fees=D.students.map((s,i)=>({id:uid(),studentId:s.id,title:"Term 1 Tuition",amount:1200,paid:i%3?1200:rnd(0,800),due:"2026-11-01"}));
+ D.books=["Dune","Charlotte's Web","The Hobbit","Matilda","Holes","Wonder","Hatchet","The Giver"].map((t,i)=>({id:uid(),title:t,author:"Various",copies:rnd(2,6),borrowedBy:i<3?D.students[i].id:"",due:i<3?"2026-10-30":""}));
+ D.notices=[{id:uid(),title:"Parent-Teacher Meeting",date:"2026-10-25",body:"All parents are invited to the auditorium at 4 PM."},{id:uid(),title:"Sports Day",date:"2026-11-08",body:"Bring your sports kit and water bottles."}];
+ D.timetable=[];D.classes.forEach(c=>days.forEach(d=>[0,1,2,3,4].forEach(p=>D.timetable.push({id:uid(),classId:c.id,day:d,period:p+1,subject:subjects[(p+days.indexOf(d)+classNames.indexOf(c.name))%8]}))));
+ return D}
+let DB=null,tm;const save=()=>{clearTimeout(tm);tm=setTimeout(()=>fetch("api.php?action=save",{method:"POST",body:JSON.stringify(DB)}).then(r=>r.json()).then(j=>{if(j.error)alert("DB error: "+j.error)}),250)};
+const by=(col,id)=>DB[col].find(x=>x.id==id)||{};
+const money=n=>DB.settings.currency+Number(n).toLocaleString();
+const E={ // entity configs
+ students:{t:"Students",f:[["name","Full name"],["classId","Class","sel:classes"],["gender","Gender","opt:Male,Female"],["dob","Birth date","date"],["guardian","Guardian"],["phone","Phone"],["address","Address"],["status","Status","opt:Active,Graduated,Withdrawn"]],c:["name",s=>by("classes",s.classId).name,"gender","guardian","phone",s=>`<span class="tag ${s.status=="Active"?"g":"y"}">${s.status}</span>`]},
+ teachers:{t:"Teachers",f:[["name","Full name"],["subject","Subject","opt:"+subjects],["phone","Phone"],["email","Email"],["salary","Salary","number"],["status","Status","opt:Active,On leave"]],c:["name","subject","phone","email",s=>money(s.salary),s=>`<span class="tag g">${s.status}</span>`]},
+ classes:{t:"Classes",f:[["name","Class name"],["teacherId","Class teacher","sel:teachers"],["room","Room"],["capacity","Capacity","number"]],c:["name",s=>by("teachers",s.teacherId).name,"room",s=>DB.students.filter(x=>x.classId==s.id).length+" / "+s.capacity]},
+ fees:{t:"Fees",f:[["studentId","Student","sel:students"],["title","Description"],["amount","Amount","number"],["paid","Paid so far","number"],["due","Due date","date"]],c:[s=>by("students",s.studentId).name,"title",s=>money(s.amount),s=>money(s.paid),"due",s=>s.paid>=s.amount?'<span class="tag g">Paid</span>':s.paid>0?'<span class="tag y">Partial</span>':'<span class="tag r">Unpaid</span>']},
+ books:{t:"Library",f:[["title","Title"],["author","Author"],["copies","Copies","number"],["borrowedBy","Borrowed by","sel:students"],["due","Due date","date"]],c:["title","author","copies",s=>s.borrowedBy?by("students",s.borrowedBy).name:"—",s=>s.due||"—"]},
+ notices:{t:"Notices & Events",f:[["title","Title"],["date","Date","date"],["body","Message","text"]],c:["title","date","body"]},
+ exams:{t:"Exams",f:[["name","Exam name"],["date","Date","date"]],c:["name","date"]},
+};
+const label=(k,f)=>typeof f=="function"?f(k):k[f];
+const nav=[["dash","📊","Dashboard"],["students","🎓","Students"],["teachers","👩‍🏫","Teachers"],["classes","🏫","Classes"],["attendance","✅","Attendance"],["grades","📝","Grades"],["exams","🗓️","Exams"],["timetable","⏰","Timetable"],["fees","💰","Fees"],["books","📚","Library"],["notices","📣","Notices"],["settings","⚙️","Settings"]];
+let page="dash",q="";
+function go(p){page=p;q="";render()}
+function render(){
+ $("#nav").innerHTML=nav.map(n=>`<a class="${n[0]==page?"on":""}" onclick="go('${n[0]}')">${n[1]} ${n[2]}</a>`).join("");
+ ({dash,attendance,grades,timetable,settings}[page]||(()=>list(page)))();
+}
+function list(k){
+ const e=E[k];const rows=DB[k].filter(r=>JSON.stringify(Object.values(r)).toLowerCase().includes(q.toLowerCase())||e.c.map(c=>label(r,c)).join(" ").toLowerCase().includes(q.toLowerCase()));
+ $("#main").innerHTML=`<div class="top"><h2>${e.t} <small style="font-size:14px;color:var(--mute)">(${rows.length})</small></h2><div class="row"><input class="search" placeholder="Search…" value="${q}" oninput="q=this.value;list('${k}');this.focus()"><button class="btn alt" onclick="exportCSV('${k}')">Export CSV</button><button class="btn" onclick="edit('${k}')">+ Add</button></div></div>
+ <div class="card tw"><table><tr>${e.f.slice(0,0).join("")}${e.c.map((c,i)=>`<th>${typeof c=="string"?(e.f.find(f=>f[0]==c)||[0,c])[1]:(e.f[i]||[0,""])[1]}</th>`).join("")}<th></th></tr>
+ ${rows.map(r=>`<tr>${e.c.map(c=>`<td>${label(r,c)??""}</td>`).join("")}<td style="white-space:nowrap"><button class="btn sm alt" onclick="edit('${k}','${r.id}')">Edit</button> <button class="btn sm del" onclick="del('${k}','${r.id}')">✕</button></td></tr>`).join("")||'<tr><td>No records.</td></tr>'}</table></div>`;
+}
+function field(f,v=""){const[n,l,t=""]=f;let inp;
+ if(t.startsWith("sel:"))inp=`<select name="${n}"><option value="">—</option>${DB[t.slice(4)].map(o=>`<option value="${o.id}" ${o.id==v?"selected":""}>${o.name||o.title}</option>`).join("")}</select>`;
+ else if(t.startsWith("opt:"))inp=`<select name="${n}">${t.slice(4).split(",").map(o=>`<option ${o==v?"selected":""}>${o}</option>`).join("")}</select>`;
+ else if(t=="text")inp=`<textarea name="${n}" rows="3">${v}</textarea>`;
+ else inp=`<input name="${n}" type="${t||"text"}" value="${v}">`;
+ return `<label>${l}</label>${inp}`}
+function edit(k,id){const r=id?by(k,id):{};
+ openModal(`<h2 style="font-size:22px">${id?"Edit":"Add"} ${E[k].t}</h2><form onsubmit="return saveRec(event,'${k}','${id||""}')">${E[k].f.map(f=>field(f,r[f[0]]??"")).join("")}<div class="row" style="margin-top:18px"><button class="btn">Save</button><button type="button" class="btn alt" onclick="closeModal()">Cancel</button></div></form>`)}
+function saveRec(ev,k,id){ev.preventDefault();const d=Object.fromEntries(new FormData(ev.target));E[k].f.forEach(f=>{if(f[2]=="number")d[f[0]]=+d[f[0]]});
+ if(id)Object.assign(by(k,id),d);else DB[k].push({id:uid(),...d});save();closeModal();render();return false}
+function del(k,id){if(confirm("Delete this record?")){DB[k]=DB[k].filter(x=>x.id!=id);save();render()}}
+function openModal(h){$("#mbox").innerHTML=h;$("#modal").classList.add("on")}function closeModal(){$("#modal").classList.remove("on")}
+$("#modal").onclick=e=>{if(e.target.id=="modal")closeModal()};
+function exportCSV(k){const e=E[k];const lines=[e.f.map(f=>f[1]).join(",")].concat(DB[k].map(r=>e.f.map(f=>`"${String(r[f[0]]??"").replace(/"/g,'""')}"`).join(",")));
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines.join("\n")],{type:"text/csv"}));a.download=k+".csv";a.click()}
+function dash(){
+ const att=DB.attendance.filter(a=>a.date==today()),pres=att.filter(a=>a.status!="Absent").length;
+ const billed=DB.fees.reduce((a,f)=>a+f.amount,0),paid=DB.fees.reduce((a,f)=>a+f.paid,0);
+ const avg=DB.classes.map(c=>{const ids=DB.students.filter(s=>s.classId==c.id).map(s=>s.id);const g=DB.grades.filter(x=>ids.includes(x.studentId));return[c.name,g.length?Math.round(g.reduce((a,x)=>a+x.score,0)/g.length):0]});
+ const top=DB.students.map(s=>{const g=DB.grades.filter(x=>x.studentId==s.id);return[s.name,g.length?g.reduce((a,x)=>a+x.score,0)/g.length:0]}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ $("#main").innerHTML=`<div class="top"><div><h2>Welcome back 👋</h2><span style="color:var(--mute)">${DB.settings.name} · ${DB.settings.year} · ${new Date().toDateString()}</span></div></div>
+ <div class="grid">${[["Students",DB.students.length],["Teachers",DB.teachers.length],["Classes",DB.classes.length],["Present today",att.length?Math.round(pres/att.length*100)+"%":"—"],["Fees collected",money(paid)],["Outstanding",money(billed-paid)]].map(s=>`<div class="card stat"><b>${s[1]}</b><span>${s[0]}</span></div>`).join("")}</div>
+ <div class="two"><div class="card"><h3>Average score by class</h3><br><div class="bars">${avg.map(a=>`<div><i style="height:${a[1]*1.4}px"></i>${a[1]}<br>${a[0].replace("Grade ","G")}</div>`).join("")}</div></div>
+ <div class="card"><h3>🏆 Top students</h3><br>${top.map((t,i)=>`<p>${i+1}. ${t[0]} <span class="tag g" style="float:right">${t[1].toFixed(1)}</span></p>`).join("")}</div></div><br>
+ <div class="two"><div class="card"><h3>Upcoming</h3><br>${[...DB.notices,...DB.exams.map(x=>({title:"Exam: "+x.name,date:x.date}))].sort((a,b)=>a.date>b.date?1:-1).map(n=>`<p><span class="tag y">${n.date}</span> ${n.title}</p>`).join("")}</div>
+ <div class="card"><h3>Library</h3><br><p>${DB.books.length} titles · ${DB.books.filter(b=>b.borrowedBy).length} borrowed</p><br><h3>Fee collection</h3><br><div style="background:var(--sand);border-radius:9px;height:14px"><div style="width:${billed?paid/billed*100:0}%;background:var(--accent2);height:100%;border-radius:9px"></div></div></div></div>`}
+function attendance(){const cid=window.acl||DB.classes[0].id,dt=window.adt||today();window.acl=cid;window.adt=dt;
+ const sts=DB.students.filter(s=>s.classId==cid);
+ $("#main").innerHTML=`<div class="top"><h2>Attendance</h2><div class="row"><select style="width:auto" onchange="acl=this.value;attendance()">${DB.classes.map(c=>`<option value="${c.id}" ${c.id==cid?"selected":""}>${c.name}</option>`).join("")}</select><input type="date" style="width:auto" value="${dt}" onchange="adt=this.value;attendance()"><button class="btn alt" onclick="markAll('Present')">All present</button></div></div>
+ <div class="card tw"><table><tr><th>Student</th><th>Status</th><th>Month rate</th></tr>${sts.map(s=>{const rec=DB.attendance.find(a=>a.studentId==s.id&&a.date==dt),all=DB.attendance.filter(a=>a.studentId==s.id),r=all.length?Math.round(all.filter(a=>a.status!="Absent").length/all.length*100):0;
+ return`<tr><td>${s.name}</td><td>${["Present","Late","Absent"].map(x=>`<button class="btn sm ${rec&&rec.status==x?(x=="Absent"?"del":""):"alt"}" onclick="mark('${s.id}','${x}')">${x}</button>`).join(" ")}</td><td>${r}%</td></tr>`}).join("")}</table></div>`}
+function mark(sid,st){let r=DB.attendance.find(a=>a.studentId==sid&&a.date==adt);if(r)r.status=st;else DB.attendance.push({id:uid(),studentId:sid,date:adt,status:st});save();attendance()}
+function markAll(st){DB.students.filter(s=>s.classId==acl).forEach(s=>mark(s.id,st))}
+function grades(){const ex=window.gex||DB.exams[0]?.id;window.gex=ex;const cid=window.gcl||"";
+ const sts=DB.students.filter(s=>!cid||s.classId==cid);const g=(s,sub)=>DB.grades.find(x=>x.studentId==s.id&&x.examId==ex&&x.subject==sub);
+ const letter=n=>n>=90?"A":n>=80?"B":n>=70?"C":n>=60?"D":"F";
+ $("#main").innerHTML=`<div class="top"><h2>Grades & Report Cards</h2><div class="row"><select style="width:auto" onchange="gex=this.value;grades()">${DB.exams.map(e=>`<option value="${e.id}" ${e.id==ex?"selected":""}>${e.name}</option>`).join("")}</select><select style="width:auto" onchange="gcl=this.value;grades()"><option value="">All classes</option>${DB.classes.map(c=>`<option value="${c.id}" ${c.id==cid?"selected":""}>${c.name}</option>`).join("")}</select></div></div>
+ <div class="card tw"><table><tr><th>Student</th>${subjects.map(s=>`<th>${s.slice(0,5)}</th>`).join("")}<th>Avg</th><th>Grade</th><th></th></tr>${sts.map(s=>{const v=subjects.map(sub=>g(s,sub)?.score),n=v.filter(x=>x!=null),a=n.length?n.reduce((x,y)=>x+y,0)/n.length:0;
+ return`<tr><td>${s.name}</td>${subjects.map((sub,i)=>`<td><input style="width:56px;padding:4px" type="number" min="0" max="100" value="${v[i]??""}" onchange="setGrade('${s.id}','${sub}',this.value)"></td>`).join("")}<td><b>${a.toFixed(1)}</b></td><td><span class="tag ${a>=70?"g":a>=60?"y":"r"}">${n.length?letter(a):"—"}</span></td><td><button class="btn sm alt" onclick="report('${s.id}')">Report</button></td></tr>`}).join("")}</table></div>`}
+function setGrade(sid,sub,val){let r=DB.grades.find(x=>x.studentId==sid&&x.examId==gex&&x.subject==sub);if(val==="")DB.grades=DB.grades.filter(x=>x!==r);else if(r)r.score=+val;else DB.grades.push({id:uid(),studentId:sid,examId:gex,subject:sub,score:+val});save();grades()}
+function report(sid){const s=by("students",sid),ex=by("exams",gex),gs=DB.grades.filter(x=>x.studentId==sid&&x.examId==gex);const a=gs.length?gs.reduce((x,y)=>x+y.score,0)/gs.length:0;
+ openModal(`<div style="text-align:center"><h2>${DB.settings.name}</h2><p>${DB.settings.motto}</p><hr style="border-color:var(--sand);margin:12px 0"><h3>Report Card — ${ex.name}</h3><p>${s.name} · ${by("classes",s.classId).name}</p></div><table style="margin:14px 0"><tr><th>Subject</th><th>Score</th></tr>${gs.map(x=>`<tr><td>${x.subject}</td><td>${x.score}</td></tr>`).join("")}<tr><td><b>Average</b></td><td><b>${a.toFixed(1)}</b></td></tr></table><div class="row noprint"><button class="btn" onclick="print()">Print</button><button class="btn alt" onclick="closeModal()">Close</button></div>`)}
+function timetable(){const cid=window.tcl||DB.classes[0].id;window.tcl=cid;
+ $("#main").innerHTML=`<div class="top"><h2>Timetable</h2><select style="width:auto" onchange="tcl=this.value;timetable()">${DB.classes.map(c=>`<option value="${c.id}" ${c.id==cid?"selected":""}>${c.name}</option>`).join("")}</select></div><div class="card tw"><table class="tt"><tr><th></th>${days.map(d=>`<th>${d}</th>`).join("")}</tr>${[1,2,3,4,5].map(p=>`<tr><th>P${p}</th>${days.map(d=>{const t=DB.timetable.find(x=>x.classId==cid&&x.day==d&&x.period==p);return`<td class="pill" onclick="chg('${t.id}')">${t.subject}</td>`}).join("")}</tr>`).join("")}</table></div><p style="color:var(--mute);margin-top:8px">Click a slot to change its subject.</p>`}
+function chg(id){const t=by("timetable",id);const i=subjects.indexOf(t.subject);t.subject=subjects[(i+1)%subjects.length];save();timetable()}
+function settings(){const s=DB.settings;$("#main").innerHTML=`<div class="top"><h2>Settings</h2></div><div class="card" style="max-width:520px"><form onsubmit="event.preventDefault();Object.assign(DB.settings,Object.fromEntries(new FormData(this)));save();alert('Saved');render()">${[["name","School name"],["year","Academic year"],["motto","Motto"],["currency","Currency symbol"]].map(f=>field(f,s[f[0]])).join("")}<div class="row" style="margin-top:18px"><button class="btn">Save</button><button type="button" class="btn del" onclick="if(confirm('Reset all data to demo?')){DB=seed();save();render()}">Reset demo data</button></div></form></div>`}
+fetch("api.php?action=load").then(r=>r.json()).then(d=>{if(d.error)throw d.error;if(d.empty){DB=seed();save()}else{delete d.empty;DB=d}render()}).catch(e=>{$("#main").innerHTML='<div class="card"><h2>Database not reachable</h2><p>'+e+'</p><p>Start Apache + MySQL in XAMPP and open via http://localhost/school/</p></div>'});
+</script></body></html>
