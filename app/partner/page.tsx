@@ -254,6 +254,7 @@ export default function PartnerPage() {
               subjectPlaceholder="Select an area..."
               options={[...ways.map((w) => w.t), "My own idea", "Not sure yet"]}
               subjectPrefix="Partnership"
+              hubspotEndpoint="/api/partner"
               successTitle="Thank you."
               successText="Thank you for choosing to partner with us. We will get back to you shortly."
               messagePlaceholder="Tell us about your organisation and what you have in mind..."

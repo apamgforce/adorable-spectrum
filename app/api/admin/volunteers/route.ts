@@ -117,7 +117,7 @@ export async function POST(request: Request) {
       if (body.action === "add_volunteer") {
         const code = makeCode();
         const [row] = await sql`INSERT INTO vol_volunteers (code, name, email, whatsapp, track, hours, mode, notes, status, approved_at)
-          VALUES (${code}, ${name}, ${email}, ${whatsapp}, ${track}, ${hours}, ${mode}, ${notes}, 'active', now()) RETURNING id`;
+          VALUES (${code}, ${name}, ${email}, ${whatsapp}, ${track}, ${hours}, ${mode}, ${notes}, ${body.status === "on_call" ? "on_call" : "active"}, now()) RETURNING id`;
         await syncOne(row.id);
         return NextResponse.json({ success: true, code, id: row.id });
       }
@@ -177,7 +177,7 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "set_status") {
-      const status = ["active", "inactive", "pending"].includes(body.status) ? body.status : "active";
+      const status = ["active", "inactive", "pending", "on_call"].includes(body.status) ? body.status : "active";
       await sql`UPDATE vol_volunteers SET status = ${status},
         approved_at = CASE WHEN ${status === "active"} THEN COALESCE(approved_at, now()) ELSE approved_at END
         WHERE id = ${Number(body.volunteerId)}`;

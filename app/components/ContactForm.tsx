@@ -22,6 +22,8 @@ type Props = {
   successTitle?: string;
   successText?: string;
   messagePlaceholder?: string;
+  /** Also save the enquiry as a HubSpot contact (partner page). */
+  hubspotEndpoint?: string;
 };
 
 const fieldStyle = {
@@ -39,6 +41,7 @@ export default function ContactForm({
   successTitle = "Message received.",
   successText = "Thank you for reaching out to VTO Greenforce Foundation Africa. We have received your message and a member of our team will get back to you as needed.",
   messagePlaceholder = "Tell us what's on your heart...",
+  hubspotEndpoint,
 }: Props) {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -50,7 +53,7 @@ export default function ContactForm({
     const topic = form.subject || "General Inquiry";
     const subject = subjectPrefix ? `${subjectPrefix}: ${topic}` : topic;
 
-    try {
+    const sendEmail = async () => {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -63,16 +66,25 @@ export default function ContactForm({
           from_name: "VTO Greenforce Foundation Africa Web",
         }),
       });
-
       const data = await response.json();
+      return response.ok && !!data.success;
+    };
+    const sendHubSpot = async () => {
+      if (!hubspotEndpoint) return false;
+      const r = await fetch(hubspotEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, email: form.email, area: form.subject, message: form.message }),
+      });
+      return r.ok;
+    };
 
-      if (response.ok && data.success) {
-        setStatus("success");
-        setForm({ name: "", email: "", subject: "", message: "" });
-      } else {
-        setStatus("error");
-      }
-    } catch {
+    // Success if either the email or HubSpot got it, so no enquiry is lost.
+    const results = await Promise.allSettled([sendEmail(), sendHubSpot()]);
+    if (results.some((x) => x.status === "fulfilled" && x.value)) {
+      setStatus("success");
+      setForm({ name: "", email: "", subject: "", message: "" });
+    } else {
       setStatus("error");
     }
   };

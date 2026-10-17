@@ -34,6 +34,7 @@ const day = (d: string | null) => (d ? new Date(d).toLocaleDateString(undefined,
 const STATUS: Record<string, { label: string; cls: string }> = {
   pending: { label: "New applicant", cls: "bg-amber/20 text-earth" },
   active: { label: "Active", cls: "bg-lime/25 text-leaf" },
+  on_call: { label: "On-Call", cls: "bg-sky-100 text-sky-700" },
   inactive: { label: "Paused", cls: "bg-slate-100 text-slate-500" },
 };
 const modeLabel = (m: string | null) => MODES.find((x) => x.value === m)?.label || m || "";
@@ -156,7 +157,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
       setEdit(null);
     } else {
       const r = await post({ action: "add_volunteer", ...edit }, "Volunteer added");
-      if (r) { setEdit(null); setWelcome({ ...(blank as unknown as Vol), id: r.id, code: r.code, name: edit.name, whatsapp: edit.whatsapp, email: edit.email || null }); }
+      if (r) { setEdit(null); if (edit.status !== "on_call") setWelcome({ ...(blank as unknown as Vol), id: r.id, code: r.code, name: edit.name, whatsapp: edit.whatsapp, email: edit.email || null }); }
     }
   };
 
@@ -255,7 +256,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
                 <input className={input + " pl-9"} placeholder="Search name, email, phone or ID" value={q} onChange={(e) => setQ(e.target.value)} />
               </div>
               <select className={input + " w-auto"} value={fStatus} onChange={(e) => setFStatus(e.target.value)}>
-                <option value="all">Everyone</option><option value="pending">New applicants</option><option value="active">Active</option><option value="inactive">Paused</option>
+                <option value="all">Everyone</option><option value="pending">New applicants</option><option value="active">Active</option><option value="on_call">On-Call</option><option value="inactive">Paused</option>
               </select>
               <select className={input + " w-auto"} value={fTrack} onChange={(e) => setFTrack(e.target.value)}>
                 <option value="">All tracks</option>{TRACKS.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -289,6 +290,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
                         {v.status === "pending" && <>
                           <button disabled={busy} onClick={() => approve(v)} className="btn-shimmer px-4 py-2 rounded-lg text-white text-sm flex items-center gap-1.5"><UserCheck size={15} /> Approve</button>
                           <button disabled={busy} onClick={() => { if (confirm(`Decline ${v.name}? They move to Paused and can be approved later.`)) post({ action: "set_status", volunteerId: v.id, status: "inactive" }, `${v.name} declined`); }} className="px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 flex items-center gap-1.5"><UserX size={15} /> Decline</button>
+                          <button disabled={busy} onClick={() => post({ action: "set_status", volunteerId: v.id, status: "on_call" }, `${v.name} moved to On-Call`)} className="px-3 py-2 rounded-lg border border-sky-200 text-sm text-sky-700">Make On-Call</button>
                         </>}
                         {v.status === "active" && chat && <a href={waLink(v.whatsapp, inviteText(v))!} target="_blank" rel="noopener noreferrer" className={waBtn} title="Opens WhatsApp with their ID, group link and portal link ready to send"><Send size={14} /> Send ID</a>}
                         {chat && <a href={chat} target="_blank" rel="noopener noreferrer" className="px-3 py-2 rounded-lg border border-[#25D366] text-[#128C7E] text-sm inline-flex items-center gap-1.5"><MessageCircle size={14} /> Chat</a>}
@@ -589,7 +591,7 @@ export default function Dashboard({ role }: { role: "owner" | "coordinator" }) {
                 <div><span className={label}>Hours / month</span><select className={input} value={edit.hours} onChange={(e) => setEdit({ ...edit, hours: e.target.value })}><option value="">Not chosen</option>{HOURS.map((h) => <option key={h}>{h}</option>)}</select></div>
                 <div><span className={label}>Engagement mode</span><select className={input} value={edit.mode} onChange={(e) => setEdit({ ...edit, mode: e.target.value })}><option value="">Not chosen</option>{MODES.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}</select></div>
               </div>
-              {edit.id && <div><span className={label}>Status</span><select className={input} value={edit.status} onChange={(e) => setEdit({ ...edit, status: e.target.value })}><option value="pending">New applicant (not approved)</option><option value="active">Active</option><option value="inactive">Paused</option></select></div>}
+              <div><span className={label}>{edit.id ? "Status" : "Type"}</span><select className={input} value={edit.status} onChange={(e) => setEdit({ ...edit, status: e.target.value })}>{edit.id && <option value="pending">New applicant (not approved)</option>}<option value="active">Active Remote Volunteer</option><option value="on_call">On-Call Volunteer (called for outreach, no portal)</option>{edit.id && <option value="inactive">Paused</option>}</select></div>
               <div><span className={label}>Private notes (only admins see these)</span><textarea className={input} rows={3} value={edit.notes} onChange={(e) => setEdit({ ...edit, notes: e.target.value })} placeholder="e.g. Prefers weekend tasks. Has a laptop." /></div>
               {v?.hubspot_error && data?.hubspotDirect && <p className="text-sm text-red-600 bg-red-50 rounded-xl p-3">HubSpot didn&apos;t accept the last update: {v.hubspot_error}. Saving again retries it.</p>}
               <div className="flex gap-2 pt-2">
